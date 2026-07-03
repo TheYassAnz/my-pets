@@ -17,10 +17,6 @@ export default function HomeScreen() {
         <Text className="text-green-700 dark:text-green-300 text-sm">{user?.email}</Text>
       </View>
 
-      <Text className="text-gray-400 dark:text-gray-500 text-sm text-center mt-2">
-        Vos animaux apparaîtront ici (Phase 2)
-      </Text>
-
       <Pressable
         className="mt-8 rounded-xl border border-red-300 dark:border-red-800 px-6 py-3 active:opacity-70"
         onPress={signOut}>

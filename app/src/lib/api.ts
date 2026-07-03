@@ -106,6 +106,61 @@ export async function clearTokens() {
   await deleteToken(REFRESH_TOKEN_KEY);
 }
 
+export type Animal = {
+  id: string;
+  name: string;
+  species: string;
+  birthDate: string | null;
+  photoUrl: string | null;
+  createdAt: string;
+};
+
+export type AnimalInput = {
+  name: string;
+  species: string;
+  birthDate?: string;
+};
+
+async function uploadFile<T>(
+  path: string,
+  file: { uri: string; name: string; type: string },
+  retryOn401 = true,
+): Promise<T> {
+  if (!API_URL) {
+    throw new ApiError(0, 'EXPO_PUBLIC_API_URL non configurée');
+  }
+
+  const accessToken = await getToken(ACCESS_TOKEN_KEY);
+  const form = new FormData();
+  // @ts-expect-error React Native accepte {uri, name, type} comme valeur de FormData
+  form.append('photo', { uri: file.uri, name: file.name, type: file.type });
+
+  const response = await fetch(`${API_URL}${path}`, {
+    method: 'POST',
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    body: form,
+  });
+
+  if (response.status === 401 && retryOn401) {
+    const refreshed = await tryRefresh();
+    if (refreshed) {
+      return uploadFile<T>(path, file, false);
+    }
+  }
+
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as {
+      message?: string | string[];
+    } | null;
+    const message = Array.isArray(body?.message)
+      ? body.message.join(', ')
+      : (body?.message ?? `Erreur ${response.status}`);
+    throw new ApiError(response.status, message);
+  }
+
+  return (await response.json()) as T;
+}
+
 export const api = {
   register: (email: string, password: string) =>
     request<AuthResponse>('/auth/register', {
@@ -133,4 +188,26 @@ export const api = {
   },
 
   me: () => request<User>('/auth/me'),
+
+  listAnimals: () => request<Animal[]>('/animals'),
+
+  getAnimal: (id: string) => request<Animal>(`/animals/${id}`),
+
+  createAnimal: (input: AnimalInput) =>
+    request<Animal>('/animals', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  updateAnimal: (id: string, input: Partial<AnimalInput>) =>
+    request<Animal>(`/animals/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+
+  deleteAnimal: (id: string) =>
+    request<void>(`/animals/${id}`, { method: 'DELETE' }),
+
+  uploadAnimalPhoto: (id: string, file: { uri: string; name: string; type: string }) =>
+    uploadFile<Animal>(`/animals/${id}/photo`, file),
 };

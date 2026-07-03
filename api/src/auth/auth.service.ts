@@ -28,7 +28,10 @@ export class AuthService {
     private readonly config: ConfigService,
   ) {}
 
-  async register(email: string, password: string): Promise<AuthTokens & { user: PublicUser }> {
+  async register(
+    email: string,
+    password: string,
+  ): Promise<AuthTokens & { user: PublicUser }> {
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) {
       throw new ConflictException('Un compte existe déjà avec cet email');
@@ -43,7 +46,10 @@ export class AuthService {
     return { ...tokens, user: this.toPublicUser(user) };
   }
 
-  async login(email: string, password: string): Promise<AuthTokens & { user: PublicUser }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<AuthTokens & { user: PublicUser }> {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user || !(await argon2.verify(user.password, password))) {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
@@ -89,7 +95,10 @@ export class AuthService {
     return this.toPublicUser(user);
   }
 
-  private async issueTokens(userId: string, email: string): Promise<AuthTokens> {
+  private async issueTokens(
+    userId: string,
+    email: string,
+  ): Promise<AuthTokens> {
     const accessToken = await this.jwt.signAsync({ sub: userId, email });
 
     const refreshToken = randomBytes(48).toString('base64url');
@@ -110,7 +119,11 @@ export class AuthService {
     return createHash('sha256').update(token).digest('hex');
   }
 
-  private toPublicUser(user: { id: string; email: string; createdAt: Date }): PublicUser {
+  private toPublicUser(user: {
+    id: string;
+    email: string;
+    createdAt: Date;
+  }): PublicUser {
     return { id: user.id, email: user.email, createdAt: user.createdAt };
   }
 }

@@ -34,7 +34,10 @@ model Animal {
   name      String
   species   String
   birthDate DateTime?
+  photoUrl  String?
   ownerId   String
   owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt DateTime  @default(now())
+
+  @@index([ownerId])
 }

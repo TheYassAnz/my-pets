@@ -1,21 +1,24 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
 } from 'react-native';
 
-import { api, ApiError, type Animal } from '@/lib/api';
+import { api, ApiError, type Animal, type HealthEvent } from '@/lib/api';
+import { EVENT_EMOJI, EVENT_LABELS, formatDate } from '@/lib/health-events';
 
 export default function AnimalDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [animal, setAnimal] = useState<Animal | null>(null);
+  const [events, setEvents] = useState<HealthEvent[]>([]);
   const [name, setName] = useState('');
   const [species, setSpecies] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +35,12 @@ export default function AnimalDetailScreen() {
       })
       .catch((e: unknown) => {
         setError(e instanceof ApiError ? e.message : 'Chargement impossible');
+      });
+    api
+      .listEvents(id)
+      .then(setEvents)
+      .catch(() => {
+        // Timeline non bloquante : l'échec ne casse pas la fiche animal
       });
   }, [id]);
 
@@ -119,7 +128,9 @@ export default function AnimalDetailScreen() {
   }
 
   return (
-    <View className="flex-1 bg-white dark:bg-black px-8 pt-8 gap-4">
+    <ScrollView
+      className="flex-1 bg-white dark:bg-black"
+      contentContainerClassName="px-8 pt-8 pb-16 gap-4">
       <Pressable
         className="items-center justify-center mb-2"
         onPress={onPickPhoto}
@@ -173,6 +184,44 @@ export default function AnimalDetailScreen() {
         onPress={onDelete}>
         <Text className="text-red-600 dark:text-red-400 font-semibold">Supprimer</Text>
       </Pressable>
-    </View>
+
+      <View className="flex-row items-center justify-between mt-8 mb-1">
+        <Text className="text-lg font-bold text-black dark:text-white">
+          Carnet de santé
+        </Text>
+        <Link href={`/animals/${id}/events/new`} asChild>
+          <Pressable className="rounded-lg bg-blue-600 px-3 py-1.5 active:opacity-80">
+            <Text className="text-white text-sm font-semibold">+ Événement</Text>
+          </Pressable>
+        </Link>
+      </View>
+
+      {events.length === 0 ? (
+        <Text className="text-gray-500 dark:text-gray-400 text-sm">
+          Aucun événement enregistré.
+        </Text>
+      ) : (
+        events.map((event) => (
+          <Link key={event.id} href={`/animals/${id}/events/${event.id}`} asChild>
+            <Pressable className="flex-row items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-3 active:opacity-70">
+              <Text className="text-2xl">{EVENT_EMOJI[event.type]}</Text>
+              <View className="flex-1">
+                <Text className="text-black dark:text-white font-semibold">
+                  {event.title}
+                </Text>
+                <Text className="text-gray-500 dark:text-gray-400 text-sm">
+                  {EVENT_LABELS[event.type]} · {formatDate(event.date)}
+                </Text>
+              </View>
+              {event.nextDueDate && (
+                <Text className="text-orange-600 dark:text-orange-400 text-xs">
+                  Rappel {formatDate(event.nextDueDate)}
+                </Text>
+              )}
+            </Pressable>
+          </Link>
+        ))
+      )}
+    </ScrollView>
   );
 }

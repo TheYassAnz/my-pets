@@ -121,6 +121,31 @@ export type AnimalInput = {
   birthDate?: string;
 };
 
+export type HealthEventType = 'VACCINE' | 'TREATMENT' | 'VISIT';
+
+export type HealthEvent = {
+  id: string;
+  type: HealthEventType;
+  title: string;
+  date: string;
+  dosage: string | null;
+  vet: string | null;
+  notes: string | null;
+  nextDueDate: string | null;
+  animalId: string;
+  createdAt: string;
+};
+
+export type HealthEventInput = {
+  type: HealthEventType;
+  title: string;
+  date: string;
+  dosage?: string;
+  vet?: string;
+  notes?: string;
+  nextDueDate?: string;
+};
+
 async function uploadFile<T>(
   path: string,
   file: { uri: string; name: string; type: string },
@@ -210,4 +235,25 @@ export const api = {
 
   uploadAnimalPhoto: (id: string, file: { uri: string; name: string; type: string }) =>
     uploadFile<Animal>(`/animals/${id}/photo`, file),
+
+  listEvents: (animalId: string) =>
+    request<HealthEvent[]>(`/animals/${animalId}/events`),
+
+  getEvent: (animalId: string, id: string) =>
+    request<HealthEvent>(`/animals/${animalId}/events/${id}`),
+
+  createEvent: (animalId: string, input: HealthEventInput) =>
+    request<HealthEvent>(`/animals/${animalId}/events`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  updateEvent: (animalId: string, id: string, input: Partial<HealthEventInput>) =>
+    request<HealthEvent>(`/animals/${animalId}/events/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+
+  deleteEvent: (animalId: string, id: string) =>
+    request<void>(`/animals/${animalId}/events/${id}`, { method: 'DELETE' }),
 };

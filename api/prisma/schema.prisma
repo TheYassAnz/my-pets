@@ -30,14 +30,38 @@ model RefreshToken {
 }
 
 model Animal {
-  id        String    @id @default(uuid())
-  name      String
-  species   String
-  birthDate DateTime?
-  photoUrl  String?
-  ownerId   String
-  owner     User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt DateTime  @default(now())
+  id           String        @id @default(uuid())
+  name         String
+  species      String
+  birthDate    DateTime?
+  photoUrl     String?
+  ownerId      String
+  owner        User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  healthEvents HealthEvent[]
+  createdAt    DateTime      @default(now())
 
   @@index([ownerId])
+}
+
+enum HealthEventType {
+  VACCINE
+  TREATMENT
+  VISIT
+}
+
+model HealthEvent {
+  id          String          @id @default(uuid())
+  type        HealthEventType
+  title       String
+  date        DateTime
+  dosage      String?
+  vet         String?
+  notes       String?
+  nextDueDate DateTime?
+  animalId    String
+  animal      Animal          @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  createdAt   DateTime        @default(now())
+
+  @@index([animalId])
+  @@index([nextDueDate])
 }

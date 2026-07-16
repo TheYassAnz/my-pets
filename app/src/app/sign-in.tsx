@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -69,6 +69,10 @@ export default function SignInScreen() {
       />
 
       {error && <Text className="text-red-600 dark:text-red-400 text-sm">{error}</Text>}
+
+      <Pressable onPress={() => router.push('/forgot-password')}>
+        <Text className="text-blue-600 text-sm text-right">Mot de passe oublié ?</Text>
+      </Pressable>
 
       <Pressable
         className="rounded-xl bg-blue-600 py-3 items-center active:opacity-80 disabled:opacity-50"

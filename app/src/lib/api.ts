@@ -214,6 +214,18 @@ export const api = {
 
   me: () => request<User>('/auth/me'),
 
+  forgotPassword: (email: string) =>
+    request<void>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (email: string, code: string, newPassword: string) =>
+    request<void>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ email, code, newPassword }),
+    }),
+
   listAnimals: () => request<Animal[]>('/animals'),
 
   getAnimal: (id: string) => request<Animal>(`/animals/${id}`),

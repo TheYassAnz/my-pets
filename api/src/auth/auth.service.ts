@@ -6,8 +6,12 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
-import { createHash, randomBytes } from 'crypto';
+import { createHash, randomBytes, randomInt } from 'crypto';
+import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma.service';
+
+const RESET_CODE_TTL_MINUTES = 10;
+const RESET_CODE_MAX_ATTEMPTS = 5;
 
 export type AuthTokens = {
   accessToken: string;
@@ -26,6 +30,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly mail: MailService,
   ) {}
 
   async register(
@@ -85,6 +90,83 @@ export class AuthService {
       where: { tokenHash, revokedAt: null },
       data: { revokedAt: new Date() },
     });
+  }
+
+  // Réponse volontairement identique que l'email existe ou non (anti-énumération de comptes)
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return;
+    }
+
+    // Un seul code actif à la fois : les précédents sont invalidés
+    await this.prisma.passwordResetCode.updateMany({
+      where: { userId: user.id, consumedAt: null },
+      data: { consumedAt: new Date() },
+    });
+
+    const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
+    await this.prisma.passwordResetCode.create({
+      data: {
+        codeHash: this.hashToken(code),
+        userId: user.id,
+        expiresAt: new Date(Date.now() + RESET_CODE_TTL_MINUTES * 60 * 1000),
+      },
+    });
+
+    await this.mail.sendPasswordResetCode(user.email, code);
+  }
+
+  async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    const invalid = () =>
+      new UnauthorizedException('Code invalide ou expiré');
+
+    if (!user) {
+      throw invalid();
+    }
+
+    const reset = await this.prisma.passwordResetCode.findFirst({
+      where: { userId: user.id, consumedAt: null },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (
+      !reset ||
+      reset.expiresAt < new Date() ||
+      reset.attempts >= RESET_CODE_MAX_ATTEMPTS
+    ) {
+      throw invalid();
+    }
+
+    if (reset.codeHash !== this.hashToken(code)) {
+      await this.prisma.passwordResetCode.update({
+        where: { id: reset.id },
+        data: { attempts: { increment: 1 } },
+      });
+      throw invalid();
+    }
+
+    const hash = await argon2.hash(newPassword);
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: hash },
+      }),
+      this.prisma.passwordResetCode.update({
+        where: { id: reset.id },
+        data: { consumedAt: new Date() },
+      }),
+      // Compromission potentielle du mot de passe : toutes les sessions existantes sont révoquées
+      this.prisma.refreshToken.updateMany({
+        where: { userId: user.id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      }),
+    ]);
   }
 
   async getMe(userId: string): Promise<PublicUser> {

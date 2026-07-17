@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 
 import { api, ApiError, type Animal, type HealthEvent } from '@/lib/api';
+import { exportAndShareHealthRecord } from '@/lib/export';
+import { AI_EXTRACTION_ENABLED } from '@/lib/features';
 import { EVENT_EMOJI, EVENT_LABELS, formatDate } from '@/lib/health-events';
 
 export default function AnimalDetailScreen() {
@@ -24,6 +26,7 @@ export default function AnimalDetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const load = useCallback(() => {
     api
@@ -119,6 +122,18 @@ export default function AnimalDetailScreen() {
     }
   };
 
+  const onExport = async () => {
+    setError(null);
+    setExporting(true);
+    try {
+      await exportAndShareHealthRecord(id, animal?.name ?? 'animal');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Export du carnet impossible');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (!animal) {
     return (
       <View className="flex-1 items-center justify-center bg-white dark:bg-black">
@@ -180,6 +195,19 @@ export default function AnimalDetailScreen() {
       </Pressable>
 
       <Pressable
+        className="rounded-xl border border-gray-300 dark:border-gray-700 py-3 items-center active:opacity-70 disabled:opacity-50"
+        disabled={exporting}
+        onPress={onExport}>
+        {exporting ? (
+          <ActivityIndicator />
+        ) : (
+          <Text className="text-black dark:text-white font-semibold">
+            📄 Exporter le carnet (PDF)
+          </Text>
+        )}
+      </Pressable>
+
+      <Pressable
         className="rounded-xl border border-red-300 dark:border-red-800 py-3 items-center active:opacity-70"
         onPress={onDelete}>
         <Text className="text-red-600 dark:text-red-400 font-semibold">Supprimer</Text>
@@ -189,11 +217,20 @@ export default function AnimalDetailScreen() {
         <Text className="text-lg font-bold text-black dark:text-white">
           Carnet de santé
         </Text>
-        <Link href={`/animals/${id}/events/new`} asChild>
-          <Pressable className="rounded-lg bg-blue-600 px-3 py-1.5 active:opacity-80">
-            <Text className="text-white text-sm font-semibold">+ Événement</Text>
-          </Pressable>
-        </Link>
+        <View className="flex-row gap-2">
+          {AI_EXTRACTION_ENABLED && (
+            <Link href={`/animals/${id}/events/scan`} asChild>
+              <Pressable className="rounded-lg border border-blue-600 px-3 py-1.5 active:opacity-70">
+                <Text className="text-blue-600 text-sm font-semibold">📷 Scanner</Text>
+              </Pressable>
+            </Link>
+          )}
+          <Link href={`/animals/${id}/events/new`} asChild>
+            <Pressable className="rounded-lg bg-blue-600 px-3 py-1.5 active:opacity-80">
+              <Text className="text-white text-sm font-semibold">+ Événement</Text>
+            </Pressable>
+          </Link>
+        </View>
       </View>
 
       {events.length === 0 ? (

@@ -7,6 +7,10 @@ import {
 } from 'react';
 
 import { api, clearTokens, storeTokens, type User } from './api';
+import {
+  registerForPushNotifications,
+  unregisterPushNotifications,
+} from './notifications';
 import { ACCESS_TOKEN_KEY, getToken } from './token-storage';
 
 type AuthContextValue = {
@@ -55,6 +59,13 @@ export function SessionProvider({ children }: PropsWithChildren) {
     };
   }, []);
 
+  // Dès qu'une session est active, on enregistre l'appareil pour les rappels
+  useEffect(() => {
+    if (user) {
+      void registerForPushNotifications();
+    }
+  }, [user]);
+
   const signIn = async (email: string, password: string) => {
     const res = await api.login(email, password);
     await storeTokens(res.accessToken, res.refreshToken);
@@ -68,6 +79,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const signOut = async () => {
+    await unregisterPushNotifications();
     await api.logout();
     setUser(null);
   };

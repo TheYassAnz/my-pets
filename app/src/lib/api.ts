@@ -136,6 +136,18 @@ export type HealthEvent = {
   createdAt: string;
 };
 
+// Résultat brut de l'extraction IA : tout champ illisible reste null,
+// l'utilisateur complète et valide toujours avant sauvegarde
+export type ExtractedHealthEvent = {
+  type: HealthEventType | null;
+  title: string | null;
+  date: string | null;
+  dosage: string | null;
+  vet: string | null;
+  notes: string | null;
+  nextDueDate: string | null;
+};
+
 export type HealthEventInput = {
   type: HealthEventType;
   title: string;
@@ -148,6 +160,7 @@ export type HealthEventInput = {
 
 async function uploadFile<T>(
   path: string,
+  field: string,
   file: { uri: string; name: string; type: string },
   retryOn401 = true,
 ): Promise<T> {
@@ -158,7 +171,7 @@ async function uploadFile<T>(
   const accessToken = await getToken(ACCESS_TOKEN_KEY);
   const form = new FormData();
   // @ts-expect-error React Native accepte {uri, name, type} comme valeur de FormData
-  form.append('photo', { uri: file.uri, name: file.name, type: file.type });
+  form.append(field, { uri: file.uri, name: file.name, type: file.type });
 
   const response = await fetch(`${API_URL}${path}`, {
     method: 'POST',
@@ -169,7 +182,7 @@ async function uploadFile<T>(
   if (response.status === 401 && retryOn401) {
     const refreshed = await tryRefresh();
     if (refreshed) {
-      return uploadFile<T>(path, file, false);
+      return uploadFile<T>(path, field, file, false);
     }
   }
 
@@ -246,7 +259,35 @@ export const api = {
     request<void>(`/animals/${id}`, { method: 'DELETE' }),
 
   uploadAnimalPhoto: (id: string, file: { uri: string; name: string; type: string }) =>
-    uploadFile<Animal>(`/animals/${id}/photo`, file),
+    uploadFile<Animal>(`/animals/${id}/photo`, 'photo', file),
+
+  extractEvent: (animalId: string, file: { uri: string; name: string; type: string }) =>
+    uploadFile<ExtractedHealthEvent>(
+      `/animals/${animalId}/extractions`,
+      'image',
+      file,
+    ),
+
+  registerPushToken: (token: string) =>
+    request<{ ok: boolean }>('/notifications/token', {
+      method: 'PUT',
+      body: JSON.stringify({ token }),
+    }),
+
+  removePushToken: (token: string) =>
+    request<void>('/notifications/token', {
+      method: 'DELETE',
+      body: JSON.stringify({ token }),
+    }),
+
+  getReminderSettings: () =>
+    request<{ leadDays: number[] }>('/notifications/settings'),
+
+  updateReminderSettings: (leadDays: number[]) =>
+    request<{ leadDays: number[] }>('/notifications/settings', {
+      method: 'PATCH',
+      body: JSON.stringify({ leadDays }),
+    }),
 
   listEvents: (animalId: string) =>
     request<HealthEvent[]>(`/animals/${animalId}/events`),

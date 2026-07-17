@@ -123,8 +123,7 @@ export class AuthService {
     newPassword: string,
   ): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    const invalid = () =>
-      new UnauthorizedException('Code invalide ou expiré');
+    const invalid = () => new UnauthorizedException('Code invalide ou expiré');
 
     if (!user) {
       throw invalid();

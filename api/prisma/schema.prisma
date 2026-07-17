@@ -12,10 +12,23 @@ model User {
   id                String              @id @default(uuid())
   email             String              @unique
   password          String
+  // Délais de rappel en jours avant l'échéance (ex: J-15 et J-1)
+  reminderLeadDays  Int[]               @default([15, 1])
   createdAt         DateTime            @default(now())
   animals           Animal[]
   refreshTokens     RefreshToken[]
   passwordResetCodes PasswordResetCode[]
+  pushTokens        PushToken[]
+}
+
+model PushToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model RefreshToken {

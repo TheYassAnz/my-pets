@@ -50,9 +50,30 @@ describe('Toast', () => {
     expect(screen.queryByText('Réglages enregistrés')).toBeNull();
   });
 
-  it('annonce le message aux lecteurs d’écran iOS', async () => {
-    // `accessibilityLiveRegion` est Android-only : sans announceForAccessibility,
-    // VoiceOver resterait muet sur le toast.
+  it('réarme le délai quand un second toast remplace le premier', async () => {
+    await render(
+      <ToastProvider>
+        <Probe />
+      </ToastProvider>,
+    );
+
+    await fireEvent.press(screen.getByText('déclencher'));
+    // 2 s plus tard, on déclenche un second toast : il doit vivre 3 s pleines,
+    // et non être coupé au bout d'1 s par le timer du premier.
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+    await fireEvent.press(screen.getByText('déclencher'));
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    expect(screen.getByText('Réglages enregistrés')).toBeTruthy();
+  });
+
+  it('annonce le message aux lecteurs d’écran (iOS et Android)', async () => {
+    // Mécanisme d'annonce unique : announceForAccessibility couvre les deux
+    // plateformes, donc sans cet appel aucun lecteur d'écran n'annoncerait le toast.
     const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
     await render(
       <ToastProvider>

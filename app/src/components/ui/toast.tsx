@@ -25,8 +25,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const show = useCallback((message: string, type: ToastType = 'success') => {
     if (timer.current) clearTimeout(timer.current);
     setToast({ message, type });
-    // `accessibilityLiveRegion` sur la vue est annoté `@platform android` dans RN :
-    // sans cet appel, VoiceOver n'annoncerait jamais le toast sur iOS.
+    // Mécanisme d'annonce unique, valable iOS ET Android. On n'utilise PAS
+    // `accessibilityLiveRegion` en plus : il est annoté `@platform android`, donc
+    // il ne couvrirait pas iOS, et cumulé à cet appel il ferait annoncer le
+    // message deux fois par TalkBack.
     AccessibilityInfo.announceForAccessibility(message);
     timer.current = setTimeout(() => setToast(null), DISMISS_AFTER_MS);
   }, []);
@@ -41,7 +43,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {toast ? (
         <View
           accessibilityRole="alert"
-          accessibilityLiveRegion="polite"
           className="absolute bottom-24 left-4 right-4 flex-row items-center gap-2 rounded-md border border-border bg-surface-elevated px-4 py-3">
           <Icon name={toast.type === 'success' ? 'check' : 'alert'} size={20} decorative />
           <Text className="flex-1 text-callout text-text">{toast.message}</Text>

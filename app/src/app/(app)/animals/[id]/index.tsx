@@ -12,10 +12,11 @@ import {
   View,
 } from 'react-native';
 
+import { Icon } from '@/components/ui';
 import { api, ApiError, type Animal, type HealthEvent } from '@/lib/api';
 import { exportAndShareHealthRecord } from '@/lib/export';
 import { AI_EXTRACTION_ENABLED } from '@/lib/features';
-import { EVENT_EMOJI, EVENT_LABELS, formatDate } from '@/lib/health-events';
+import { EVENT_ICONS, EVENT_LABELS, formatDate } from '@/lib/health-events';
 
 export default function AnimalDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -241,7 +242,7 @@ export default function AnimalDetailScreen() {
         events.map((event) => (
           <Link key={event.id} href={`/animals/${id}/events/${event.id}`} asChild>
             <Pressable className="flex-row items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-800 p-3 active:opacity-70">
-              <Text className="text-2xl">{EVENT_EMOJI[event.type]}</Text>
+              <Icon name={EVENT_ICONS[event.type]} size={24} decorative />
               <View className="flex-1">
                 <Text className="text-black dark:text-white font-semibold">
                   {event.title}

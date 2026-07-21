@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { Text, View } from 'react-native';
 
+import { Button, Input, SegmentedControl } from '@/components/ui';
 import type { HealthEventInput, HealthEventType } from '@/lib/api';
 import { EVENT_LABELS, EVENT_TYPES } from '@/lib/health-events';
 
@@ -16,6 +17,8 @@ function isValidDate(value: string): boolean {
   return !Number.isNaN(new Date(value).getTime());
 }
 
+const TYPE_OPTIONS = EVENT_TYPES.map((t) => ({ value: t, label: EVENT_LABELS[t] }));
+
 export function HealthEventForm({ initial, submitLabel, onSubmit }: Props) {
   const [type, setType] = useState<HealthEventType>(initial?.type ?? 'VACCINE');
   const [title, setTitle] = useState(initial?.title ?? '');
@@ -24,23 +27,30 @@ export function HealthEventForm({ initial, submitLabel, onSubmit }: Props) {
   const [vet, setVet] = useState(initial?.vet ?? '');
   const [notes, setNotes] = useState(initial?.notes ?? '');
   const [nextDueDate, setNextDueDate] = useState(initial?.nextDueDate?.slice(0, 10) ?? '');
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null);
+  const [nextDueDateError, setNextDueDateError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    setTitleError(null);
+    setDateError(null);
+    setNextDueDateError(null);
+    setError(null);
+
     if (!title.trim()) {
-      setError('Titre requis');
+      setTitleError('Titre requis');
       return;
     }
     if (!isValidDate(date)) {
-      setError('Date requise au format AAAA-MM-JJ');
+      setDateError('Date requise au format AAAA-MM-JJ');
       return;
     }
     if (nextDueDate && !isValidDate(nextDueDate)) {
-      setError('Date de rappel invalide (AAAA-MM-JJ)');
+      setNextDueDateError('Date de rappel invalide (AAAA-MM-JJ)');
       return;
     }
-    setError(null);
     setSubmitting(true);
     try {
       await onSubmit({
@@ -61,84 +71,53 @@ export function HealthEventForm({ initial, submitLabel, onSubmit }: Props) {
 
   return (
     <View className="gap-4">
-      <View className="flex-row gap-2">
-        {EVENT_TYPES.map((t) => (
-          <Pressable
-            key={t}
-            className={`flex-1 rounded-xl border py-2 items-center ${
-              type === t
-                ? 'bg-blue-600 border-blue-600'
-                : 'border-gray-300 dark:border-gray-700'
-            }`}
-            onPress={() => setType(t)}>
-            <Text
-              className={
-                type === t ? 'text-white font-semibold' : 'text-black dark:text-white'
-              }>
-              {EVENT_LABELS[t]}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      <SegmentedControl
+        options={TYPE_OPTIONS}
+        value={type}
+        onChange={(value) => setType(value as HealthEventType)}
+      />
 
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Titre (ex: Rage, Antipuces...)"
-        placeholderTextColor="#9ca3af"
+      <Input
+        label="Titre"
+        placeholder="Ex : Rage, Antipuces…"
         value={title}
         onChangeText={setTitle}
+        error={titleError ?? undefined}
       />
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Date (AAAA-MM-JJ)"
-        placeholderTextColor="#9ca3af"
+      <Input
+        label="Date"
+        placeholder="AAAA-MM-JJ"
         autoCapitalize="none"
         value={date}
         onChangeText={setDate}
+        error={dateError ?? undefined}
       />
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Dosage (optionnel)"
-        placeholderTextColor="#9ca3af"
-        value={dosage}
-        onChangeText={setDosage}
-      />
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Vétérinaire (optionnel)"
-        placeholderTextColor="#9ca3af"
+      <Input label="Dosage" placeholder="Optionnel" value={dosage} onChangeText={setDosage} />
+      <Input
+        label="Vétérinaire"
+        placeholder="Optionnel"
         value={vet}
         onChangeText={setVet}
       />
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Prochain rappel (AAAA-MM-JJ, optionnel)"
-        placeholderTextColor="#9ca3af"
+      <Input
+        label="Prochain rappel"
+        placeholder="AAAA-MM-JJ, optionnel"
         autoCapitalize="none"
         value={nextDueDate}
         onChangeText={setNextDueDate}
+        error={nextDueDateError ?? undefined}
       />
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Notes (optionnel)"
-        placeholderTextColor="#9ca3af"
+      <Input
+        label="Notes"
+        placeholder="Optionnel"
         multiline
         value={notes}
         onChangeText={setNotes}
       />
 
-      {error && <Text className="text-red-600 dark:text-red-400 text-sm">{error}</Text>}
+      {error && <Text className="text-callout text-danger">{error}</Text>}
 
-      <Pressable
-        className="rounded-xl bg-blue-600 py-3 items-center active:opacity-80 disabled:opacity-50"
-        disabled={submitting}
-        onPress={handleSubmit}>
-        {submitting ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <Text className="text-white font-semibold text-base">{submitLabel}</Text>
-        )}
-      </Pressable>
+      <Button label={submitLabel} loading={submitting} onPress={handleSubmit} />
     </View>
   );
 }

@@ -76,8 +76,10 @@ export default function SignUpScreen() {
 
       <View className="flex-row justify-center gap-1 mt-4">
         <Text className="text-text-secondary">Déjà un compte ?</Text>
-        <Link href="/sign-in" className="text-primary font-semibold">
-          Se connecter
+        {/* `asChild` est nécessaire : un `className` posé directement sur `Link`
+            n'atteint pas le texte rendu (il restait noir, illisible en thème sombre). */}
+        <Link href="/sign-in" asChild>
+          <Text className="text-primary font-semibold">Se connecter</Text>
         </Link>
       </View>
     </KeyboardAvoidingView>

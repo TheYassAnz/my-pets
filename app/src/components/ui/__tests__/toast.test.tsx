@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react-native';
-import { Button as RNButton } from 'react-native';
+import { AccessibilityInfo, Button as RNButton } from 'react-native';
 
 import { ToastProvider, useToast } from '@/components/ui/toast';
 
@@ -48,6 +48,22 @@ describe('Toast', () => {
     });
 
     expect(screen.queryByText('Réglages enregistrés')).toBeNull();
+  });
+
+  it('annonce le message aux lecteurs d’écran iOS', async () => {
+    // `accessibilityLiveRegion` est Android-only : sans announceForAccessibility,
+    // VoiceOver resterait muet sur le toast.
+    const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
+    await render(
+      <ToastProvider>
+        <Probe />
+      </ToastProvider>,
+    );
+
+    await fireEvent.press(screen.getByText('déclencher'));
+
+    expect(announce).toHaveBeenCalledWith('Réglages enregistrés');
+    announce.mockRestore();
   });
 
   it('lève une erreur si useToast est utilisé hors provider', async () => {

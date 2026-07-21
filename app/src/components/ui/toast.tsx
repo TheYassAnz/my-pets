@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Text, View } from 'react-native';
+import { AccessibilityInfo, Text, View } from 'react-native';
 
 import { Icon } from './icon';
 
@@ -25,6 +25,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const show = useCallback((message: string, type: ToastType = 'success') => {
     if (timer.current) clearTimeout(timer.current);
     setToast({ message, type });
+    // `accessibilityLiveRegion` sur la vue est annoté `@platform android` dans RN :
+    // sans cet appel, VoiceOver n'annoncerait jamais le toast sur iOS.
+    AccessibilityInfo.announceForAccessibility(message);
     timer.current = setTimeout(() => setToast(null), DISMISS_AFTER_MS);
   }, []);
 

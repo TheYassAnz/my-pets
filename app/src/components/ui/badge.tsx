@@ -1,6 +1,6 @@
 import { useColorScheme, Text, View } from 'react-native';
 
-import { Colors } from '@/constants/theme';
+import { Colors, type ThemeColor } from '@/constants/theme';
 
 import { Icon, type IconName } from './icon';
 
@@ -25,17 +25,31 @@ export type BadgeProps = {
   testID?: string;
 };
 
+const GLYPH: Record<BadgeTone, ThemeColor> = {
+  neutral: 'textSecondary',
+  primary: 'primary',
+  warning: 'warning',
+};
+
 export function Badge({ label, icon, tone = 'neutral', testID }: BadgeProps) {
   // `Icon` attend une couleur résolue : une classe ne l'atteindrait pas.
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
-  const glyphColor = tone === 'primary' ? colors.primary : colors.textSecondary;
+  const glyphColor = colors[GLYPH[tone]];
 
   return (
     <View
       testID={testID}
       className={`flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1 ${CONTAINER[tone]}`}>
-      {icon ? <Icon name={icon} size={14} color={glyphColor} decorative /> : null}
+      {icon ? (
+        <Icon
+          name={icon}
+          size={14}
+          color={glyphColor}
+          decorative
+          testID={testID ? `${testID}-icon` : undefined}
+        />
+      ) : null}
       <Text className={`text-caption font-medium ${LABEL[tone]}`}>{label}</Text>
     </View>
   );

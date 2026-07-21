@@ -36,9 +36,11 @@ export type IconProps = {
   label?: string;
   /** Icône purement visuelle : masquée aux lecteurs d'écran. */
   decorative?: boolean;
+  /** Uniquement pour les tests : permet de cibler le nœud rendu. */
+  testID?: string;
 };
 
-export function Icon({ name, size = 20, color, label, decorative = false }: IconProps) {
+export function Icon({ name, size = 20, color, label, decorative = false, testID }: IconProps) {
   const a11y = decorative
     ? { accessibilityElementsHidden: true, importantForAccessibility: 'no-hide-descendants' as const }
     : { accessible: true, accessibilityRole: 'image' as const, accessibilityLabel: label };
@@ -49,12 +51,19 @@ export function Icon({ name, size = 20, color, label, decorative = false }: Icon
         name={MATERIAL[name as keyof typeof MATERIAL]}
         size={size}
         color={color}
+        testID={testID}
         {...a11y}
       />
     );
   }
 
   return (
-    <Ionicons name={IONICONS[name as keyof typeof IONICONS]} size={size} color={color} {...a11y} />
+    <Ionicons
+      name={IONICONS[name as keyof typeof IONICONS]}
+      size={size}
+      color={color}
+      testID={testID}
+      {...a11y}
+    />
   );
 }

@@ -1,9 +1,10 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { HealthEventForm } from '@/components/health-event-form';
+import { Button, EmptyState, Skeleton } from '@/components/ui';
 import {
   api,
   ApiError,
@@ -73,20 +74,21 @@ export default function ScanHealthEventScreen() {
   // Écran atteignable uniquement par lien direct quand la fonctionnalité est coupée
   if (!AI_EXTRACTION_ENABLED) {
     return (
-      <View className="flex-1 items-center justify-center bg-white dark:bg-black px-8">
-        <Text className="text-gray-500 dark:text-gray-400 text-center">
-          L&apos;extraction automatique est momentanément indisponible. Vous
-          pouvez saisir l&apos;événement manuellement.
-        </Text>
+      <View className="flex-1 justify-center bg-surface">
+        <EmptyState
+          icon="camera"
+          title="Extraction indisponible"
+          message="L'extraction automatique est momentanément indisponible. Vous pouvez saisir l'événement manuellement."
+        />
       </View>
     );
   }
 
   if (extracting) {
     return (
-      <View className="flex-1 items-center justify-center gap-4 bg-white dark:bg-black">
-        <ActivityIndicator size="large" />
-        <Text className="text-gray-500 dark:text-gray-400">
+      <View className="flex-1 items-center justify-center gap-4 bg-surface px-8">
+        <Skeleton variant="card" count={1} />
+        <Text className="text-callout text-text-secondary">
           Analyse du document en cours…
         </Text>
       </View>
@@ -96,9 +98,9 @@ export default function ScanHealthEventScreen() {
   if (extracted) {
     return (
       <ScrollView
-        className="flex-1 bg-white dark:bg-black"
+        className="flex-1 bg-surface"
         contentContainerClassName="px-8 pt-8 pb-16 gap-4">
-        <Text className="text-gray-500 dark:text-gray-400 text-sm">
+        <Text className="text-callout text-text-secondary">
           Vérifiez et corrigez les informations extraites avant d&apos;enregistrer.
         </Text>
         <HealthEventForm
@@ -117,35 +119,29 @@ export default function ScanHealthEventScreen() {
         <Pressable
           className="items-center py-2 active:opacity-70"
           onPress={() => setExtracted(null)}>
-          <Text className="text-blue-600 text-sm">Scanner un autre document</Text>
+          <Text className="text-callout text-primary">Scanner un autre document</Text>
         </Pressable>
       </ScrollView>
     );
   }
 
   return (
-    <View className="flex-1 bg-white dark:bg-black px-8 pt-8 gap-4">
-      <Text className="text-gray-500 dark:text-gray-400 text-sm">
+    <View className="flex-1 bg-surface px-8 pt-8 gap-4">
+      <Text className="text-callout text-text-secondary">
         Photographiez une ordonnance ou une page du carnet de santé : les
         informations seront extraites automatiquement, puis vous pourrez les
         vérifier avant de les enregistrer.
       </Text>
 
-      <Pressable
-        className="rounded-xl bg-blue-600 py-3 items-center active:opacity-80"
-        onPress={onTakePhoto}>
-        <Text className="text-white font-semibold text-base">📷 Prendre une photo</Text>
-      </Pressable>
+      <Button label="Prendre une photo" icon="camera" onPress={onTakePhoto} />
 
-      <Pressable
-        className="rounded-xl border border-gray-300 dark:border-gray-700 py-3 items-center active:opacity-70"
-        onPress={onPickFromLibrary}>
-        <Text className="text-black dark:text-white font-semibold text-base">
-          Choisir depuis la galerie
-        </Text>
-      </Pressable>
+      <Button
+        variant="secondary"
+        label="Choisir depuis la galerie"
+        onPress={onPickFromLibrary}
+      />
 
-      {error && <Text className="text-red-600 dark:text-red-400 text-sm">{error}</Text>}
+      {error && <Text className="text-callout text-danger">{error}</Text>}
     </View>
   );
 }

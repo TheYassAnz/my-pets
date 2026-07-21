@@ -3,6 +3,8 @@ import * as UI from '@/components/ui';
 describe('barrel export de la librairie UI', () => {
   it('expose tous les composants du Lot 2', async () => {
     const expected = [
+      'Avatar',
+      'Badge',
       'Button',
       'Card',
       'Chip',

@@ -1,10 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native';
+import { Text, View } from 'react-native';
 
+import { Button, Input, useToast } from '@/components/ui';
 import { api, ApiError } from '@/lib/api';
 
 export default function NewAnimalScreen() {
+  const { show } = useToast();
   const [name, setName] = useState('');
   const [species, setSpecies] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +21,7 @@ export default function NewAnimalScreen() {
     setSubmitting(true);
     try {
       await api.createAnimal({ name: name.trim(), species: species.trim() });
+      show('Animal ajouté');
       router.back();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Création impossible');
@@ -28,35 +31,19 @@ export default function NewAnimalScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white dark:bg-black px-8 pt-8 gap-4">
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Nom"
-        placeholderTextColor="#9ca3af"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Espèce (ex: Chien, Chat)"
-        placeholderTextColor="#9ca3af"
+    <View className="flex-1 bg-surface px-8 pt-8 gap-4">
+      <Input label="Nom" value={name} onChangeText={setName} />
+      <Input
+        label="Espèce"
+        placeholder="Ex: Chien, Chat"
         value={species}
         onChangeText={setSpecies}
         onSubmitEditing={onSubmit}
       />
 
-      {error && <Text className="text-red-600 dark:text-red-400 text-sm">{error}</Text>}
+      {error && <Text className="text-callout text-danger">{error}</Text>}
 
-      <Pressable
-        className="rounded-xl bg-blue-600 py-3 items-center active:opacity-80 disabled:opacity-50"
-        disabled={submitting}
-        onPress={onSubmit}>
-        {submitting ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <Text className="text-white font-semibold text-base">Ajouter</Text>
-        )}
-      </Pressable>
+      <Button label="Ajouter" loading={submitting} onPress={onSubmit} />
     </View>
   );
 }

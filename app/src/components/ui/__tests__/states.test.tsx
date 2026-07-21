@@ -28,6 +28,18 @@ describe('EmptyState', () => {
 
     expect(screen.queryByRole('button')).toBeNull();
   });
+
+  it('n’affiche pas de bouton mort quand une seule des deux props est fournie', async () => {
+    // Cas mixte : sans lui, une condition affaiblie (`actionLabel ?` au lieu de
+    // `actionLabel && onAction ?`) rendrait un bouton sans handler sans être détectée.
+    await render(<EmptyState icon="paw" title="Aucun animal" actionLabel="Ajouter" />);
+    expect(screen.queryByRole('button')).toBeNull();
+
+    await screen.unmount();
+
+    await render(<EmptyState icon="paw" title="Aucun animal" onAction={jest.fn()} />);
+    expect(screen.queryByRole('button')).toBeNull();
+  });
 });
 
 describe('ErrorState', () => {
@@ -52,7 +64,10 @@ describe('Skeleton', () => {
   it('se déclare occupé aux lecteurs d’écran', async () => {
     await render(<Skeleton />);
 
-    expect(screen.getByLabelText('Chargement en cours')).toBeTruthy();
+    // Asserter l'état `busy` lui-même : trouver le nœud par son label ne prouve
+    // pas qu'il s'annonce comme occupé.
+    const node = screen.getByLabelText('Chargement en cours');
+    expect(node.props.accessibilityState).toMatchObject({ busy: true });
   });
 
   it('rend le nombre de placeholders demandé', async () => {

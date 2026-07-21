@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { AccessibilityInfo, Text, View } from 'react-native';
+import { AccessibilityInfo, Text, useColorScheme, View } from 'react-native';
+
+import { Colors } from '@/constants/theme';
 
 import { Icon } from './icon';
 
@@ -21,6 +23,8 @@ export function useToast(): ToastApi {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<ToastState>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
 
   const show = useCallback((message: string, type: ToastType = 'success') => {
     if (timer.current) clearTimeout(timer.current);
@@ -44,7 +48,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <View
           accessibilityRole="alert"
           className="absolute bottom-24 left-4 right-4 flex-row items-center gap-2 rounded-md border border-border bg-surface-elevated px-4 py-3">
-          <Icon name={toast.type === 'success' ? 'check' : 'alert'} size={20} decorative />
+          <Icon
+            name={toast.type === 'success' ? 'check' : 'alert'}
+            size={20}
+            decorative
+            color={colors.textSecondary}
+          />
           <Text className="flex-1 text-callout text-text">{toast.message}</Text>
         </View>
       ) : null}

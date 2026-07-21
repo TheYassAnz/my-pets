@@ -1,4 +1,6 @@
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, useColorScheme, View } from 'react-native';
+
+import { Colors } from '@/constants/theme';
 
 import { Icon, type IconName } from './icon';
 
@@ -16,6 +18,16 @@ const LABEL: Record<ButtonVariant, string> = {
   secondary: 'text-text',
   destructive: 'text-danger',
   ghost: 'text-primary',
+};
+
+// L'icône ne peut pas hériter de la classe du libellé (Text ne transmet pas sa
+// couleur à un enfant Text distinct) : on la résout ici depuis Colors, pour
+// qu'elle reste alignée avec `LABEL` ci-dessus.
+const ICON_COLOR_KEY: Record<ButtonVariant, keyof typeof Colors.light> = {
+  primary: 'onPrimary',
+  secondary: 'text',
+  destructive: 'danger',
+  ghost: 'primary',
 };
 
 export type ButtonProps = {
@@ -39,6 +51,8 @@ export function Button({
   accessibilityLabel,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
 
   return (
     <Pressable
@@ -54,7 +68,9 @@ export function Button({
         <ActivityIndicator />
       ) : (
         <View className="flex-row items-center gap-2">
-          {icon ? <Icon name={icon} size={18} decorative /> : null}
+          {icon ? (
+            <Icon name={icon} size={18} decorative color={colors[ICON_COLOR_KEY[variant]]} />
+          ) : null}
           <Text className={`text-body font-semibold ${LABEL[variant]}`}>{label}</Text>
         </View>
       )}

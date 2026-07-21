@@ -19,6 +19,8 @@ export const Colors = {
     textSecondary: '#60646C',
     textTertiary: '#6B7280',
     primary: '#0D9488',
+    onPrimary: '#FFFFFF',
+    danger: '#DC2626',
   },
   dark: {
     text: '#F5F5F7',
@@ -28,6 +30,8 @@ export const Colors = {
     textSecondary: '#B0B4BA',
     textTertiary: '#9AA0A6',
     primary: '#2DD4BF',
+    onPrimary: '#0B0B0C',
+    danger: '#F87171',
   },
 } as const;
 

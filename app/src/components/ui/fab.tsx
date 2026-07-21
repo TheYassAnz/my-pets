@@ -1,4 +1,6 @@
-import { Pressable } from 'react-native';
+import { Pressable, useColorScheme } from 'react-native';
+
+import { Colors } from '@/constants/theme';
 
 import { Icon, type IconName } from './icon';
 
@@ -10,6 +12,9 @@ export type FABProps = {
 };
 
 export function FAB({ icon, label, onPress }: FABProps) {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -24,7 +29,8 @@ export function FAB({ icon, label, onPress }: FABProps) {
         elevation: 6,
       }}
       className="h-14 w-14 items-center justify-center rounded-full bg-primary active:bg-primary-pressed">
-      <Icon name={icon} size={26} decorative />
+      {/* Le FAB est toujours une surface primaire : l'icône suit `onPrimary`, comme le libellé du Button primary. */}
+      <Icon name={icon} size={26} decorative color={colors.onPrimary} />
     </Pressable>
   );
 }

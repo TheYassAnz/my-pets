@@ -1,4 +1,6 @@
-import { Text, View } from 'react-native';
+import { Text, useColorScheme, View } from 'react-native';
+
+import { Colors } from '@/constants/theme';
 
 import { Button } from './button';
 import { Icon } from './icon';
@@ -9,9 +11,12 @@ export type ErrorStateProps = {
 };
 
 export function ErrorState({ message, onRetry }: ErrorStateProps) {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+
   return (
     <View className="items-center justify-center gap-3 px-8 py-16">
-      <Icon name="alert" size={40} decorative />
+      <Icon name="alert" size={40} decorative color={colors.textSecondary} />
       <Text className="text-callout text-text-secondary text-center">{message}</Text>
       {onRetry ? (
         <View className="mt-2">

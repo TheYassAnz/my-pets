@@ -4,6 +4,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { ToastProvider } from '@/components/ui';
 import { SessionProvider, useSession } from '@/lib/auth-context';
 
 function RootNavigator() {
@@ -34,8 +35,10 @@ export default function RootLayout() {
   return (
     <SessionProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <AnimatedSplashOverlay />
-        <RootNavigator />
+        <ToastProvider>
+          <AnimatedSplashOverlay />
+          <RootNavigator />
+        </ToastProvider>
       </ThemeProvider>
     </SessionProvider>
   );

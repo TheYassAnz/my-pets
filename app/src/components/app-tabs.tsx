@@ -15,6 +15,7 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
+          sf={{ default: 'house', selected: 'house.fill' }}
           src={require('@/assets/images/tabIcons/home.png')}
           renderingMode="template"
         />
@@ -23,15 +24,17 @@ export default function AppTabs() {
       <NativeTabs.Trigger name="animals">
         <NativeTabs.Trigger.Label>Mes animaux</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/explore.png')}
+          sf={{ default: 'pawprint', selected: 'pawprint.fill' }}
+          src={require('@/assets/images/tabIcons/paw.png')}
           renderingMode="template"
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="explore">
+      <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Label>Réglages</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          src={require('@/assets/images/tabIcons/explore.png')}
+          sf={{ default: 'gearshape', selected: 'gearshape.fill' }}
+          src={require('@/assets/images/tabIcons/settings.png')}
           renderingMode="template"
         />
       </NativeTabs.Trigger>

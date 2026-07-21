@@ -1,15 +1,8 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
 
+import { Button, Input } from '@/components/ui';
 import { api } from '@/lib/api';
 
 export default function ForgotPasswordScreen() {
@@ -41,18 +34,16 @@ export default function ForgotPasswordScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 justify-center bg-white dark:bg-black px-8 gap-4">
-      <Text className="text-3xl font-bold text-black dark:text-white text-center mb-2">
+      className="flex-1 justify-center bg-surface px-8 gap-4">
+      <Text className="text-display font-bold text-text text-center mb-2">
         Mot de passe oublié
       </Text>
-      <Text className="text-base text-gray-500 dark:text-gray-400 text-center mb-6">
+      <Text className="text-body text-text-secondary text-center mb-6">
         Recevez un code par email pour réinitialiser votre mot de passe
       </Text>
 
-      <TextInput
-        className="rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-black dark:text-white"
-        placeholder="Email"
-        placeholderTextColor="#9ca3af"
+      <Input
+        label="Email"
         autoCapitalize="none"
         autoComplete="email"
         keyboardType="email-address"
@@ -61,24 +52,13 @@ export default function ForgotPasswordScreen() {
         onSubmitEditing={onSubmit}
       />
 
-      {error && <Text className="text-red-600 dark:text-red-400 text-sm">{error}</Text>}
+      {error && <Text className="text-callout text-danger">{error}</Text>}
 
-      <Pressable
-        className="rounded-xl bg-blue-600 py-3 items-center active:opacity-80 disabled:opacity-50"
-        disabled={submitting}
-        onPress={onSubmit}>
-        {submitting ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <Text className="text-white font-semibold text-base">Envoyer le code</Text>
-        )}
-      </Pressable>
+      <Button label="Envoyer le code" loading={submitting} onPress={onSubmit} />
 
-      <View className="flex-row justify-center gap-1 mt-4">
-        <Text className="text-gray-500 dark:text-gray-400">Vous vous souvenez ?</Text>
-        <Pressable onPress={() => router.back()}>
-          <Text className="text-blue-600 font-semibold">Se connecter</Text>
-        </Pressable>
+      <View className="flex-row justify-center items-center gap-1 mt-4">
+        <Text className="text-text-secondary">Vous vous souvenez ?</Text>
+        <Button variant="ghost" label="Se connecter" onPress={() => router.back()} />
       </View>
     </KeyboardAvoidingView>
   );

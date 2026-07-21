@@ -1,0 +1,49 @@
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Text, View } from 'react-native';
+
+import { Icon } from './icon';
+
+const DISMISS_AFTER_MS = 3000;
+
+type ToastType = 'success' | 'error';
+type ToastState = { message: string; type: ToastType } | null;
+
+type ToastApi = { show: (message: string, type?: ToastType) => void };
+
+const ToastContext = createContext<ToastApi | null>(null);
+
+export function useToast(): ToastApi {
+  const api = useContext(ToastContext);
+  if (!api) throw new Error('useToast doit être utilisé dans un ToastProvider');
+  return api;
+}
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [toast, setToast] = useState<ToastState>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const show = useCallback((message: string, type: ToastType = 'success') => {
+    if (timer.current) clearTimeout(timer.current);
+    setToast({ message, type });
+    timer.current = setTimeout(() => setToast(null), DISMISS_AFTER_MS);
+  }, []);
+
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+
+  return (
+    <ToastContext.Provider value={{ show }}>
+      {children}
+      {toast ? (
+        <View
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          className="absolute bottom-24 left-4 right-4 flex-row items-center gap-2 rounded-md border border-border bg-surface-elevated px-4 py-3">
+          <Icon name={toast.type === 'success' ? 'check' : 'alert'} size={20} decorative />
+          <Text className="flex-1 text-callout text-text">{toast.message}</Text>
+        </View>
+      ) : null}
+    </ToastContext.Provider>
+  );
+}

@@ -1,4 +1,3 @@
-/// <reference types="jest" />
 import { render, screen, fireEvent } from '@testing-library/react-native';
 import { Pressable, Text } from 'react-native';
 

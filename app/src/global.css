@@ -11,3 +11,52 @@
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
   --font-serif: Georgia, 'Times New Roman', serif;
 }
+
+@layer base {
+  /* Tokens sémantiques — thème clair.
+     Valeurs en canaux RGB séparés par des espaces pour supporter <alpha-value>. */
+  :root {
+    --color-primary: 13 148 136;
+    --color-primary-pressed: 15 118 110;
+    --color-primary-surface: 240 253 250;
+    --color-on-primary: 255 255 255;
+
+    --color-surface: 255 255 255;
+    --color-surface-elevated: 247 247 248;
+    --color-surface-sunken: 240 240 243;
+    --color-border: 227 227 231;
+
+    --color-text: 11 11 12;
+    --color-text-secondary: 96 100 108;
+    --color-text-tertiary: 107 114 128;
+
+    --color-danger: 220 38 38;
+    --color-danger-surface: 254 242 242;
+    --color-success: 22 163 74;
+    --color-warning: 217 119 6;
+  }
+
+  /* Thème sombre : mêmes noms de tokens, autres valeurs. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-primary: 45 212 191;
+      --color-primary-pressed: 20 184 166;
+      --color-primary-surface: 12 46 43;
+      --color-on-primary: 11 11 12;
+
+      --color-surface: 11 11 12;
+      --color-surface-elevated: 26 26 29;
+      --color-surface-sunken: 33 34 37;
+      --color-border: 46 49 53;
+
+      --color-text: 245 245 247;
+      --color-text-secondary: 176 180 186;
+      --color-text-tertiary: 154 160 166;
+
+      --color-danger: 248 113 113;
+      --color-danger-surface: 59 22 20;
+      --color-success: 74 222 128;
+      --color-warning: 251 191 36;
+    }
+  }
+}

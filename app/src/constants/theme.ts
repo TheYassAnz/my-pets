@@ -7,20 +7,27 @@ import '@/global.css';
 
 import { Platform } from 'react-native';
 
+// Doit rester synchronisé avec les variables CSS de src/global.css.
+// `textTertiary` est indispensable : certaines props RN (placeholderTextColor)
+// n'acceptent qu'une couleur résolue, jamais une classe Tailwind.
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
+    text: '#0B0B0C',
+    background: '#FFFFFF',
     backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
+    backgroundSelected: '#E3E3E7',
     textSecondary: '#60646C',
+    textTertiary: '#6B7280',
+    primary: '#0D9488',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
+    text: '#F5F5F7',
+    background: '#0B0B0C',
     backgroundElement: '#212225',
     backgroundSelected: '#2E3135',
     textSecondary: '#B0B4BA',
+    textTertiary: '#9AA0A6',
+    primary: '#2DD4BF',
   },
 } as const;
 

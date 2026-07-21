@@ -47,6 +47,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {toast ? (
         <View
           accessibilityRole="alert"
+          // Rien à l'intérieur n'est interactif (l'annonce lecteur d'écran est
+          // déjà gérée par announceForAccessibility) : sans ça, ce bandeau plein
+          // écran intercepterait les taps pendant les 3 s où il est affiché.
+          pointerEvents="none"
           className="absolute bottom-24 left-4 right-4 flex-row items-center gap-2 rounded-md border border-border bg-surface-elevated px-4 py-3">
           <Icon
             name={toast.type === 'success' ? 'check' : 'alert'}

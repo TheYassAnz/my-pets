@@ -71,6 +71,22 @@ describe('Toast', () => {
     expect(screen.getByText('Réglages enregistrés')).toBeTruthy();
   });
 
+  it('ne bloque pas les taps sous la bannière (pointerEvents="none")', async () => {
+    // La bannière est en position absolue plein-largeur pendant 3 s ; rien à
+    // l'intérieur n'étant interactif, elle ne doit jamais intercepter les taps.
+    await render(
+      <ToastProvider>
+        <Probe />
+      </ToastProvider>,
+    );
+
+    await fireEvent.press(screen.getByText('déclencher'));
+
+    // `accessibilityRole="alert"` n'est pas reconnu par la requête getByRole de
+    // RNTL sur RN Web/natif : on remonte depuis le texte jusqu'au conteneur.
+    expect(screen.getByText('Réglages enregistrés').parent?.props.pointerEvents).toBe('none');
+  });
+
   it('annonce le message aux lecteurs d’écran (iOS et Android)', async () => {
     // Mécanisme d'annonce unique : announceForAccessibility couvre les deux
     // plateformes, donc sans cet appel aucun lecteur d'écran n'annoncerait le toast.

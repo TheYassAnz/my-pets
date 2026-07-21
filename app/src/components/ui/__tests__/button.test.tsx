@@ -39,4 +39,10 @@ describe('Button', () => {
 
     expect(onPress).not.toHaveBeenCalled();
   });
+
+  it('expose le testID fourni par l’appelant, pour le cibler depuis un écran', async () => {
+    await render(<Button label="Enregistrer" testID="save-button" />);
+
+    expect(screen.getByTestId('save-button')).toBeTruthy();
+  });
 });

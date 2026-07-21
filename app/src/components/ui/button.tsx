@@ -39,6 +39,10 @@ export type ButtonProps = {
   onPress?: () => void;
   /** Remplace le libellé pour les lecteurs d'écran si le texte visible est ambigu. */
   accessibilityLabel?: string;
+  /** Fusionnée en dernier dans la classe du conteneur : permet à l'appelant de surcharger le style. */
+  className?: string;
+  /** Uniquement pour les tests : permet de cibler le nœud rendu. */
+  testID?: string;
 };
 
 export function Button({
@@ -49,6 +53,8 @@ export function Button({
   icon,
   onPress,
   accessibilityLabel,
+  className,
+  testID,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const scheme = useColorScheme();
@@ -61,9 +67,10 @@ export function Button({
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
       onPress={onPress}
+      testID={testID}
       className={`min-h-11 flex-row items-center justify-center gap-2 rounded-md px-4 py-3 ${
         CONTAINER[variant]
-      } ${isDisabled ? 'opacity-50' : ''}`}>
+      } ${isDisabled ? 'opacity-50' : ''} ${className ?? ''}`}>
       {loading ? (
         <ActivityIndicator />
       ) : (

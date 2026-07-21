@@ -13,4 +13,14 @@ describe('Card', () => {
 
     expect(screen.getByText('Carnet de santé')).toBeTruthy();
   });
+
+  it('expose le testID fourni par l’appelant, pour le cibler depuis un écran', async () => {
+    await render(
+      <Card testID="animal-card">
+        <Text>Carnet de santé</Text>
+      </Card>,
+    );
+
+    expect(screen.getByTestId('animal-card')).toBeTruthy();
+  });
 });

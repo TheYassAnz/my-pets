@@ -9,6 +9,10 @@ export type ListRowProps = {
   onPress?: () => void;
   /** Par défaut : « titre, sous-titre ». */
   accessibilityLabel?: string;
+  /** Fusionnée en dernier : permet à l'appelant de surcharger le style. */
+  className?: string;
+  /** Uniquement pour les tests : permet de cibler le nœud rendu. */
+  testID?: string;
 };
 
 export function ListRow({
@@ -18,6 +22,8 @@ export function ListRow({
   trailing,
   onPress,
   accessibilityLabel,
+  className,
+  testID,
 }: ListRowProps) {
   const content = (
     <>
@@ -33,7 +39,11 @@ export function ListRow({
   const layout = 'min-h-11 flex-row items-center gap-3 rounded-md border border-border p-3';
 
   if (!onPress) {
-    return <View className={layout}>{content}</View>;
+    return (
+      <View testID={testID} className={`${layout} ${className ?? ''}`}>
+        {content}
+      </View>
+    );
   }
 
   return (
@@ -41,7 +51,8 @@ export function ListRow({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? [title, subtitle].filter(Boolean).join(', ')}
       onPress={onPress}
-      className={`${layout} active:bg-surface-sunken`}>
+      testID={testID}
+      className={`${layout} active:bg-surface-sunken ${className ?? ''}`}>
       {content}
     </Pressable>
   );

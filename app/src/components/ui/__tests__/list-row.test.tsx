@@ -24,4 +24,16 @@ describe('ListRow', () => {
 
     expect(screen.queryByRole('button')).toBeNull();
   });
+
+  it('expose le testID fourni par l’appelant quand elle n’est pas pressable', async () => {
+    await render(<ListRow title="Rex" subtitle="Chien" testID="animal-row" />);
+
+    expect(screen.getByTestId('animal-row')).toBeTruthy();
+  });
+
+  it('expose le testID fourni par l’appelant quand elle est pressable', async () => {
+    await render(<ListRow title="Rex" subtitle="Chien" onPress={jest.fn()} testID="animal-row" />);
+
+    expect(screen.getByTestId('animal-row')).toBeTruthy();
+  });
 });

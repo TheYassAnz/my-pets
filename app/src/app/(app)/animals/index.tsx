@@ -13,6 +13,9 @@ export default function AnimalsListScreen() {
   const insets = useSafeAreaInsets();
 
   const load = useCallback(() => {
+    // Purger l'erreur avant chaque tentative : sans cela, `error` reste positionné
+    // après un « Réessayer » réussi et l'écran d'erreur ne disparaît jamais.
+    setError(null);
     return api
       .listAnimals()
       .then(setAnimals)

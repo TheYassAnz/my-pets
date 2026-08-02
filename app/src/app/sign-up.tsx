@@ -1,42 +1,34 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'expo-router';
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
 
-import { Button, Input } from '@/components/ui';
+import { Button, FormField } from '@/components/ui';
 import { useSession } from '@/lib/auth-context';
+import { signUpSchema, type SignUpValues } from '@/lib/forms/schemas';
 
 export default function SignUpScreen() {
   const { signUp } = useSession();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmRef = useRef<TextInput>(null);
 
-  const onSubmit = async () => {
-    if (!email || !password) {
-      setError('Email et mot de passe requis');
-      return;
-    }
-    if (password.length < 8) {
-      setError('Le mot de passe doit faire au moins 8 caractères');
-      return;
-    }
-    if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas');
-      return;
-    }
+  const { control, handleSubmit, formState } = useForm<SignUpValues>({
+    resolver: zodResolver(signUpSchema),
+    mode: 'onTouched',
+    defaultValues: { email: '', password: '', confirm: '' },
+  });
+
+  const onSubmit = handleSubmit(async (values) => {
     setError(null);
-    setSubmitting(true);
     try {
-      await signUp(email.trim().toLowerCase(), password);
+      await signUp(values.email.trim().toLowerCase(), values.password);
       // Pas de navigation manuelle : Stack.Protected bascule vers (app)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Inscription impossible');
-    } finally {
-      setSubmitting(false);
     }
-  };
+  });
 
   return (
     <KeyboardAvoidingView
@@ -45,34 +37,44 @@ export default function SignUpScreen() {
       <Text className="text-display font-bold text-text text-center mb-2">my-pets 🐾</Text>
       <Text className="text-body text-text-secondary text-center mb-6">Créez votre compte</Text>
 
-      <Input
+      <FormField
+        control={control}
+        name="email"
         label="Email"
         autoCapitalize="none"
         autoComplete="email"
         keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+        returnKeyType="next"
+        // Garde le clavier ouvert et donne le focus au champ suivant (PET-7).
+        submitBehavior="submit"
+        onSubmitEditing={() => passwordRef.current?.focus()}
       />
-      <Input
+      <FormField
+        control={control}
+        name="password"
         label="Mot de passe"
         placeholder="8 caractères min."
+        inputRef={passwordRef}
         secureTextEntry
         autoComplete="new-password"
-        value={password}
-        onChangeText={setPassword}
+        returnKeyType="next"
+        submitBehavior="submit"
+        onSubmitEditing={() => confirmRef.current?.focus()}
       />
-      <Input
+      <FormField
+        control={control}
+        name="confirm"
         label="Confirmer le mot de passe"
+        inputRef={confirmRef}
         secureTextEntry
         autoComplete="new-password"
-        value={confirm}
-        onChangeText={setConfirm}
+        returnKeyType="done"
         onSubmitEditing={onSubmit}
       />
 
       {error && <Text className="text-callout text-danger">{error}</Text>}
 
-      <Button label="Créer mon compte" loading={submitting} onPress={onSubmit} />
+      <Button label="Créer mon compte" loading={formState.isSubmitting} onPress={onSubmit} />
 
       <View className="flex-row justify-center gap-1 mt-4">
         <Text className="text-text-secondary">Déjà un compte ?</Text>

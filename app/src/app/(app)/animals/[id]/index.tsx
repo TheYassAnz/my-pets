@@ -1,23 +1,29 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import * as ImagePicker from 'expo-image-picker';
 import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 
 import {
   Avatar,
   Badge,
   Button,
   Card,
+  DateField,
   EmptyState,
   ErrorState,
-  Input,
+  FormField,
   ListRow,
   Skeleton,
+  SpeciesPicker,
   useToast,
 } from '@/components/ui';
+import { computeAge, OTHER_SPECIES, resolveSpecies, splitSpecies } from '@/lib/animals';
 import { api, ApiError, type Animal, type HealthEvent } from '@/lib/api';
 import { exportAndShareHealthRecord } from '@/lib/export';
 import { AI_EXTRACTION_ENABLED } from '@/lib/features';
+import { animalSchema, type AnimalValues } from '@/lib/forms/schemas';
 import { EVENT_ICONS, EVENT_LABELS, formatDate } from '@/lib/health-events';
 
 export default function AnimalDetailScreen() {
@@ -25,12 +31,20 @@ export default function AnimalDetailScreen() {
   const { show } = useToast();
   const [animal, setAnimal] = useState<Animal | null>(null);
   const [events, setEvents] = useState<HealthEvent[]>([]);
-  const [name, setName] = useState('');
-  const [species, setSpecies] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const speciesOtherRef = useRef<TextInput>(null);
+
+  const { control, handleSubmit, reset, formState } = useForm<AnimalValues>({
+    resolver: zodResolver(animalSchema),
+    mode: 'onTouched',
+    defaultValues: { name: '', speciesChoice: 'Chien', speciesOther: '', birthDate: null },
+  });
+
+  // `useWatch` plutôt que `watch()` : cette dernière renvoie une fonction que le
+  // React Compiler ne peut pas mémoïser, ce qui lui fait sauter tout l'écran.
+  const speciesChoice = useWatch({ control, name: 'speciesChoice' });
 
   const load = useCallback(() => {
     // Purger l'erreur avant chaque tentative : sans cela, `error` reste positionné
@@ -40,8 +54,13 @@ export default function AnimalDetailScreen() {
       .getAnimal(id)
       .then((a) => {
         setAnimal(a);
-        setName(a.name);
-        setSpecies(a.species);
+        const species = splitSpecies(a.species);
+        reset({
+          name: a.name,
+          speciesChoice: species.choice,
+          speciesOther: species.other,
+          birthDate: a.birthDate ? a.birthDate.slice(0, 10) : null,
+        });
       })
       .catch((e: unknown) => {
         setError(e instanceof ApiError ? e.message : 'Chargement impossible');
@@ -52,7 +71,7 @@ export default function AnimalDetailScreen() {
       .catch(() => {
         // Timeline non bloquante : l'échec ne casse pas la fiche animal
       });
-  }, [id]);
+  }, [id, reset]);
 
   useFocusEffect(
     useCallback(() => {
@@ -60,26 +79,20 @@ export default function AnimalDetailScreen() {
     }, [load]),
   );
 
-  const onSave = async () => {
-    if (!name.trim() || !species.trim()) {
-      setError('Nom et espèce requis');
-      return;
-    }
+  const onSave = handleSubmit(async (values) => {
     setError(null);
-    setSaving(true);
     try {
       const updated = await api.updateAnimal(id, {
-        name: name.trim(),
-        species: species.trim(),
+        name: values.name.trim(),
+        species: resolveSpecies({ choice: values.speciesChoice, other: values.speciesOther }),
+        birthDate: values.birthDate ?? undefined,
       });
       setAnimal(updated);
       show('Animal mis à jour');
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Mise à jour impossible');
-    } finally {
-      setSaving(false);
     }
-  };
+  });
 
   const onDelete = () => {
     Alert.alert('Supprimer cet animal ?', 'Cette action est irréversible.', [
@@ -175,10 +188,64 @@ export default function AnimalDetailScreen() {
           </Text>
         </Pressable>
 
-        <Input label="Nom" value={name} onChangeText={setName} />
-        <Input label="Espèce" value={species} onChangeText={setSpecies} />
+        {/* Un animal sans date de naissance n'affiche simplement pas d'âge (PET-8). */}
+        {animal.birthDate && computeAge(animal.birthDate.slice(0, 10)) ? (
+          <Text className="text-callout text-text-secondary text-center">
+            {computeAge(animal.birthDate.slice(0, 10))}
+          </Text>
+        ) : null}
 
-        <Button label="Enregistrer" loading={saving} onPress={onSave} />
+        <FormField
+          control={control}
+          name="name"
+          label="Nom"
+          returnKeyType="next"
+          submitBehavior={speciesChoice === OTHER_SPECIES ? 'submit' : 'blurAndSubmit'}
+          onSubmitEditing={() => speciesOtherRef.current?.focus()}
+        />
+
+        <Controller
+          control={control}
+          name="speciesChoice"
+          render={({ field, fieldState }) => (
+            <SpeciesPicker
+              label="Espèce"
+              value={field.value}
+              onChange={field.onChange}
+              error={fieldState.error?.message}
+            />
+          )}
+        />
+
+        {speciesChoice === OTHER_SPECIES ? (
+          <FormField
+            control={control}
+            name="speciesOther"
+            label="Préciser l'espèce"
+            placeholder="Ex : Furet, Cheval…"
+            inputRef={speciesOtherRef}
+            returnKeyType="done"
+            onSubmitEditing={onSave}
+          />
+        ) : null}
+
+        <Controller
+          control={control}
+          name="birthDate"
+          render={({ field, fieldState }) => (
+            <DateField
+              label="Date de naissance"
+              placeholder="Optionnelle"
+              value={field.value}
+              onChange={field.onChange}
+              error={fieldState.error?.message}
+              clearable
+              maximumDate={new Date()}
+            />
+          )}
+        />
+
+        <Button label="Enregistrer" loading={formState.isSubmitting} onPress={onSave} />
       </Card>
 
       <Card>

@@ -1,8 +1,11 @@
-import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { Text, TextInput, View } from 'react-native';
 
-import { Button, Input, SegmentedControl } from '@/components/ui';
+import { Button, DateField, FormField, SegmentedControl } from '@/components/ui';
 import type { HealthEventInput, HealthEventType } from '@/lib/api';
+import { healthEventSchema, type HealthEventValues } from '@/lib/forms/schemas';
 import { EVENT_LABELS, EVENT_TYPES } from '@/lib/health-events';
 
 type Props = {
@@ -11,113 +14,137 @@ type Props = {
   onSubmit: (input: HealthEventInput) => Promise<void>;
 };
 
-// Validation légère d'une date saisie au format AAAA-MM-JJ
-function isValidDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  return !Number.isNaN(new Date(value).getTime());
-}
-
 const TYPE_OPTIONS = EVENT_TYPES.map((t) => ({ value: t, label: EVENT_LABELS[t] }));
 
 export function HealthEventForm({ initial, submitLabel, onSubmit }: Props) {
-  const [type, setType] = useState<HealthEventType>(initial?.type ?? 'VACCINE');
-  const [title, setTitle] = useState(initial?.title ?? '');
-  const [date, setDate] = useState(initial?.date?.slice(0, 10) ?? '');
-  const [dosage, setDosage] = useState(initial?.dosage ?? '');
-  const [vet, setVet] = useState(initial?.vet ?? '');
-  const [notes, setNotes] = useState(initial?.notes ?? '');
-  const [nextDueDate, setNextDueDate] = useState(initial?.nextDueDate?.slice(0, 10) ?? '');
-  const [titleError, setTitleError] = useState<string | null>(null);
-  const [dateError, setDateError] = useState<string | null>(null);
-  const [nextDueDateError, setNextDueDateError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const dosageRef = useRef<TextInput>(null);
+  const vetRef = useRef<TextInput>(null);
+  const notesRef = useRef<TextInput>(null);
 
-  const handleSubmit = async () => {
-    setTitleError(null);
-    setDateError(null);
-    setNextDueDateError(null);
+  const { control, handleSubmit, formState } = useForm<HealthEventValues>({
+    resolver: zodResolver(healthEventSchema),
+    mode: 'onTouched',
+    defaultValues: {
+      type: initial?.type ?? 'VACCINE',
+      title: initial?.title ?? '',
+      date: initial?.date?.slice(0, 10) ?? '',
+      dosage: initial?.dosage ?? '',
+      vet: initial?.vet ?? '',
+      notes: initial?.notes ?? '',
+      nextDueDate: initial?.nextDueDate?.slice(0, 10) ?? null,
+    },
+  });
+
+  const submit = handleSubmit(async (values) => {
     setError(null);
-
-    if (!title.trim()) {
-      setTitleError('Titre requis');
-      return;
-    }
-    if (!isValidDate(date)) {
-      setDateError('Date requise au format AAAA-MM-JJ');
-      return;
-    }
-    if (nextDueDate && !isValidDate(nextDueDate)) {
-      setNextDueDateError('Date de rappel invalide (AAAA-MM-JJ)');
-      return;
-    }
-    setSubmitting(true);
     try {
       await onSubmit({
-        type,
-        title: title.trim(),
-        date,
-        dosage: dosage.trim() || undefined,
-        vet: vet.trim() || undefined,
-        notes: notes.trim() || undefined,
-        nextDueDate: nextDueDate || undefined,
+        type: values.type as HealthEventType,
+        title: values.title.trim(),
+        date: values.date,
+        dosage: values.dosage.trim() || undefined,
+        vet: values.vet.trim() || undefined,
+        notes: values.notes.trim() || undefined,
+        nextDueDate: values.nextDueDate ?? undefined,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Enregistrement impossible');
-    } finally {
-      setSubmitting(false);
     }
-  };
+  });
 
   return (
     <View className="gap-4">
-      <SegmentedControl
-        options={TYPE_OPTIONS}
-        value={type}
-        onChange={(value) => setType(value as HealthEventType)}
+      <Controller
+        control={control}
+        name="type"
+        render={({ field }) => (
+          <SegmentedControl
+            options={TYPE_OPTIONS}
+            value={field.value}
+            onChange={field.onChange}
+          />
+        )}
       />
 
-      <Input
+      <FormField
+        control={control}
+        name="title"
         label="Titre"
         placeholder="Ex : Rage, Antipuces…"
-        value={title}
-        onChangeText={setTitle}
-        error={titleError ?? undefined}
+        returnKeyType="next"
+        // Le champ Date n'accepte pas le focus clavier : la chaîne le saute et
+        // enchaîne sur Dosage, en suivant l'ordre visuel (PET-7).
+        submitBehavior="submit"
+        onSubmitEditing={() => dosageRef.current?.focus()}
       />
-      <Input
-        label="Date"
-        placeholder="AAAA-MM-JJ"
-        autoCapitalize="none"
-        value={date}
-        onChangeText={setDate}
-        error={dateError ?? undefined}
+
+      <Controller
+        control={control}
+        name="date"
+        render={({ field, fieldState }) => (
+          <DateField
+            label="Date"
+            value={field.value || null}
+            onChange={(value) => field.onChange(value ?? '')}
+            error={fieldState.error?.message}
+            maximumDate={new Date()}
+          />
+        )}
       />
-      <Input label="Dosage" placeholder="Optionnel" value={dosage} onChangeText={setDosage} />
-      <Input
+
+      <FormField
+        control={control}
+        name="dosage"
+        label="Dosage"
+        placeholder="Optionnel"
+        inputRef={dosageRef}
+        returnKeyType="next"
+        submitBehavior="submit"
+        onSubmitEditing={() => vetRef.current?.focus()}
+      />
+
+      <FormField
+        control={control}
+        name="vet"
         label="Vétérinaire"
         placeholder="Optionnel"
-        value={vet}
-        onChangeText={setVet}
+        inputRef={vetRef}
+        returnKeyType="next"
+        submitBehavior="submit"
+        onSubmitEditing={() => notesRef.current?.focus()}
       />
-      <Input
-        label="Prochain rappel"
-        placeholder="AAAA-MM-JJ, optionnel"
-        autoCapitalize="none"
-        value={nextDueDate}
-        onChangeText={setNextDueDate}
-        error={nextDueDateError ?? undefined}
+
+      <Controller
+        control={control}
+        name="nextDueDate"
+        render={({ field, fieldState }) => (
+          <DateField
+            label="Prochain rappel"
+            placeholder="Optionnel"
+            value={field.value}
+            onChange={field.onChange}
+            error={fieldState.error?.message}
+            clearable
+          />
+        )}
       />
-      <Input
+
+      {/* Notes est multiligne : lui faire soumettre le formulaire à la touche
+          entrée rendrait impossible la saisie d'une seconde ligne. La chaîne
+          clavier s'y termine, la soumission passe par le bouton. */}
+      <FormField
+        control={control}
+        name="notes"
         label="Notes"
         placeholder="Optionnel"
+        inputRef={notesRef}
         multiline
-        value={notes}
-        onChangeText={setNotes}
       />
 
       {error && <Text className="text-callout text-danger">{error}</Text>}
 
-      <Button label={submitLabel} loading={submitting} onPress={handleSubmit} />
+      <Button label={submitLabel} loading={formState.isSubmitting} onPress={submit} />
     </View>
   );
 }

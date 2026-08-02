@@ -1,33 +1,33 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, router } from 'expo-router';
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { KeyboardAvoidingView, Platform, Text, TextInput, View } from 'react-native';
 
-import { Button, Input } from '@/components/ui';
+import { Button, FormField } from '@/components/ui';
 import { useSession } from '@/lib/auth-context';
+import { signInSchema, type SignInValues } from '@/lib/forms/schemas';
 
 export default function SignInScreen() {
   const { signIn } = useSession();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const passwordRef = useRef<TextInput>(null);
 
-  const onSubmit = async () => {
-    if (!email || !password) {
-      setError('Email et mot de passe requis');
-      return;
-    }
+  const { control, handleSubmit, formState } = useForm<SignInValues>({
+    resolver: zodResolver(signInSchema),
+    mode: 'onTouched',
+    defaultValues: { email: '', password: '' },
+  });
+
+  const onSubmit = handleSubmit(async (values) => {
     setError(null);
-    setSubmitting(true);
     try {
-      await signIn(email.trim().toLowerCase(), password);
+      await signIn(values.email.trim().toLowerCase(), values.password);
       // Pas de navigation manuelle : Stack.Protected bascule vers (app)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Connexion impossible');
-    } finally {
-      setSubmitting(false);
     }
-  };
+  });
 
   return (
     <KeyboardAvoidingView
@@ -38,20 +38,26 @@ export default function SignInScreen() {
         Connexion à votre carnet de santé
       </Text>
 
-      <Input
+      <FormField
+        control={control}
+        name="email"
         label="Email"
         autoCapitalize="none"
         autoComplete="email"
         keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+        returnKeyType="next"
+        // Garde le clavier ouvert et donne le focus au champ suivant (PET-7).
+        submitBehavior="submit"
+        onSubmitEditing={() => passwordRef.current?.focus()}
       />
-      <Input
+      <FormField
+        control={control}
+        name="password"
         label="Mot de passe"
+        inputRef={passwordRef}
         secureTextEntry
         autoComplete="password"
-        value={password}
-        onChangeText={setPassword}
+        returnKeyType="done"
         onSubmitEditing={onSubmit}
       />
 
@@ -64,7 +70,7 @@ export default function SignInScreen() {
         onPress={() => router.push('/forgot-password')}
       />
 
-      <Button label="Se connecter" loading={submitting} onPress={onSubmit} />
+      <Button label="Se connecter" loading={formState.isSubmitting} onPress={onSubmit} />
 
       <View className="flex-row justify-center gap-1 mt-4">
         <Text className="text-text-secondary">Pas encore de compte ?</Text>

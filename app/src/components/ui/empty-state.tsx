@@ -22,7 +22,7 @@ export function EmptyState({ icon, title, message, actionLabel, onAction }: Empt
       <Icon name={icon} size={40} decorative color={colors.textSecondary} />
       <Text className="text-headline font-semibold text-text text-center">{title}</Text>
       {message ? (
-        <Text className="text-callout text-text-secondary text-center">{message}</Text>
+        <Text className="text-body text-text-secondary text-center">{message}</Text>
       ) : null}
       {actionLabel && onAction ? (
         <View className="mt-2">

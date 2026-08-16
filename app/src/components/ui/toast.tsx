@@ -58,7 +58,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             decorative
             color={colors.textSecondary}
           />
-          <Text className="flex-1 text-callout text-text">{toast.message}</Text>
+          <Text className="flex-1 text-body text-text">{toast.message}</Text>
         </View>
       ) : null}
     </ToastContext.Provider>

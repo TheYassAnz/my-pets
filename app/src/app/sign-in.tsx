@@ -61,7 +61,7 @@ export default function SignInScreen() {
         onSubmitEditing={onSubmit}
       />
 
-      {error && <Text className="text-callout text-danger">{error}</Text>}
+      {error && <Text className="text-body text-danger">{error}</Text>}
 
       <Button
         variant="ghost"

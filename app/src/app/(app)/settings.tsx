@@ -86,7 +86,7 @@ export default function SettingsScreen() {
 
       <Card>
         <Text className="text-headline font-semibold text-text">Rappels de santé</Text>
-        <Text className="text-callout text-text-secondary">
+        <Text className="text-body text-text-secondary">
           Recevez une notification avant chaque échéance (vaccin, traitement,
           visite). Choisissez quand être prévenu :
         </Text>
@@ -102,7 +102,7 @@ export default function SettingsScreen() {
           ))}
         </View>
 
-        {error ? <Text className="text-callout text-danger">{error}</Text> : null}
+        {error ? <Text className="text-body text-danger">{error}</Text> : null}
 
         <Button label="Enregistrer" loading={saving} onPress={onSave} />
       </Card>

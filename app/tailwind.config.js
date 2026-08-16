@@ -10,7 +10,6 @@ module.exports = {
         primary: {
           DEFAULT: token('primary'),
           pressed: token('primary-pressed'),
-          surface: token('primary-surface'),
         },
         'on-primary': token('on-primary'),
         surface: {
@@ -24,12 +23,16 @@ module.exports = {
           secondary: token('text-secondary'),
           tertiary: token('text-tertiary'),
         },
+        // Même rouge que status-late — sémantique différente (erreur/destructif vs échéance dépassée).
         danger: {
-          DEFAULT: token('danger'),
+          DEFAULT: token('status-late'),
           surface: token('danger-surface'),
         },
-        success: token('success'),
-        warning: token('warning'),
+        status: {
+          ok: token('status-ok'),
+          soon: token('status-soon'),
+          late: token('status-late'),
+        },
       },
       borderRadius: {
         sm: '8px',
@@ -37,12 +40,12 @@ module.exports = {
         lg: '16px',
       },
       fontSize: {
-        display: ['30px', { lineHeight: '36px' }],
+        display: ['32px', { lineHeight: '38px', letterSpacing: '-0.6px' }],
         title: ['22px', { lineHeight: '28px' }],
         headline: ['17px', { lineHeight: '22px' }],
-        body: ['16px', { lineHeight: '22px' }],
-        callout: ['15px', { lineHeight: '20px' }],
-        caption: ['13px', { lineHeight: '18px' }],
+        body: ['15px', { lineHeight: '20px' }],
+        caption: ['13px', { lineHeight: '16px' }],
+        eyebrow: ['11px', { lineHeight: '14px', letterSpacing: '0.8px' }],
       },
     },
   },

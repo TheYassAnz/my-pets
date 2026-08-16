@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, TextInput, useColorScheme, View } from 'react-native';
 
 import {
   Avatar,
@@ -14,6 +14,7 @@ import {
   EmptyState,
   ErrorState,
   FormField,
+  Icon,
   ListRow,
   Skeleton,
   SpeciesPicker,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui';
 import { computeAge, OTHER_SPECIES, resolveSpecies, splitSpecies } from '@/lib/animals';
 import { api, ApiError, type Animal, type HealthEvent } from '@/lib/api';
+import { Colors } from '@/constants/theme';
 import { exportAndShareHealthRecord } from '@/lib/export';
 import { AI_EXTRACTION_ENABLED } from '@/lib/features';
 import { animalSchema, type AnimalValues } from '@/lib/forms/schemas';
@@ -28,6 +30,8 @@ import { EVENT_ICONS, EVENT_LABELS, formatDate } from '@/lib/health-events';
 
 export default function AnimalDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const scheme = useColorScheme();
+  const eventIconColor = Colors[scheme === 'dark' ? 'dark' : 'light'].textSecondary;
   const { show } = useToast();
   const [animal, setAnimal] = useState<Animal | null>(null);
   const [events, setEvents] = useState<HealthEvent[]>([]);
@@ -173,7 +177,7 @@ export default function AnimalDetailScreen() {
 
   return (
     <ScrollView className="flex-1 bg-surface" contentContainerClassName="p-4 gap-4">
-      {error ? <Text className="text-callout text-danger">{error}</Text> : null}
+      {error ? <Text className="text-body text-danger">{error}</Text> : null}
 
       <Card>
         <Pressable
@@ -183,14 +187,14 @@ export default function AnimalDetailScreen() {
           onPress={onPickPhoto}
           className="items-center gap-2">
           <Avatar uri={animal.photoUrl} size="lg" />
-          <Text className="text-callout text-primary">
+          <Text className="text-body text-primary">
             {uploadingPhoto ? 'Envoi…' : 'Changer la photo'}
           </Text>
         </Pressable>
 
         {/* Un animal sans date de naissance n'affiche simplement pas d'âge (PET-8). */}
         {animal.birthDate && computeAge(animal.birthDate.slice(0, 10)) ? (
-          <Text className="text-callout text-text-secondary text-center">
+          <Text className="text-body text-text-secondary text-center">
             {computeAge(animal.birthDate.slice(0, 10))}
           </Text>
         ) : null}
@@ -286,12 +290,19 @@ export default function AnimalDetailScreen() {
           events.map((event) => (
             <ListRow
               key={event.id}
-              leading={<Badge label={EVENT_LABELS[event.type]} icon={EVENT_ICONS[event.type]} />}
+              leading={
+                <View className="flex-row items-center gap-1.5 self-start rounded-full px-2.5 py-1 bg-surface-sunken">
+                  <Icon name={EVENT_ICONS[event.type]} size={14} color={eventIconColor} decorative />
+                  <Text className="text-caption font-medium text-text-secondary">
+                    {EVENT_LABELS[event.type]}
+                  </Text>
+                </View>
+              }
               title={event.title}
               subtitle={formatDate(event.date)}
               trailing={
                 event.nextDueDate ? (
-                  <Badge label={`Rappel ${formatDate(event.nextDueDate)}`} tone="warning" />
+                  <Badge label={`Rappel ${formatDate(event.nextDueDate)}`} state="soon" />
                 ) : undefined
               }
               onPress={() => router.push(`/animals/${id}/events/${event.id}`)}

@@ -79,7 +79,7 @@ export function DateField({
             accessibilityLabel={`Effacer ${label}`}
             onPress={() => onChange(null)}
             className="min-h-11 justify-center px-2">
-            <Text className="text-callout text-primary">Effacer</Text>
+            <Text className="text-body text-primary">Effacer</Text>
           </Pressable>
         ) : null}
       </View>

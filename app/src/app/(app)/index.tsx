@@ -55,7 +55,7 @@ export default function HomeScreen() {
       className="flex-1 bg-surface"
       contentContainerClassName="flex-grow items-center justify-center gap-4 px-8 py-12">
       <Text className="text-display font-bold text-text">my-pets 🐾</Text>
-      <Text className="text-callout text-text-secondary">carnet de santé numérique</Text>
+      <Text className="text-body text-text-secondary">carnet de santé numérique</Text>
 
       {showOnboarding ? (
         <Card className="mt-4 w-full">
@@ -65,7 +65,7 @@ export default function HomeScreen() {
               <Icon name={step.icon} decorative />
               <View className="flex-1">
                 <Text className="font-semibold text-text">{step.title}</Text>
-                <Text className="text-callout text-text-secondary">{step.text}</Text>
+                <Text className="text-body text-text-secondary">{step.text}</Text>
               </View>
             </View>
           ))}

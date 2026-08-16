@@ -52,7 +52,7 @@ export default function ForgotPasswordScreen() {
         onSubmitEditing={onSubmit}
       />
 
-      {error && <Text className="text-callout text-danger">{error}</Text>}
+      {error && <Text className="text-body text-danger">{error}</Text>}
 
       <Button label="Envoyer le code" loading={submitting} onPress={onSubmit} />
 

@@ -58,17 +58,25 @@ describe('synchronisation Colors (theme.ts) / global.css', () => {
     );
   }
 
-  // Correspondance explicite JS -> CSS. `backgroundElement` et
-  // `backgroundSelected` sont volontairement exclus : ce sont des variations
-  // internes propres à Colors (ex. `backgroundElement` = token "sunken", pas
-  // "surface-elevated" — la dérive de nommage déjà constatée), sans
-  // équivalent un-à-un côté CSS.
+  // Correspondance explicite JS -> CSS. `danger` est volontairement exclu :
+  // c'est un alias Tailwind vers `status-late` (même rouge, sémantique
+  // différente — erreur/destructif vs échéance dépassée), sans variable CSS
+  // propre dans global.css.
   const JS_TO_CSS_VAR: Record<string, string> = {
+    surface: '--color-surface',
+    surfaceElevated: '--color-surface-elevated',
+    surfaceSunken: '--color-surface-sunken',
+    border: '--color-border',
     text: '--color-text',
-    background: '--color-surface',
     textSecondary: '--color-text-secondary',
     textTertiary: '--color-text-tertiary',
     primary: '--color-primary',
+    primaryPressed: '--color-primary-pressed',
+    onPrimary: '--color-on-primary',
+    statusOk: '--color-status-ok',
+    statusSoon: '--color-status-soon',
+    statusLate: '--color-status-late',
+    dangerSurface: '--color-danger-surface',
   };
 
   it('a les mêmes valeurs hex que les variables CSS correspondantes, en light et en dark', async () => {

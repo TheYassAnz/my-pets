@@ -72,7 +72,7 @@ export default function SignUpScreen() {
         onSubmitEditing={onSubmit}
       />
 
-      {error && <Text className="text-callout text-danger">{error}</Text>}
+      {error && <Text className="text-body text-danger">{error}</Text>}
 
       <Button label="Créer mon compte" loading={formState.isSubmitting} onPress={onSubmit} />
 

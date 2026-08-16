@@ -88,7 +88,7 @@ export default function ScanHealthEventScreen() {
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-surface px-8">
         <Skeleton variant="card" count={1} />
-        <Text className="text-callout text-text-secondary">
+        <Text className="text-body text-text-secondary">
           Analyse du document en cours…
         </Text>
       </View>
@@ -100,7 +100,7 @@ export default function ScanHealthEventScreen() {
       <ScrollView
         className="flex-1 bg-surface"
         contentContainerClassName="px-8 pt-8 pb-16 gap-4">
-        <Text className="text-callout text-text-secondary">
+        <Text className="text-body text-text-secondary">
           Vérifiez et corrigez les informations extraites avant d&apos;enregistrer.
         </Text>
         <HealthEventForm
@@ -119,7 +119,7 @@ export default function ScanHealthEventScreen() {
         <Pressable
           className="items-center py-2 active:opacity-70"
           onPress={() => setExtracted(null)}>
-          <Text className="text-callout text-primary">Scanner un autre document</Text>
+          <Text className="text-body text-primary">Scanner un autre document</Text>
         </Pressable>
       </ScrollView>
     );
@@ -127,7 +127,7 @@ export default function ScanHealthEventScreen() {
 
   return (
     <View className="flex-1 bg-surface px-8 pt-8 gap-4">
-      <Text className="text-callout text-text-secondary">
+      <Text className="text-body text-text-secondary">
         Photographiez une ordonnance ou une page du carnet de santé : les
         informations seront extraites automatiquement, puis vous pourrez les
         vérifier avant de les enregistrer.
@@ -141,7 +141,7 @@ export default function ScanHealthEventScreen() {
         onPress={onPickFromLibrary}
       />
 
-      {error && <Text className="text-callout text-danger">{error}</Text>}
+      {error && <Text className="text-body text-danger">{error}</Text>}
     </View>
   );
 }

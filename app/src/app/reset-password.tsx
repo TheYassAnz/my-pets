@@ -80,7 +80,7 @@ export default function ResetPasswordScreen() {
         onSubmitEditing={onSubmit}
       />
 
-      {error && <Text className="text-callout text-danger">{error}</Text>}
+      {error && <Text className="text-body text-danger">{error}</Text>}
 
       <Button label="Réinitialiser" loading={submitting} onPress={onSubmit} />
     </KeyboardAvoidingView>

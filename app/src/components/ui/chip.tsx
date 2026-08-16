@@ -17,7 +17,7 @@ export function Chip({ label, selected, onPress }: ChipProps) {
         selected ? 'border-primary bg-primary' : 'border-border'
       }`}>
       <Text
-        className={`text-callout ${selected ? 'font-semibold text-on-primary' : 'text-text'}`}>
+        className={`text-body ${selected ? 'font-semibold text-on-primary' : 'text-text'}`}>
         {label}
       </Text>
     </Pressable>

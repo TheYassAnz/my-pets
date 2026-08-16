@@ -24,7 +24,7 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
               selected ? 'border-primary bg-primary' : 'border-border'
             }`}>
             <Text
-              className={`text-callout ${
+              className={`text-body ${
                 selected ? 'font-semibold text-on-primary' : 'text-text'
               }`}>
               {option.label}

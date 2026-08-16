@@ -142,7 +142,7 @@ export function HealthEventForm({ initial, submitLabel, onSubmit }: Props) {
         multiline
       />
 
-      {error && <Text className="text-callout text-danger">{error}</Text>}
+      {error && <Text className="text-body text-danger">{error}</Text>}
 
       <Button label={submitLabel} loading={formState.isSubmitting} onPress={submit} />
     </View>

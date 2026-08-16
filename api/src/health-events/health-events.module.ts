@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { HealthEventsController } from './health-events.controller';
+import { UpcomingHealthEventsController } from './upcoming-health-events.controller';
 import { HealthEventsService } from './health-events.service';
 import { AuthModule } from '../auth/auth.module';
 import { PrismaService } from '../prisma.service';
 
 @Module({
   imports: [AuthModule],
-  controllers: [HealthEventsController],
+  controllers: [HealthEventsController, UpcomingHealthEventsController],
   providers: [HealthEventsService, PrismaService],
 })
 export class HealthEventsModule {}

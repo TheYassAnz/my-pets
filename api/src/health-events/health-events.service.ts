@@ -68,6 +68,34 @@ export class HealthEventsService {
     await this.prisma.healthEvent.delete({ where: { id } });
   }
 
+  // Toutes espèces confondues, pour l'écran d'accueil — une seule requête,
+  // jamais un N+1 animal par animal.
+  async findUpcoming(ownerId: string, days: number) {
+    const now = new Date();
+    now.setUTCHours(0, 0, 0, 0);
+    const horizon = new Date(now);
+    horizon.setUTCDate(horizon.getUTCDate() + days);
+
+    const events = await this.prisma.healthEvent.findMany({
+      where: {
+        nextDueDate: { gte: now, lte: horizon },
+        animal: { ownerId },
+      },
+      include: { animal: { select: { id: true, name: true } } },
+      orderBy: { nextDueDate: 'asc' },
+    });
+
+    return events.map((event) => ({
+      id: event.id,
+      type: event.type,
+      title: event.title,
+      date: event.date,
+      nextDueDate: event.nextDueDate,
+      animalId: event.animal.id,
+      animalName: event.animal.name,
+    }));
+  }
+
   // L'animal doit exister ET appartenir à l'utilisateur — sinon on ne révèle rien
   private async assertAnimalOwned(ownerId: string, animalId: string) {
     const animal = await this.prisma.animal.findUnique({

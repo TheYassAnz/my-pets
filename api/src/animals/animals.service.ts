@@ -15,11 +15,46 @@ export class AnimalsService {
     private readonly storage: SupabaseStorageService,
   ) {}
 
-  findAll(ownerId: string) {
-    return this.prisma.animal.findMany({
+  async findAll(ownerId: string) {
+    const animals = await this.prisma.animal.findMany({
       where: { ownerId },
       orderBy: { createdAt: 'desc' },
     });
+    if (animals.length === 0) return [];
+
+    const animalIds = animals.map((animal) => animal.id);
+
+    // Deux groupBy, pas une requête par animal : un pour le nombre total
+    // d'événements, un pour la plus proche échéance à venir (filtres
+    // différents, donc pas combinables en un seul appel).
+    const [counts, upcoming] = await Promise.all([
+      this.prisma.healthEvent.groupBy({
+        by: ['animalId'],
+        where: { animalId: { in: animalIds } },
+        _count: { _all: true },
+      }),
+      this.prisma.healthEvent.groupBy({
+        by: ['animalId'],
+        where: {
+          animalId: { in: animalIds },
+          nextDueDate: { gte: new Date() },
+        },
+        _min: { nextDueDate: true },
+      }),
+    ]);
+
+    const eventCountByAnimal = new Map(
+      counts.map((c) => [c.animalId, c._count._all]),
+    );
+    const nextDueDateByAnimal = new Map(
+      upcoming.map((u) => [u.animalId, u._min.nextDueDate]),
+    );
+
+    return animals.map((animal) => ({
+      ...animal,
+      eventCount: eventCountByAnimal.get(animal.id) ?? 0,
+      nextDueDate: nextDueDateByAnimal.get(animal.id) ?? null,
+    }));
   }
 
   async findOne(ownerId: string, id: string) {

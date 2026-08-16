@@ -13,7 +13,7 @@ export default function AppTabs() {
       indicatorColor={colors.surfaceElevated}
       labelStyle={{ selected: { color: colors.text } }}>
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Aujourd&apos;hui</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={{ default: 'house', selected: 'house.fill' }}
           src={require('@/assets/images/tabIcons/home.png')}
@@ -22,7 +22,7 @@ export default function AppTabs() {
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="animals">
-        <NativeTabs.Trigger.Label>Mes animaux</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Animaux</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={{ default: 'pawprint', selected: 'pawprint.fill' }}
           src={require('@/assets/images/tabIcons/paw.png')}

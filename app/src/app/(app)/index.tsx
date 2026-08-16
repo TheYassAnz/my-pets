@@ -1,12 +1,24 @@
-import { Link, router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { Link, router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 
-import { Button, Card, Icon, type IconName } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Divider,
+  ErrorState,
+  Icon,
+  ListRow,
+  Metric,
+  Section,
+  Skeleton,
+  type IconName,
+} from '@/components/ui';
+import { api, ApiError, type AnimalWithUpcoming, type UpcomingHealthEvent } from '@/lib/api';
 import { AI_EXTRACTION_ENABLED } from '@/lib/features';
-import { getToken, setToken } from '@/lib/token-storage';
+import { daysUntil, deadlineState } from '@/lib/health-events';
 
-const ONBOARDING_SEEN_KEY = 'mypets.onboardingSeen';
+const UPCOMING_WINDOW_DAYS = 90;
 
 const ONBOARDING_STEPS: { icon: IconName; title: string; text: string }[] = [
   {
@@ -36,49 +48,129 @@ const ONBOARDING_STEPS: { icon: IconName; title: string; text: string }[] = [
   },
 ];
 
-export default function HomeScreen() {
-  const [showOnboarding, setShowOnboarding] = useState(false);
+export default function TodayScreen() {
+  const [animals, setAnimals] = useState<AnimalWithUpcoming[] | null>(null);
+  const [upcoming, setUpcoming] = useState<UpcomingHealthEvent[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    getToken(ONBOARDING_SEEN_KEY).then((seen) => {
-      if (!seen) setShowOnboarding(true);
-    });
+  const load = useCallback(() => {
+    // Purger l'erreur avant chaque tentative : sans cela, `error` reste positionné
+    // après un « Réessayer » réussi et l'écran d'erreur ne disparaît jamais.
+    setError(null);
+    return Promise.all([api.listAnimals(), api.listUpcomingEvents(UPCOMING_WINDOW_DAYS)])
+      .then(([animalsResult, upcomingResult]) => {
+        setAnimals(animalsResult);
+        setUpcoming(upcomingResult);
+      })
+      .catch((e: unknown) => {
+        setError(e instanceof ApiError ? e.message : 'Chargement impossible');
+      });
   }, []);
 
-  const dismissOnboarding = async () => {
-    setShowOnboarding(false);
-    await setToken(ONBOARDING_SEEN_KEY, '1');
-  };
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
 
-  return (
-    <ScrollView
-      className="flex-1 bg-surface"
-      contentContainerClassName="flex-grow items-center justify-center gap-4 px-8 py-12">
-      <Text className="text-display font-bold text-text">my-pets 🐾</Text>
-      <Text className="text-body text-text-secondary">carnet de santé numérique</Text>
+  if (error) {
+    return (
+      <View className="flex-1 justify-center bg-surface">
+        <ErrorState message={error} onRetry={load} />
+      </View>
+    );
+  }
 
-      {showOnboarding ? (
-        <Card className="mt-4 w-full">
-          <Text className="text-headline font-bold text-text">Bienvenue !</Text>
+  if (!animals || !upcoming) {
+    return (
+      <View className="flex-1 bg-surface p-4 gap-4">
+        <Skeleton variant="card" />
+        <Skeleton variant="row" count={3} />
+      </View>
+    );
+  }
+
+  if (animals.length === 0) {
+    return (
+      <ScrollView className="flex-1 bg-surface" contentContainerClassName="gap-4 p-4">
+        <Text className="text-display font-bold text-text">Aujourd&apos;hui</Text>
+
+        <Section>
+          <Text className="text-headline font-semibold text-text">Aucun animal suivi</Text>
+          <Text className="text-body text-text-secondary">
+            Ajoutez votre premier compagnon pour démarrer son carnet de santé.
+          </Text>
+        </Section>
+
+        <View className="gap-4">
           {ONBOARDING_STEPS.map((step) => (
             <View key={step.title} className="flex-row gap-3">
               <Icon name={step.icon} decorative />
               <View className="flex-1">
-                <Text className="font-semibold text-text">{step.title}</Text>
+                <Text className="text-headline font-semibold text-text">{step.title}</Text>
                 <Text className="text-body text-text-secondary">{step.text}</Text>
               </View>
             </View>
           ))}
-          <Link href="/animals/new" asChild>
-            <Button label="Ajouter mon premier animal" onPress={dismissOnboarding} />
-          </Link>
-          <Button label="Plus tard" variant="ghost" onPress={dismissOnboarding} />
-        </Card>
-      ) : (
-        <View className="mt-6 w-full">
-          <Button label="Voir mes animaux" onPress={() => router.push('/animals')} />
         </View>
-      )}
+
+        <Button label="Ajouter un animal" onPress={() => router.push('/animals/new')} />
+      </ScrollView>
+    );
+  }
+
+  const [hero, ...rest] = upcoming;
+
+  return (
+    <ScrollView className="flex-1 bg-surface" contentContainerClassName="pb-8">
+      <Text className="text-display font-bold text-text p-4">Aujourd&apos;hui</Text>
+
+      <Section>
+        {hero ? (
+          <>
+            <Text className="text-eyebrow font-semibold uppercase text-text-tertiary">
+              Prochaine échéance
+            </Text>
+            <Metric
+              days={daysUntil(hero.nextDueDate)}
+              state={deadlineState(daysUntil(hero.nextDueDate))}
+              label={`${hero.title} · ${hero.animalName}`}
+            />
+          </>
+        ) : (
+          <Text className="text-body text-text-secondary">
+            Aucune échéance dans les {UPCOMING_WINDOW_DAYS} jours.
+          </Text>
+        )}
+      </Section>
+
+      {rest.length > 0 ? (
+        <>
+          <Divider />
+          <Section>
+            <Text className="text-eyebrow font-semibold uppercase text-text-tertiary">
+              À venir ({UPCOMING_WINDOW_DAYS} jours)
+            </Text>
+            {rest.map((event, index) => (
+              <View key={event.id}>
+                <Link href={`/animals/${event.animalId}/events/${event.id}`} asChild>
+                  <ListRow
+                    title={event.title}
+                    subtitle={event.animalName}
+                    trailing={
+                      <Badge
+                        state={deadlineState(daysUntil(event.nextDueDate))}
+                        label={`J-${daysUntil(event.nextDueDate)}`}
+                      />
+                    }
+                  />
+                </Link>
+                {index < rest.length - 1 ? <Divider /> : null}
+              </View>
+            ))}
+          </Section>
+        </>
+      ) : null}
     </ScrollView>
   );
 }

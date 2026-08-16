@@ -115,6 +115,13 @@ export type Animal = {
   createdAt: string;
 };
 
+// GET /animals renvoie chaque animal enrichi — jamais GET /animals/:id,
+// une requête à la fois n'a pas besoin de ce résumé.
+export type AnimalWithUpcoming = Animal & {
+  nextDueDate: string | null;
+  eventCount: number;
+};
+
 export type AnimalInput = {
   name: string;
   species: string;
@@ -134,6 +141,19 @@ export type HealthEvent = {
   nextDueDate: string | null;
   animalId: string;
   createdAt: string;
+};
+
+// GET /health-events/upcoming — toutes espèces confondues, pour l'écran
+// d'accueil. Un sous-ensemble aplati de HealthEvent (nom de l'animal
+// inclus, nextDueDate garanti non nul puisque c'est le critère de tri).
+export type UpcomingHealthEvent = {
+  id: string;
+  type: HealthEventType;
+  title: string;
+  date: string;
+  nextDueDate: string;
+  animalId: string;
+  animalName: string;
 };
 
 // Résultat brut de l'extraction IA : tout champ illisible reste null,
@@ -239,7 +259,7 @@ export const api = {
       body: JSON.stringify({ email, code, newPassword }),
     }),
 
-  listAnimals: () => request<Animal[]>('/animals'),
+  listAnimals: () => request<AnimalWithUpcoming[]>('/animals'),
 
   getAnimal: (id: string) => request<Animal>(`/animals/${id}`),
 
@@ -288,6 +308,9 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ leadDays }),
     }),
+
+  listUpcomingEvents: (days = 90) =>
+    request<UpcomingHealthEvent[]>(`/health-events/upcoming?days=${days}`),
 
   listEvents: (animalId: string) =>
     request<HealthEvent[]>(`/animals/${animalId}/events`),

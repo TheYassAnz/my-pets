@@ -1,6 +1,6 @@
 import { Link, router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import {
   Badge,
@@ -10,6 +10,7 @@ import {
   Icon,
   ListRow,
   Metric,
+  Screen,
   Section,
   Skeleton,
   type IconName,
@@ -75,24 +76,24 @@ export default function TodayScreen() {
 
   if (error) {
     return (
-      <View className="flex-1 justify-center bg-surface">
+      <Screen scroll={false} className="justify-center">
         <ErrorState message={error} onRetry={load} />
-      </View>
+      </Screen>
     );
   }
 
   if (!animals || !upcoming) {
     return (
-      <View className="flex-1 bg-surface p-4 gap-4">
+      <Screen scroll={false} className="p-4 gap-4">
         <Skeleton variant="card" />
         <Skeleton variant="row" count={3} />
-      </View>
+      </Screen>
     );
   }
 
   if (animals.length === 0) {
     return (
-      <ScrollView className="flex-1 bg-surface" contentContainerClassName="gap-4 p-4">
+      <Screen contentContainerClassName="gap-4 p-4">
         <Text className="text-display font-bold text-text">Aujourd&apos;hui</Text>
 
         <Section>
@@ -115,14 +116,14 @@ export default function TodayScreen() {
         </View>
 
         <Button label="Ajouter un animal" onPress={() => router.push('/animals/new')} />
-      </ScrollView>
+      </Screen>
     );
   }
 
   const [hero, ...rest] = upcoming;
 
   return (
-    <ScrollView className="flex-1 bg-surface" contentContainerClassName="pb-8">
+    <Screen contentContainerClassName="pb-8">
       <Text className="text-display font-bold text-text p-4">Aujourd&apos;hui</Text>
 
       <Section>
@@ -171,6 +172,6 @@ export default function TodayScreen() {
           </Section>
         </>
       ) : null}
-    </ScrollView>
+    </Screen>
   );
 }

@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { Button, Card, Chip, ErrorState, Skeleton, useToast } from '@/components/ui';
+import { Button, Card, Chip, ErrorState, Screen, Skeleton, useToast } from '@/components/ui';
 import { useSession } from '@/lib/auth-context';
 import { api, ApiError } from '@/lib/api';
 
@@ -66,22 +66,22 @@ export default function SettingsScreen() {
 
   if (error && !leadDays) {
     return (
-      <View className="flex-1 justify-center bg-surface">
+      <Screen scroll={false} className="justify-center">
         <ErrorState message={error} onRetry={load} />
-      </View>
+      </Screen>
     );
   }
 
   if (!leadDays) {
     return (
-      <View className="flex-1 bg-surface p-4">
+      <Screen scroll={false} className="p-4">
         <Skeleton variant="card" count={2} />
-      </View>
+      </Screen>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-surface" contentContainerClassName="p-4 gap-4">
+    <Screen contentContainerClassName="p-4 gap-4">
       <Text className="text-title font-bold text-text">Réglages</Text>
 
       <Card>
@@ -111,6 +111,6 @@ export default function SettingsScreen() {
         <Text className="text-headline font-semibold text-text">Compte</Text>
         <Button label="Se déconnecter" variant="destructive" onPress={signOut} />
       </Card>
-    </ScrollView>
+    </Screen>
   );
 }

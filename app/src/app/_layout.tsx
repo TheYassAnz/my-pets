@@ -2,6 +2,7 @@ import '@/global.css';
 
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useColorScheme } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { ToastProvider } from '@/components/ui';
@@ -33,13 +34,15 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <SessionProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <ToastProvider>
-          <AnimatedSplashOverlay />
-          <RootNavigator />
-        </ToastProvider>
-      </ThemeProvider>
-    </SessionProvider>
+    <SafeAreaProvider>
+      <SessionProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <ToastProvider>
+            <AnimatedSplashOverlay />
+            <RootNavigator />
+          </ToastProvider>
+        </ThemeProvider>
+      </SessionProvider>
+    </SafeAreaProvider>
   );
 }

@@ -14,6 +14,7 @@ export { Icon, type IconName, type IconProps } from './icon';
 export { Input, type InputProps } from './input';
 export { ListRow, type ListRowProps } from './list-row';
 export { Metric, type MetricProps, type MetricState } from './metric';
+export { Screen, type ScreenProps } from './screen';
 export { Section, type SectionProps } from './section';
 export {
   SegmentedControl,

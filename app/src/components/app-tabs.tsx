@@ -9,11 +9,16 @@ export default function AppTabs() {
 
   return (
     <NativeTabs
-      backgroundColor={colors.surface}
-      indicatorColor={colors.surfaceElevated}
-      labelStyle={{ selected: { color: colors.text } }}>
+      backgroundColor={colors.surfaceElevated}
+      indicatorColor={colors.brand}
+      activeTintColor={colors.brand}
+      inactiveTintColor={colors.textSecondary}
+      labelStyle={{
+        default: { fontSize: 10, color: colors.textSecondary },
+        selected: { fontSize: 10, color: colors.brand, fontWeight: '600' },
+      }}>
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Aujourd&apos;hui</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Accueil</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={{ default: 'house', selected: 'house.fill' }}
           src={require('@/assets/images/tabIcons/home.png')}
@@ -22,7 +27,7 @@ export default function AppTabs() {
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="animals">
-        <NativeTabs.Trigger.Label>Animaux</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Foyer</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={{ default: 'pawprint', selected: 'pawprint.fill' }}
           src={require('@/assets/images/tabIcons/paw.png')}
@@ -30,10 +35,19 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="settings">
-        <NativeTabs.Trigger.Label>Réglages</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="calendar">
+        <NativeTabs.Trigger.Label>Agenda</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          sf={{ default: 'gearshape', selected: 'gearshape.fill' }}
+          sf={{ default: 'calendar', selected: 'calendar' }}
+          src={require('@/assets/images/tabIcons/home.png')}
+          renderingMode="template"
+        />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger name="settings">
+        <NativeTabs.Trigger.Label>Profil</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'person', selected: 'person.fill' }}
           src={require('@/assets/images/tabIcons/settings.png')}
           renderingMode="template"
         />

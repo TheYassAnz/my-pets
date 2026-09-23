@@ -12,6 +12,11 @@ module.exports = {
           pressed: token('primary-pressed'),
         },
         'on-primary': token('on-primary'),
+        brand: {
+          DEFAULT: token('brand'),
+          pressed: token('brand-pressed'),
+        },
+        'on-brand': token('on-brand'),
         surface: {
           DEFAULT: token('surface'),
           elevated: token('surface-elevated'),
@@ -23,7 +28,6 @@ module.exports = {
           secondary: token('text-secondary'),
           tertiary: token('text-tertiary'),
         },
-        // Même rouge que status-late — sémantique différente (erreur/destructif vs échéance dépassée).
         danger: {
           DEFAULT: token('status-late'),
           surface: token('danger-surface'),
@@ -35,9 +39,10 @@ module.exports = {
         },
       },
       borderRadius: {
-        sm: '8px',
-        md: '12px',
-        lg: '16px',
+        sm: '4px',
+        md: '8px',
+        lg: '14px',
+        xl: '20px',
       },
       fontSize: {
         display: ['32px', { lineHeight: '38px', letterSpacing: '-0.6px' }],

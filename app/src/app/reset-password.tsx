@@ -1,8 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Input } from '@/components/ui';
+import { Button, Icon, Input } from '@/components/ui';
 import { api } from '@/lib/api';
 
 export default function ResetPasswordScreen() {
@@ -33,56 +34,88 @@ export default function ResetPasswordScreen() {
 
   if (success) {
     return (
-      <View className="flex-1 justify-center bg-surface px-8 gap-4">
-        <Text className="text-title font-bold text-text text-center mb-2">
-          Mot de passe mis à jour
-        </Text>
-        <Text className="text-body text-text-secondary text-center mb-6">
-          Vous pouvez maintenant vous connecter avec votre nouveau mot de passe
-        </Text>
-        <Button label="Se connecter" onPress={() => router.replace('/sign-in')} />
-      </View>
+      <SafeAreaView className="flex-1 bg-surface-sunken">
+        <View className="flex-1 justify-center items-center px-8 gap-4">
+          <View className="w-16 h-16 rounded-full items-center justify-center bg-brand/20 border border-brand/40 mb-4">
+            <Icon name="check" size={28} color="rgb(var(--color-primary))" />
+          </View>
+          <Text className="text-[22px] font-medium text-text text-center">
+            Mot de passe mis à jour
+          </Text>
+          <Text className="text-[14px] text-text-secondary text-center mb-6 leading-relaxed">
+            Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
+          </Text>
+          <Button
+            label="Se connecter"
+            variant="primary"
+            className="w-full"
+            onPress={() => router.replace('/sign-in')}
+          />
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 justify-center bg-surface px-8 gap-4">
-      <Text className="text-display font-bold text-text text-center mb-2">
-        Nouveau mot de passe
-      </Text>
-      <Text className="text-body text-text-secondary text-center mb-6">
-        Entrez le code reçu par email et votre nouveau mot de passe
-      </Text>
+    <SafeAreaView className="flex-1 bg-surface-sunken">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        className="flex-1">
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 16 }}>
+          <View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Retour"
+              onPress={() => router.back()}
+              className="w-[34px] h-[34px] rounded-full items-center justify-center bg-surface border border-border">
+              <Icon name="chevron-left" size={16} color="rgb(var(--color-text))" />
+            </Pressable>
 
-      <Input
-        label="Email"
-        autoCapitalize="none"
-        autoComplete="email"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <Input
-        label="Code à 6 chiffres"
-        keyboardType="number-pad"
-        maxLength={6}
-        value={code}
-        onChangeText={setCode}
-      />
-      <Input
-        label="Nouveau mot de passe"
-        secureTextEntry
-        autoComplete="password-new"
-        value={newPassword}
-        onChangeText={setNewPassword}
-        onSubmitEditing={onSubmit}
-      />
+            <Text className="text-[27px] font-medium tracking-tight text-text mt-4 mb-2">
+              Nouveau mot de passe
+            </Text>
+            <Text className="text-[14px] text-text-secondary mb-6 leading-relaxed">
+              Entrez le code reçu par email et votre nouveau mot de passe.
+            </Text>
 
-      {error && <Text className="text-body text-danger">{error}</Text>}
+            <View className="gap-3.5">
+              <Input
+                label="E-mail"
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+                value={email}
+                onChangeText={setEmail}
+              />
+              <Input
+                label="Code à 6 chiffres"
+                keyboardType="number-pad"
+                maxLength={6}
+                value={code}
+                onChangeText={setCode}
+              />
+              <Input
+                label="Nouveau mot de passe"
+                secureTextEntry
+                autoComplete="new-password"
+                value={newPassword}
+                onChangeText={setNewPassword}
+                onSubmitEditing={onSubmit}
+              />
 
-      <Button label="Réinitialiser" loading={submitting} onPress={onSubmit} />
-    </KeyboardAvoidingView>
+              {error ? <Text className="text-body text-danger">{error}</Text> : null}
+
+              <Button
+                label="Réinitialiser"
+                variant="primary"
+                className="mt-3"
+                loading={submitting}
+                onPress={onSubmit}
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

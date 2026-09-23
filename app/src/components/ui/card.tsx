@@ -23,7 +23,7 @@ export function Card({
   className,
   testID,
 }: CardProps) {
-  const layout = `gap-3 rounded-lg border border-border p-4 ${
+  const layout = `gap-3 rounded-lg p-4 ${
     elevated ? 'bg-surface-elevated' : 'bg-surface'
   } ${className ?? ''}`;
 

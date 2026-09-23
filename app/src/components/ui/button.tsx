@@ -7,14 +7,14 @@ import { Icon, type IconName } from './icon';
 export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost';
 
 const CONTAINER: Record<ButtonVariant, string> = {
-  primary: 'bg-primary active:bg-primary-pressed',
+  primary: 'border border-primary active:bg-primary/15',
   secondary: 'border border-border active:bg-surface-sunken',
   destructive: 'border border-danger active:bg-danger-surface',
-  ghost: 'active:opacity-70',
+  ghost: 'active:bg-primary/10',
 };
 
 const LABEL: Record<ButtonVariant, string> = {
-  primary: 'text-on-primary',
+  primary: 'text-primary',
   secondary: 'text-text',
   destructive: 'text-danger',
   ghost: 'text-primary',
@@ -24,7 +24,7 @@ const LABEL: Record<ButtonVariant, string> = {
 // couleur à un enfant Text distinct) : on la résout ici depuis Colors, pour
 // qu'elle reste alignée avec `LABEL` ci-dessus.
 const ICON_COLOR_KEY: Record<ButtonVariant, keyof typeof Colors.light> = {
-  primary: 'onPrimary',
+  primary: 'primary',
   secondary: 'text',
   destructive: 'danger',
   ghost: 'primary',

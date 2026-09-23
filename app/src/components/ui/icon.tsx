@@ -15,10 +15,13 @@ const IONICONS = {
   add: 'add',
   close: 'close',
   chevron: 'chevron-forward',
-  check: 'checkmark-circle-outline',
+  'chevron-left': 'chevron-back',
+  'chevron-back': 'chevron-back',
+  check: 'checkmark',
   alert: 'alert-circle-outline',
   refresh: 'refresh',
   trash: 'trash-outline',
+  search: 'search-outline',
 } as const;
 
 const MATERIAL = {

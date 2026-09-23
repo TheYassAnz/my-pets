@@ -13,47 +13,53 @@
 }
 
 @layer base {
-  /* Tokens sémantiques — thème clair. Valeurs en canaux RGB séparés par des espaces pour supporter <alpha-value>. */
   :root {
-    --color-surface: 255 255 255;
-    --color-surface-elevated: 250 250 250;
-    --color-surface-sunken: 240 240 242;
-    --color-border: 235 235 239;
+    --color-surface: 243 245 254;
+    --color-surface-elevated: 255 255 255;
+    --color-surface-sunken: 228 231 245;
+    --color-border: 207 211 229;
 
-    --color-text: 10 10 11;
-    --color-text-secondary: 113 113 122;
-    --color-text-tertiary: 161 161 170;
+    --color-text: 41 43 49;
+    --color-text-secondary: 89 93 108;
+    --color-text-tertiary: 147 151 171;
 
-    --color-primary: 10 10 11;
-    --color-primary-pressed: 39 39 42;
+    --color-primary: 121 108 191;
+    --color-primary-pressed: 93 82 148;
     --color-on-primary: 255 255 255;
 
-    /* Couleurs d'état — status-* pour les échéances, danger pour erreurs/destructif (même rouge que status-late) */
-    --color-status-ok: 13 148 136;
+    --color-brand: 121 108 191;
+    --color-brand-pressed: 93 82 148;
+    --color-on-brand: 255 255 255;
+
+    --color-status-ok: 46 125 71;
     --color-status-soon: 180 83 9;
     --color-status-late: 220 38 38;
-    --color-danger-surface: 254 242 242;
+    --color-danger-surface: 254 226 226;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --color-surface: 11 11 12;
-      --color-surface-elevated: 20 20 22;
-      --color-surface-sunken: 28 28 31;
-      --color-border: 35 35 38;
+      --color-surface: 35 37 50;
+      --color-surface-elevated: 43 45 60;
+      --color-surface-sunken: 22 24 38;
+      --color-border: 63 66 77;
 
-      --color-text: 250 250 250;
-      --color-text-secondary: 154 154 162;
-      --color-text-tertiary: 110 110 118;
+      --color-text: 233 233 237;
+      --color-text-secondary: 147 151 171;
+      --color-text-tertiary: 117 121 140;
 
-      --color-primary: 250 250 250;
-      --color-primary-pressed: 228 228 231;
-      --color-on-primary: 10 10 11;
+      --color-primary: 145 132 217;
+      --color-primary-pressed: 181 171 252;
+      --color-on-primary: 22 24 38;
 
-      --color-status-ok: 45 212 191;
-      --color-status-soon: 251 191 36;
-      --color-status-late: 248 113 113;
-      --color-danger-surface: 59 22 20;
+      --color-brand: 145 132 217;
+      --color-brand-pressed: 181 171 252;
+      --color-on-brand: 22 24 38;
+
+      --color-status-ok: 150 204 168;
+      --color-status-soon: 221 201 138;
+      --color-status-late: 226 145 159;
+      --color-danger-surface: 56 30 39;
     }
   }
 }

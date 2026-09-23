@@ -10,7 +10,7 @@ export type SegmentedControlProps = {
 
 export function SegmentedControl({ options, value, onChange }: SegmentedControlProps) {
   return (
-    <View accessibilityRole="radiogroup" className="flex-row gap-2">
+    <View accessibilityRole="radiogroup" className="flex-row rounded-full bg-surface p-1 gap-1">
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -20,12 +20,12 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
             accessibilityLabel={option.label}
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
-            className={`min-h-11 flex-1 items-center justify-center rounded-md border py-2 ${
-              selected ? 'border-primary bg-primary' : 'border-border'
+            className={`min-h-9 flex-1 items-center justify-center rounded-full py-2 ${
+              selected ? 'bg-brand/20 border border-brand/50' : 'border border-transparent'
             }`}>
             <Text
-              className={`text-body ${
-                selected ? 'font-semibold text-on-primary' : 'text-text'
+              className={`text-caption ${
+                selected ? 'font-medium text-brand' : 'text-text-secondary'
               }`}>
               {option.label}
             </Text>

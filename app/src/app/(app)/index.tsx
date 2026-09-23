@@ -1,177 +1,344 @@
-import { Link, router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Text, View } from 'react-native';
-
 import {
-  Badge,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  useColorScheme,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { EmptyHousehold } from '@/components/empty-household';
+import {
   Button,
-  Divider,
-  ErrorState,
+  Card,
+  Checkbox,
+  HighlightCard,
   Icon,
-  ListRow,
-  Metric,
+  OfflineBanner,
   Screen,
-  Section,
   Skeleton,
-  type IconName,
 } from '@/components/ui';
-import { api, ApiError, type AnimalWithUpcoming, type UpcomingHealthEvent } from '@/lib/api';
-import { AI_EXTRACTION_ENABLED } from '@/lib/features';
-import { daysUntil, deadlineState } from '@/lib/health-events';
-
-const UPCOMING_WINDOW_DAYS = 90;
-
-const ONBOARDING_STEPS: { icon: IconName; title: string; text: string }[] = [
-  {
-    icon: 'paw',
-    title: 'Ajoutez vos animaux',
-    text: 'Créez une fiche par animal avec sa photo, son espèce et sa date de naissance.',
-  },
-  ...(AI_EXTRACTION_ENABLED
-    ? [
-        {
-          icon: 'camera' as IconName,
-          title: 'Scannez vos documents',
-          text: "Photographiez une ordonnance ou le carnet papier : l'IA pré-remplit l'événement, vous validez.",
-        },
-      ]
-    : [
-        {
-          icon: 'document' as IconName,
-          title: 'Tenez le carnet à jour',
-          text: 'Ajoutez vaccins, traitements et visites en quelques secondes.',
-        },
-      ]),
-  {
-    icon: 'bell',
-    title: 'Ne ratez plus un rappel',
-    text: 'Recevez une notification avant chaque échéance de vaccin ou de traitement.',
-  },
-];
+import { Colors } from '@/constants/theme';
+import {
+  api,
+  type AnimalWithUpcoming,
+  type TodayTask,
+  type UpcomingHealthEvent,
+} from '@/lib/api';
+import { useSession } from '@/lib/auth-context';
+import { formatDate } from '@/lib/health-events';
+import { useAppStore } from '@/lib/store/use-app-store';
 
 export default function TodayScreen() {
-  const [animals, setAnimals] = useState<AnimalWithUpcoming[] | null>(null);
-  const [upcoming, setUpcoming] = useState<UpcomingHealthEvent[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const insets = useSafeAreaInsets();
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const { user } = useSession();
 
-  const load = useCallback(() => {
-    // Purger l'erreur avant chaque tentative : sans cela, `error` reste positionné
-    // après un « Réessayer » réussi et l'écran d'erreur ne disparaît jamais.
-    setError(null);
-    return Promise.all([api.listAnimals(), api.listUpcomingEvents(UPCOMING_WINDOW_DAYS)])
-      .then(([animalsResult, upcomingResult]) => {
-        setAnimals(animalsResult);
-        setUpcoming(upcomingResult);
-      })
-      .catch((e: unknown) => {
-        setError(e instanceof ApiError ? e.message : 'Chargement impossible');
-      });
+  const { selectedAnimalId, setSelectedAnimalId } = useAppStore();
+
+  const [animals, setAnimals] = useState<AnimalWithUpcoming[]>([]);
+  const [tasks, setTasks] = useState<TodayTask[]>([]);
+  const [upcoming, setUpcoming] = useState<UpcomingHealthEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadData = useCallback(() => {
+    return Promise.all([
+      api.listAnimals().catch(() => []),
+      api.listTodayTasks().catch(() => []),
+      api.listUpcomingEvents(90).catch(() => []),
+    ]).then(([animalsRes, tasksRes, upcomingRes]) => {
+      setAnimals(animalsRes);
+      setTasks(tasksRes);
+      setUpcoming(upcomingRes);
+      setLoading(false);
+    });
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      load();
-    }, [load]),
+      loadData();
+    }, [loadData]),
   );
 
-  if (error) {
-    return (
-      <Screen scroll={false} className="justify-center">
-        <ErrorState message={error} onRetry={load} />
-      </Screen>
-    );
-  }
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadData().finally(() => setRefreshing(false));
+  }, [loadData]);
 
-  if (!animals || !upcoming) {
+  const toggleTask = async (task: TodayTask) => {
+    // Mise à jour optimiste
+    setTasks((prev) =>
+      prev.map((t) => (t.id === task.id ? { ...t, checked: !t.checked } : t)),
+    );
+    try {
+      await api.toggleTask(task.routineId);
+    } catch {
+      // Revert en cas d'erreur
+      setTasks((prev) =>
+        prev.map((t) => (t.id === task.id ? { ...t, checked: task.checked } : t)),
+      );
+    }
+  };
+
+  // Filtrage des tâches selon l'animal sélectionné
+  const selectedAnimal = animals.find((a) => a.id === selectedAnimalId);
+  const filteredTasks = selectedAnimal
+    ? tasks.filter((t) => t.animal === selectedAnimal.name)
+    : tasks;
+
+  const nextAppointment = upcoming[0];
+
+  // Date du jour formatée : ex. "Jeudi 10 septembre"
+  const rawDate = new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date());
+  const todayFormatted = rawDate.charAt(0).toUpperCase() + rawDate.slice(1);
+
+  // Nom d'utilisateur pour la salutation
+  const userName = user?.email ? user.email.split('@')[0] : 'Camille';
+  const greetingName = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+  if (loading && animals.length === 0) {
     return (
-      <Screen scroll={false} className="p-4 gap-4">
+      <View className="flex-1 bg-surface p-4 pt-14 gap-4">
         <Skeleton variant="card" />
-        <Skeleton variant="row" count={3} />
-      </Screen>
+        <Skeleton variant="row" count={4} />
+      </View>
     );
   }
 
-  if (animals.length === 0) {
+  if (!loading && animals.length === 0) {
     return (
-      <Screen contentContainerClassName="gap-4 p-4">
-        <Text className="text-display font-bold text-text">Aujourd&apos;hui</Text>
-
-        <Section>
-          <Text className="text-headline font-semibold text-text">Aucun animal suivi</Text>
-          <Text className="text-body text-text-secondary">
-            Ajoutez votre premier compagnon pour démarrer son carnet de santé.
-          </Text>
-        </Section>
-
-        <View className="gap-4">
-          {ONBOARDING_STEPS.map((step) => (
-            <View key={step.title} className="flex-row gap-3">
-              <Icon name={step.icon} decorative />
-              <View className="flex-1">
-                <Text className="text-headline font-semibold text-text">{step.title}</Text>
-                <Text className="text-body text-text-secondary">{step.text}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        <Button label="Ajouter un animal" onPress={() => router.push('/animals/new')} />
-      </Screen>
+      <View className="flex-1 bg-surface pt-12">
+        <EmptyHousehold onAddAnimal={() => router.push('/animals/new')} />
+      </View>
     );
   }
 
-  const [hero, ...rest] = upcoming;
+  const completedCount = filteredTasks.filter((t) => t.checked).length;
+  const totalCount = filteredTasks.length;
+  const progressRatio = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   return (
-    <Screen contentContainerClassName="pb-8">
-      <Text className="text-display font-bold text-text p-4">Aujourd&apos;hui</Text>
+    <View className="flex-1 bg-surface">
+      <Screen scroll contentContainerClassName="pb-36">
+        <ScrollView
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          contentContainerClassName="pt-2">
+          {/* Bandeau hors ligne automatique (Screen 23) */}
+          <OfflineBanner />
 
-      <Section>
-        {hero ? (
-          <>
-            <Text className="text-eyebrow font-semibold uppercase text-text-tertiary">
-              Prochaine échéance
-            </Text>
-            <Metric
-              days={daysUntil(hero.nextDueDate)}
-              state={deadlineState(daysUntil(hero.nextDueDate))}
-              label={`${hero.title} · ${hero.animalName}`}
-            />
-          </>
-        ) : (
-          <Text className="text-body text-text-secondary">
-            Aucune échéance dans les {UPCOMING_WINDOW_DAYS} jours.
-          </Text>
-        )}
-      </Section>
+          {/* Header Screen 1 */}
+          <View className="px-5 pt-3 pb-2 flex-row items-center justify-between">
+            <View className="flex-1">
+              <Text className="text-[11px] uppercase tracking-wider font-semibold text-text-tertiary">
+                {todayFormatted}
+              </Text>
+              <Text className="text-[26px] font-medium text-text tracking-tight mt-0.5">
+                Bonjour {greetingName}
+              </Text>
+            </View>
 
-      {rest.length > 0 ? (
-        <>
-          <Divider />
-          <Section>
-            <Text className="text-eyebrow font-semibold uppercase text-text-tertiary">
-              À venir ({UPCOMING_WINDOW_DAYS} jours)
-            </Text>
-            {rest.map((event, index) => (
-              <View key={event.id}>
-                <Link href={`/animals/${event.animalId}/events/${event.id}`} asChild>
-                  <ListRow
-                    title={event.title}
-                    subtitle={event.animalName}
-                    trailing={
-                      <Badge
-                        state={deadlineState(daysUntil(event.nextDueDate))}
-                        label={`J-${daysUntil(event.nextDueDate)}`}
-                      />
-                    }
-                  />
-                </Link>
-                {index < rest.length - 1 ? <Divider /> : null}
+            <View className="flex-row items-center gap-2">
+              {/* Bouton Recherche globale (Screen 21) */}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Recherche globale"
+                onPress={() => router.push('/search')}
+                className="w-10 h-10 rounded-full border border-border items-center justify-center active:bg-surface-elevated">
+                <Icon name="search" size={17} color={colors.textSecondary} decorative />
+              </Pressable>
+
+              {/* Bouton cloche notifications (Screen 20) */}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Centre de notifications"
+                onPress={() => router.push('/notifications')}
+                className="w-10 h-10 rounded-full border border-border items-center justify-center relative active:bg-surface-elevated">
+                <Icon name="bell" size={18} color={colors.textSecondary} decorative />
+                <View className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-primary" />
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Carrousel sélecteur d'animaux */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="px-5 gap-2.5 py-3">
+            <Pressable
+              onPress={() => setSelectedAnimalId(null)}
+              className={`flex-row items-center gap-2 rounded-full px-3.5 py-1.5 border ${
+                selectedAnimalId === null
+                  ? 'bg-surface-elevated border-brand/50 shadow-sm'
+                  : 'bg-surface border-border/60'
+              }`}>
+              <View
+                className={`w-6 h-6 rounded-full items-center justify-center ${
+                  selectedAnimalId === null ? 'bg-brand/20' : 'bg-surface-sunken'
+                }`}>
+                <Text
+                  className={`text-[10px] font-bold ${
+                    selectedAnimalId === null ? 'text-brand' : 'text-text-secondary'
+                  }`}>
+                  *
+                </Text>
               </View>
-            ))}
-          </Section>
-        </>
-      ) : null}
-    </Screen>
+              <Text
+                className={`text-[13px] ${
+                  selectedAnimalId === null ? 'text-text font-medium' : 'text-text-secondary'
+                }`}>
+                Tous
+              </Text>
+            </Pressable>
+
+            {animals.map((a) => {
+              const isSelected = selectedAnimalId === a.id;
+              return (
+                <Pressable
+                  key={a.id}
+                  onPress={() => setSelectedAnimalId(isSelected ? null : a.id)}
+                  className={`flex-row items-center gap-2 rounded-full px-3.5 py-1.5 border ${
+                    isSelected
+                      ? 'bg-surface-elevated border-brand/50 shadow-sm'
+                      : 'bg-surface border-border/60'
+                  }`}>
+                  <View
+                    className={`w-6 h-6 rounded-full items-center justify-center ${
+                      isSelected ? 'bg-brand/20' : 'bg-surface-sunken'
+                    }`}>
+                    <Text
+                      className={`text-[11px] font-bold ${
+                        isSelected ? 'text-brand' : 'text-text-secondary'
+                      }`}>
+                      {a.name[0]?.toUpperCase()}
+                    </Text>
+                  </View>
+                  <Text
+                    className={`text-[13px] ${
+                      isSelected ? 'text-text font-medium' : 'text-text-secondary'
+                    }`}>
+                    {a.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          {/* Section "À faire aujourd'hui" */}
+          <View className="px-5 mt-3">
+            <View className="flex-row items-baseline justify-between mb-2">
+              <Text className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+                À faire aujourd&apos;hui
+              </Text>
+              <Text className="text-xs font-semibold text-primary">
+                {completedCount} / {totalCount}
+              </Text>
+            </View>
+
+            {/* Barre de progression fine */}
+            <View className="h-[2px] rounded-full bg-surface-sunken overflow-hidden mb-3.5">
+              <View
+                className="h-full bg-primary rounded-full"
+                style={{ width: `${progressRatio}%` }}
+              />
+            </View>
+
+            {filteredTasks.length === 0 ? (
+              <Card elevated className="p-4 items-center justify-center">
+                <Text className="text-caption text-text-secondary">
+                  Toutes les tâches du jour sont terminées !
+                </Text>
+              </Card>
+            ) : (
+              <View className="gap-2.5">
+                {filteredTasks.map((task) => (
+                  <View
+                    key={task.id}
+                    className="flex-row items-center gap-3 p-3.5 rounded-lg bg-surface border border-border/50">
+                    <Checkbox
+                      variant="round"
+                      checked={task.checked}
+                      onCheckedChange={() => toggleTask(task)}
+                    />
+                    <View className="flex-1">
+                      <Text
+                        className={`text-[14px] font-medium ${
+                          task.checked ? 'text-text-tertiary line-through' : 'text-text'
+                        }`}>
+                        {task.title}
+                      </Text>
+                      {task.subtitle ? (
+                        <Text
+                          className={`text-[11px] mt-0.5 ${
+                            task.checked ? 'text-text-tertiary' : 'text-text-secondary'
+                          }`}>
+                          {task.subtitle}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <View className="rounded-sm bg-surface-sunken px-2 py-0.5 border border-border/60">
+                      <Text className="text-[11px] font-medium text-text-secondary">
+                        {task.animal}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Section Prochain Rendez-vous */}
+          {nextAppointment ? (
+            <View className="px-5 mt-5">
+              <HighlightCard
+                kicker="Prochain rendez-vous"
+                title={`${nextAppointment.title} — ${nextAppointment.animalName}`}
+                subtitle={`${formatDate(nextAppointment.nextDueDate)}${
+                  nextAppointment.description ? ` · ${nextAppointment.description}` : ''
+                }`}
+                actions={
+                  <>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onPress={() => router.push('/calendar')}>
+                      Ajouter au calendrier
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onPress={() => router.push('/calendar')}>
+                      Déplacer
+                    </Button>
+                  </>
+                }
+              />
+            </View>
+          ) : null}
+        </ScrollView>
+      </Screen>
+
+      {/* Bouton d'action flottant (FAB) */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Ajouter"
+        onPress={() => router.push('/animals/new')}
+        className="absolute right-5 rounded-full border border-brand/70 bg-brand/15 items-center justify-center shadow-md active:opacity-75"
+        style={{
+          width: 52,
+          height: 52,
+          bottom: Math.max(insets.bottom + 64, 104),
+        }}>
+        <Icon name="add" size={24} color={colors.brand} decorative />
+      </Pressable>
+    </View>
   );
 }

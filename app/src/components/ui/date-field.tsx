@@ -65,10 +65,10 @@ export function DateField({
               : `${label}, ${value ? formatLongDate(value) : 'aucune date'}`
           }
           onPress={handleOpen}
-          className={`min-h-11 flex-1 justify-center rounded-md border px-4 py-3 bg-surface ${
-            error ? 'border-danger' : 'border-border'
+          className={`min-h-[56px] flex-1 justify-center rounded-xl px-5 py-4 bg-surface-sunken ${
+            error ? 'border-2 border-danger' : 'border-transparent'
           }`}>
-          <Text className={`text-body ${value ? 'text-text' : 'text-text-tertiary'}`}>
+          <Text className={`text-headline ${value ? 'text-text' : 'text-text-tertiary'}`}>
             {display}
           </Text>
         </Pressable>
@@ -99,10 +99,11 @@ export function DateField({
             {/* Carte centrée : absorbe les taps pour éviter la fermeture du backdrop */}
             <Pressable
               onPress={(e) => e.stopPropagation()}
-              className="rounded-lg bg-surface mx-4 p-4 gap-3">
+              className="w-[90%] max-w-[360px] rounded-2xl bg-surface p-4 gap-3">
               {/* Calendrier */}
               {draft !== null ? (
                 <DateTimePicker
+                  style={{ width: 320, height: 320, alignSelf: 'center' }}
                   value={draft}
                   mode="date"
                   display="inline"
@@ -139,6 +140,7 @@ export function DateField({
         /* Android : conserve le comportement natif avec dialogue Material */
         open ? (
           <DateTimePicker
+                  style={{ width: 320, height: 320, alignSelf: 'center' }}
             value={selected}
             mode="date"
             display="default"

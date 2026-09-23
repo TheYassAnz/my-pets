@@ -4,7 +4,7 @@ import { Text, TextInput, useColorScheme, View, type TextInputProps } from 'reac
 import { Colors } from '@/constants/theme';
 
 export type InputProps = Omit<TextInputProps, 'placeholderTextColor' | 'accessibilityLabel'> & {
-  label: string;
+  label?: string; // Rend le label optionnel si on fait un wizard ultra épuré
   error?: string;
 };
 
@@ -12,32 +12,26 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
   { label, error, multiline, className, ...rest },
   ref,
 ) {
-  // `placeholderTextColor` n'accepte qu'une couleur résolue : NativeWind ne mappe
-  // pas `placeholderClassName` à l'exécution (il est typé mais ignoré en 4.2.6).
-  // On lit donc le token depuis Colors, qui est synchronisé avec global.css.
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
 
   return (
-    <View className="gap-1.5">
-      <Text className="text-caption font-medium text-text-secondary">{label}</Text>
+    <View className="gap-2">
+      {label && <Text className="text-body font-semibold text-text ml-1">{label}</Text>}
 
       <TextInput
         ref={ref}
-        // React Native n'a ni `aria-invalid` ni `accessibilityState.invalid` :
-        // joindre l'erreur au libellé est le seul moyen de l'annoncer.
-        accessibilityLabel={error ? `${label}, erreur : ${error}` : label}
+        accessibilityLabel={error ? `${label ?? 'Champ'}, erreur : ${error}` : (label ?? 'Champ')}
         multiline={multiline}
-        // Contraste conforme (≥4.5:1) : remplace l'ancien #9ca3af (~2.5:1).
         placeholderTextColor={colors.textTertiary}
-        className={`min-h-11 rounded-md border px-4 py-3 text-body text-text bg-surface ${
-          error ? 'border-danger' : 'border-border'
-        } ${multiline ? 'min-h-24' : ''} ${className ?? ''}`}
+        className={`min-h-[46px] rounded-md px-3.5 py-2.5 text-body text-text bg-surface border ${
+          error ? 'border-danger bg-danger-surface' : 'border-border'
+        } ${multiline ? 'min-h-[100px] pt-3' : ''} ${className ?? ''}`}
         {...rest}
       />
 
       {error ? (
-        <Text accessibilityLiveRegion="polite" className="text-caption text-danger">
+        <Text accessibilityLiveRegion="polite" className="text-caption text-danger ml-1">
           {error}
         </Text>
       ) : null}

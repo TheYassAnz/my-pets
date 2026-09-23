@@ -14,10 +14,10 @@ export function Chip({ label, selected, onPress }: ChipProps) {
       accessibilityState={{ checked: selected }}
       onPress={onPress}
       className={`min-h-11 items-center justify-center rounded-full border px-4 ${
-        selected ? 'border-primary bg-primary' : 'border-border'
+        selected ? 'border-brand bg-brand/20' : 'border-border bg-surface'
       }`}>
       <Text
-        className={`text-body ${selected ? 'font-semibold text-on-primary' : 'text-text'}`}>
+        className={`text-body ${selected ? 'font-medium text-brand' : 'text-text-secondary'}`}>
         {label}
       </Text>
     </Pressable>

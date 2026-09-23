@@ -18,15 +18,18 @@ export class AnimalsService {
   async findAll(ownerId: string) {
     const animals = await this.prisma.animal.findMany({
       where: { ownerId },
+      include: {
+        weightRecords: {
+          orderBy: { date: 'desc' },
+          take: 1,
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
     if (animals.length === 0) return [];
 
     const animalIds = animals.map((animal) => animal.id);
 
-    // Deux groupBy, pas une requête par animal : un pour le nombre total
-    // d'événements, un pour la plus proche échéance à venir (filtres
-    // différents, donc pas combinables en un seul appel).
     const [counts, upcoming] = await Promise.all([
       this.prisma.healthEvent.groupBy({
         by: ['animalId'],
@@ -52,15 +55,28 @@ export class AnimalsService {
 
     return animals.map((animal) => ({
       ...animal,
+      latestWeight: (animal as any).weightRecords?.[0]?.weightKg ?? null,
       eventCount: eventCountByAnimal.get(animal.id) ?? 0,
       nextDueDate: nextDueDateByAnimal.get(animal.id) ?? null,
     }));
   }
 
   async findOne(ownerId: string, id: string) {
-    const animal = await this.prisma.animal.findUnique({ where: { id } });
+    const animal = await this.prisma.animal.findUnique({
+      where: { id },
+      include: {
+        weightRecords: {
+          orderBy: { date: 'desc' },
+          take: 10,
+        },
+        documents: true,
+      },
+    });
     this.assertOwned(animal, ownerId);
-    return animal;
+    return {
+      ...animal,
+      latestWeight: animal.weightRecords[0]?.weightKg ?? null,
+    };
   }
 
   create(ownerId: string, dto: CreateAnimalDto) {
@@ -68,6 +84,14 @@ export class AnimalsService {
       data: {
         name: dto.name,
         species: dto.species,
+        breed: dto.breed,
+        gender: dto.gender,
+        isSterilized: dto.isSterilized ?? false,
+        dailyRation: dto.dailyRation,
+        foodBrand: dto.foodBrand,
+        foodStockKg: dto.foodStockKg,
+        foodTotalKg: dto.foodTotalKg,
+        foodOpenedAt: dto.foodOpenedAt ? new Date(dto.foodOpenedAt) : undefined,
         birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
         ownerId,
       },
@@ -83,6 +107,14 @@ export class AnimalsService {
       data: {
         name: dto.name,
         species: dto.species,
+        breed: dto.breed,
+        gender: dto.gender,
+        isSterilized: dto.isSterilized,
+        dailyRation: dto.dailyRation,
+        foodBrand: dto.foodBrand,
+        foodStockKg: dto.foodStockKg,
+        foodTotalKg: dto.foodTotalKg,
+        foodOpenedAt: dto.foodOpenedAt ? new Date(dto.foodOpenedAt) : undefined,
         birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined,
       },
     });

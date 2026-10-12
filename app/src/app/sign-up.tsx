@@ -56,84 +56,83 @@ export default function SignUpScreen() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 40, paddingBottom: 24 }}>
           <View>
-          <AuthPortraits />
-          <Text accessibilityRole="header" className="mb-6 text-[32px] font-bold text-text">
-            Créer un compte
-          </Text>
+            <AuthPortraits />
+            <Text accessibilityRole="header" className="mb-6 text-[32px] font-bold text-text">
+              Créer un compte
+            </Text>
 
-          <View className="gap-3.5">
-            <FormField
-              control={control}
-              name="email"
-              label="E-mail"
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              returnKeyType="next"
-              submitBehavior="submit"
-              onSubmitEditing={() => passwordRef.current?.focus()}
-            />
-
-            <View className="gap-1.5">
+            <View className="gap-3.5">
               <FormField
                 control={control}
-                name="password"
-                label="Mot de passe"
-                placeholder="8 caractères min."
-                inputRef={passwordRef}
-                secureTextEntry
-                autoComplete="new-password"
+                name="email"
+                label="E-mail"
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
                 returnKeyType="next"
                 submitBehavior="submit"
-                onSubmitEditing={() => confirmRef.current?.focus()}
+                onSubmitEditing={() => passwordRef.current?.focus()}
               />
 
-              {/* Jauge de solidité du mot de passe */}
-              {passwordValue.length > 0 ? (
-                <View className="mt-1">
-                  <View className="flex-row gap-1">
-                    {[1, 2, 3, 4].map((step) => (
-                      <View
-                        key={step}
-                        className={`flex-1 h-[3px] rounded-full ${
-                          step <= passwordStrength ? 'bg-primary' : 'bg-border'
-                        }`}
-                      />
-                    ))}
+              <View className="gap-1.5">
+                <FormField
+                  control={control}
+                  name="password"
+                  label="Mot de passe"
+                  placeholder="8 caractères min."
+                  inputRef={passwordRef}
+                  secureTextEntry
+                  autoComplete="new-password"
+                  returnKeyType="next"
+                  submitBehavior="submit"
+                  onSubmitEditing={() => confirmRef.current?.focus()}
+                />
+
+                {/* Jauge de solidité du mot de passe */}
+                {passwordValue.length > 0 ? (
+                  <View className="mt-1">
+                    <View className="flex-row gap-1">
+                      {[1, 2, 3, 4].map((step) => (
+                        <View
+                          key={step}
+                          className={`flex-1 h-[3px] rounded-full ${
+                            step <= passwordStrength ? 'bg-primary' : 'bg-border'
+                          }`}
+                        />
+                      ))}
+                    </View>
+                    <Text className="text-[11px] text-text-tertiary mt-1.5">
+                      {passwordStrength >= 3
+                        ? 'Solide · 12 caractères minimum recommandés'
+                        : 'Moyen · Ajoutez des chiffres ou symboles'}
+                    </Text>
                   </View>
-                  <Text className="text-[11px] text-text-tertiary mt-1.5">
-                    {passwordStrength >= 3
-                      ? 'Solide · 12 caractères minimum recommandés'
-                      : 'Moyen · Ajoutez des chiffres ou symboles'}
-                  </Text>
-                </View>
-              ) : null}
+                ) : null}
+              </View>
+
+              <FormField
+                control={control}
+                name="confirm"
+                label="Confirmer le mot de passe"
+                inputRef={confirmRef}
+                secureTextEntry
+                autoComplete="new-password"
+                returnKeyType="done"
+                onSubmitEditing={onSubmit}
+              />
+
+              {/* Conditions d'utilisation */}
+              <Pressable
+                onPress={() => setAcceptedTerms(!acceptedTerms)}
+                className="flex-row items-start gap-2.5 mt-1">
+                <Checkbox checked={acceptedTerms} onCheckedChange={setAcceptedTerms} accessibilityLabel="Accepter les conditions d’utilisation" />
+                <Text className="flex-1 text-[12px] leading-relaxed text-text-secondary">
+                  J'accepte les conditions d'utilisation et la politique de confidentialité.
+                </Text>
+              </Pressable>
+
+              {error ? <Text className="text-body text-danger">{error}</Text> : null}
             </View>
-
-            <FormField
-              control={control}
-              name="confirm"
-              label="Confirmer le mot de passe"
-              inputRef={confirmRef}
-              secureTextEntry
-              autoComplete="new-password"
-              returnKeyType="done"
-              onSubmitEditing={onSubmit}
-            />
-
-            {/* Conditions d'utilisation */}
-            <Pressable
-              onPress={() => setAcceptedTerms(!acceptedTerms)}
-              className="flex-row items-start gap-2.5 mt-1">
-              <Checkbox checked={acceptedTerms} onCheckedChange={setAcceptedTerms} accessibilityLabel="Accepter les conditions d’utilisation" />
-              <Text className="flex-1 text-[12px] leading-relaxed text-text-secondary">
-                J'accepte les conditions d'utilisation et la politique de confidentialité.
-              </Text>
-            </Pressable>
-
-            {error ? <Text className="text-body text-danger">{error}</Text> : null}
-
-          </View>
           </View>
 
           <View>

@@ -29,6 +29,7 @@ const MATERIAL = {
   vaccine: 'needle',
   treatment: 'pill',
   visit: 'stethoscope',
+  scale: 'scale-bathroom',
 } as const;
 
 export type IconName = keyof typeof IONICONS | keyof typeof MATERIAL;

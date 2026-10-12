@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react-native';
 
+import { Text } from 'react-native';
+
 import { ListRow } from '@/components/ui/list-row';
 
 describe('ListRow', () => {
@@ -35,5 +37,11 @@ describe('ListRow', () => {
     await render(<ListRow title="Rex" subtitle="Chien" onPress={jest.fn()} testID="animal-row" />);
 
     expect(screen.getByTestId('animal-row')).toBeTruthy();
+  });
+
+  it('rend le trailing', async () => {
+    await render(<ListRow title="Rex" trailing={<Text>12 mars</Text>} />);
+
+    expect(screen.getByText('12 mars')).toBeTruthy();
   });
 });

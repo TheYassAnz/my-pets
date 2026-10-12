@@ -17,6 +17,7 @@ describe('barrel export de la librairie UI', () => {
       'SegmentedControl',
       'Skeleton',
       'ToastProvider',
+      'TypeIcon',
       'useToast',
     ];
 

@@ -25,6 +25,7 @@ export {
 } from './segmented-control';
 export { Skeleton, type SkeletonProps } from './skeleton';
 export { SpeciesPicker, type SpeciesPickerProps } from './species-picker';
+export { TypeIcon, type TypeIconProps, type TypeIconType } from './type-icon';
 export { Text, TextInput } from './text';
 export { ToastProvider, useToast } from './toast';
 export { OfflineBanner, type OfflineBannerProps } from './offline-banner';

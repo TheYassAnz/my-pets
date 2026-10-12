@@ -17,3 +17,27 @@ describe('Avatar', () => {
     expect(screen.getByTestId('avatar')).toBeTruthy();
   });
 });
+
+describe('Avatar tailles et pastille', () => {
+  it.each([
+    ['xs', 32],
+    ['sm', 44],
+    ['md', 60],
+    ['lg', 92],
+    ['xl', 112],
+  ] as const)('taille %s = %d', async (size, d) => {
+    await render(<Avatar size={size} testID="a" />);
+    const style = [screen.getByTestId('a').props.style].flat();
+    expect(style).toContainEqual(expect.objectContaining({ width: d, height: d }));
+  });
+
+  it('affiche la pastille uniquement si editable', async () => {
+    await render(<Avatar editable testID="a" />);
+    expect(screen.getByTestId('a-badge', { includeHiddenElements: true })).toBeTruthy();
+  });
+
+  it('sans editable, pas de pastille', async () => {
+    await render(<Avatar testID="a" />);
+    expect(screen.queryByTestId('a-badge', { includeHiddenElements: true })).toBeNull();
+  });
+});

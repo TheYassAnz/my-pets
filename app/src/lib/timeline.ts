@@ -1,4 +1,4 @@
-import { formatKg } from '@/lib/animals';
+import { formatKg, roundKg } from '@/lib/animals';
 import type { HealthEvent, WeightRecord } from '@/lib/api';
 
 export type TimelineKind = 'VACCINE' | 'TREATMENT' | 'VISIT' | 'WEIGHT';
@@ -58,7 +58,8 @@ export function weightTrend(weights: WeightRecord[]): {
   if (!previous) return { latestKg: latest.weightKg, deltaKg: null, since: null };
   return {
     latestKg: latest.weightKg,
-    deltaKg: Math.round((latest.weightKg - previous.weightKg) * 10) / 10,
+    // Écart calculé sur les poids affichés ; `+ 0` évite -0.
+    deltaKg: roundKg(roundKg(latest.weightKg) - roundKg(previous.weightKg)) + 0,
     since: previous.date,
   };
 }

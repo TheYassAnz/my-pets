@@ -47,8 +47,11 @@ export function computeAge(birthDateIso: string, today: Date = new Date()): stri
   return `${Math.floor(months / 12)} ans`;
 }
 
+// Arrondi d'affichage (1 décimale), partagé avec le calcul d'écart des pesées.
+export const roundKg = (kg: number) => Math.round(kg * 10) / 10;
+
 // « 4,2 kg » (virgule décimale, 1 décimale au plus) ; « — » quand aucun poids n'est connu.
 export function formatKg(kg: number | null | undefined): string {
-  if (kg == null) return '—';
-  return `${String(Math.round(kg * 10) / 10).replace('.', ',')} kg`;
+  if (kg == null || !Number.isFinite(kg)) return '—';
+  return `${String(roundKg(kg)).replace('.', ',')} kg`;
 }

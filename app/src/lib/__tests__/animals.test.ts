@@ -56,6 +56,13 @@ describe('formatKg', () => {
     expect(formatKg(12)).toBe('12 kg');
   });
 
+  it('arrondit à 1 décimale sans artefact flottant', () => {
+    expect(formatKg(0.1 + 0.2)).toBe('0,3 kg');
+    expect(formatKg(4.25)).toBe('4,3 kg');
+    expect(formatKg(5)).toBe('5 kg');
+    expect(formatKg(18.65)).toBe('18,7 kg');
+  });
+
   it('renvoie un tiret sans poids', () => {
     expect(formatKg(null)).toBe('—');
     expect(formatKg(undefined)).toBe('—');

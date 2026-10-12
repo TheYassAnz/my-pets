@@ -85,7 +85,16 @@ export default function MyAnimalsScreen() {
               title={a.name}
               subtitle={subtitle}
               leading={<Avatar uri={a.photoUrl} size="md" />}
-              trailing={<Text className="text-[15px] font-bold text-text">{weight}</Text>}
+              trailing={
+                <Text
+                  className={
+                    a.latestWeight != null
+                      ? 'text-[15px] font-bold text-text'
+                      : 'text-[15px] text-text-tertiary'
+                  }>
+                  {weight}
+                </Text>
+              }
               accessibilityLabel={[a.name, a.species.toLowerCase(), age, a.latestWeight != null && weight]
                 .filter(Boolean)
                 .join(', ')}
@@ -110,9 +119,10 @@ export default function MyAnimalsScreen() {
 
   return (
     <ScrollView
-      style={{ paddingTop: insets.top }}
+      testID="animals-scroll"
       className="flex-1 bg-surface"
-      contentContainerClassName="px-5 pb-36 pt-3"
+      contentContainerStyle={{ paddingTop: insets.top + 12 }}
+      contentContainerClassName="px-5 pb-36"
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       <View className="flex-row justify-end">
         <Pressable
@@ -127,6 +137,11 @@ export default function MyAnimalsScreen() {
       <Text accessibilityRole="header" className="mb-3 mt-2 text-[32px] font-extrabold text-text">
         Mes animaux
       </Text>
+      {error && animals?.length ? (
+        <Text accessibilityRole="alert" className="mb-2 text-[14px] text-text-secondary">
+          Impossible d&apos;actualiser. Réessayez.
+        </Text>
+      ) : null}
       {body}
     </ScrollView>
   );

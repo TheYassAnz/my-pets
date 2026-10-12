@@ -23,8 +23,8 @@ function RootNavigator() {
       </Stack.Protected>
 
       <Stack.Protected guard={!user}>
-        <Stack.Screen name="welcome" />
         <Stack.Screen name="sign-in" />
+        <Stack.Screen name="welcome" />
         <Stack.Screen name="sign-up" />
         <Stack.Screen name="forgot-password" />
         <Stack.Screen name="reset-password" />

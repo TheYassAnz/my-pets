@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type TextInput as RNTextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Checkbox, FormField, Icon } from '@/components/ui';
+import { AuthPortraits } from '@/components/auth-portraits';
+import { Button, Checkbox, FormField } from '@/components/ui';
+import { Text } from '@/components/ui/text';
 import { useSession } from '@/lib/auth-context';
 import { signUpSchema, type SignUpValues } from '@/lib/forms/schemas';
 
@@ -13,8 +15,8 @@ export default function SignUpScreen() {
   const { signUp } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(true);
-  const passwordRef = useRef<TextInput>(null);
-  const confirmRef = useRef<TextInput>(null);
+  const passwordRef = useRef<RNTextInput>(null);
+  const confirmRef = useRef<RNTextInput>(null);
 
   const { control, handleSubmit, watch, formState } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
@@ -48,21 +50,14 @@ export default function SignUpScreen() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-surface-sunken">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1">
-        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingVertical: 16 }}>
-          {/* Bouton Retour Circulaire */}
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Retour"
-            onPress={() => router.back()}
-            className="w-[34px] h-[34px] rounded-full items-center justify-center bg-surface border border-border">
-            <Icon name="chevron-left" size={16} color="rgb(var(--color-text))" />
-          </Pressable>
-
-          <Text className="text-[27px] font-medium tracking-tight text-text mt-4 mb-5">
+    <SafeAreaView className="flex-1 bg-surface">
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1">
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 40, paddingBottom: 24 }}>
+          <View>
+          <AuthPortraits />
+          <Text accessibilityRole="header" className="mb-6 text-[32px] font-bold text-text">
             Créer un compte
           </Text>
 
@@ -101,7 +96,7 @@ export default function SignUpScreen() {
                       <View
                         key={step}
                         className={`flex-1 h-[3px] rounded-full ${
-                          step <= passwordStrength ? 'bg-primary' : 'bg-surface'
+                          step <= passwordStrength ? 'bg-primary' : 'bg-border'
                         }`}
                       />
                     ))}
@@ -130,7 +125,7 @@ export default function SignUpScreen() {
             <Pressable
               onPress={() => setAcceptedTerms(!acceptedTerms)}
               className="flex-row items-start gap-2.5 mt-1">
-              <Checkbox checked={acceptedTerms} onToggle={setAcceptedTerms} />
+              <Checkbox checked={acceptedTerms} onCheckedChange={setAcceptedTerms} accessibilityLabel="Accepter les conditions d’utilisation" />
               <Text className="flex-1 text-[12px] leading-relaxed text-text-secondary">
                 J'accepte les conditions d'utilisation et la politique de confidentialité.
               </Text>
@@ -138,25 +133,19 @@ export default function SignUpScreen() {
 
             {error ? <Text className="text-body text-danger">{error}</Text> : null}
 
-            <Button
-              label="Continuer"
-              variant="primary"
-              className="mt-2"
-              loading={formState.isSubmitting}
-              onPress={onSubmit}
-            />
+          </View>
+          </View>
 
-            <View className="flex-row items-center gap-3 my-2">
-              <View className="flex-1 h-[1px] bg-border" />
-              <Text className="text-[11px] text-text-tertiary">ou</Text>
-              <View className="flex-1 h-[1px] bg-border" />
-            </View>
-
-            <View className="flex-row justify-center gap-1 mt-2">
-              <Text className="text-text-secondary">Déjà un compte ?</Text>
-              <Link href="/sign-in" asChild>
-                <Text className="text-primary font-semibold">Se connecter</Text>
-              </Link>
+          <View>
+            <Button label="Continuer" variant="primary" loading={formState.isSubmitting} onPress={onSubmit} />
+            <View className="mt-4 flex-row items-center justify-center gap-1">
+              <Text className="text-[15px] text-text-secondary">Déjà un compte ?</Text>
+              <Text
+                accessibilityRole="link"
+                onPress={() => router.replace('/sign-in')}
+                className="min-h-[44px] py-3 text-[15px] font-bold text-text">
+                Se connecter
+              </Text>
             </View>
           </View>
         </ScrollView>

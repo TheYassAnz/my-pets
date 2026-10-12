@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
 
@@ -45,6 +45,27 @@ describe('Mes animaux', () => {
     expect(screen.getByText('—')).toBeTruthy();
     await fireEvent.press(screen.getByLabelText('Nala, chat, 4,2 kg'));
     expect(router.push).toHaveBeenCalledWith('/animals/1');
+  });
+
+  it('affiche l’âge et la photo', async () => {
+    jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate', 'setTimeout', 'queueMicrotask'], now: new Date('2026-10-12') });
+    mockListAnimals.mockResolvedValue([
+      animal({ id: '1', name: 'Nala', birthDate: '2023-01-05T00:00:00.000Z', photoUrl: 'https://x/y.jpg' }),
+    ]);
+    await render(<MyAnimalsScreen />);
+    expect(await screen.findByText('Chat · 3 ans')).toBeTruthy();
+    jest.useRealTimers();
+  });
+
+  it('échec d’actualisation : message affiché, liste conservée', async () => {
+    mockListAnimals.mockResolvedValueOnce([animal({ id: '1', name: 'Nala' })]);
+    await render(<MyAnimalsScreen />);
+    await screen.findByText('Nala');
+    mockListAnimals.mockRejectedValue(new Error('boom'));
+    const { refreshControl } = screen.getByTestId('animals-scroll').props;
+    await act(() => refreshControl.props.onRefresh());
+    expect(await screen.findByText("Impossible d'actualiser. Réessayez.")).toBeTruthy();
+    expect(screen.getByText('Nala')).toBeTruthy();
   });
 
   it('liste vide : EmptyState', async () => {

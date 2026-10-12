@@ -21,6 +21,7 @@ const IONICONS = {
   alert: 'alert-circle-outline',
   refresh: 'refresh',
   trash: 'trash-outline',
+  edit: 'create-outline',
   search: 'search-outline',
 } as const;
 

@@ -77,6 +77,14 @@ describe('synchronisation Colors (theme.ts) / global.css', () => {
     statusSoon: '--color-status-soon',
     statusLate: '--color-status-late',
     dangerSurface: '--color-danger-surface',
+    typeVaccine: '--color-type-vaccine',
+    typeVaccineFg: '--color-type-vaccine-fg',
+    typeTreatment: '--color-type-treatment',
+    typeTreatmentFg: '--color-type-treatment-fg',
+    typeVisit: '--color-type-visit',
+    typeVisitFg: '--color-type-visit-fg',
+    typeWeight: '--color-type-weight',
+    typeWeightFg: '--color-type-weight-fg',
   };
 
   it('a les mêmes valeurs hex que les variables CSS correspondantes, en light et en dark', async () => {

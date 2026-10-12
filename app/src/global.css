@@ -14,52 +14,60 @@
 
 @layer base {
   :root {
-    --color-surface: 243 245 254;
+    --color-surface: 255 255 255;
     --color-surface-elevated: 255 255 255;
-    --color-surface-sunken: 228 231 245;
-    --color-border: 207 211 229;
-
-    --color-text: 41 43 49;
-    --color-text-secondary: 89 93 108;
-    --color-text-tertiary: 147 151 171;
-
-    --color-primary: 121 108 191;
-    --color-primary-pressed: 93 82 148;
+    --color-surface-sunken: 242 242 244;
+    --color-border: 236 236 238;
+    --color-text: 10 10 10;
+    --color-text-secondary: 138 138 142;
+    --color-text-tertiary: 180 180 184;
+    --color-primary: 10 10 10;
+    --color-primary-pressed: 58 58 60;
     --color-on-primary: 255 255 255;
-
-    --color-brand: 121 108 191;
-    --color-brand-pressed: 93 82 148;
+    --color-brand: 10 10 10;
+    --color-brand-pressed: 58 58 60;
     --color-on-brand: 255 255 255;
-
-    --color-status-ok: 46 125 71;
-    --color-status-soon: 180 83 9;
+    --color-status-ok: 0 168 98;
+    --color-status-soon: 217 119 6;
     --color-status-late: 220 38 38;
     --color-danger-surface: 254 226 226;
+    --color-type-vaccine: 255 217 207;
+    --color-type-vaccine-fg: 229 83 47;
+    --color-type-treatment: 255 235 184;
+    --color-type-treatment-fg: 185 122 0;
+    --color-type-visit: 213 239 224;
+    --color-type-visit-fg: 46 139 87;
+    --color-type-weight: 221 228 255;
+    --color-type-weight-fg: 75 95 214;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --color-surface: 35 37 50;
-      --color-surface-elevated: 43 45 60;
-      --color-surface-sunken: 22 24 38;
-      --color-border: 63 66 77;
-
-      --color-text: 233 233 237;
-      --color-text-secondary: 147 151 171;
-      --color-text-tertiary: 117 121 140;
-
-      --color-primary: 145 132 217;
-      --color-primary-pressed: 181 171 252;
-      --color-on-primary: 22 24 38;
-
-      --color-brand: 145 132 217;
-      --color-brand-pressed: 181 171 252;
-      --color-on-brand: 22 24 38;
-
-      --color-status-ok: 150 204 168;
-      --color-status-soon: 221 201 138;
-      --color-status-late: 226 145 159;
-      --color-danger-surface: 56 30 39;
+      --color-surface: 0 0 0;
+      --color-surface-elevated: 14 14 16;
+      --color-surface-sunken: 28 28 30;
+      --color-border: 44 44 46;
+      --color-text: 255 255 255;
+      --color-text-secondary: 142 142 147;
+      --color-text-tertiary: 99 99 102;
+      --color-primary: 255 255 255;
+      --color-primary-pressed: 209 209 214;
+      --color-on-primary: 0 0 0;
+      --color-brand: 255 255 255;
+      --color-brand-pressed: 209 209 214;
+      --color-on-brand: 0 0 0;
+      --color-status-ok: 47 210 122;
+      --color-status-soon: 245 165 36;
+      --color-status-late: 255 107 107;
+      --color-danger-surface: 58 20 20;
+      --color-type-vaccine: 59 38 32;
+      --color-type-vaccine-fg: 255 138 107;
+      --color-type-treatment: 58 48 24;
+      --color-type-treatment-fg: 242 193 78;
+      --color-type-visit: 31 51 41;
+      --color-type-visit-fg: 95 211 154;
+      --color-type-weight: 35 42 74;
+      --color-type-weight-fg: 143 160 255;
     }
   }
 }

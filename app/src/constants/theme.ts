@@ -4,52 +4,70 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    surface: '#F3F5FE',
+    surface: '#FFFFFF',
     surfaceElevated: '#FFFFFF',
-    surfaceSunken: '#E4E7F5',
-    border: '#CFD3E5',
+    surfaceSunken: '#F2F2F4',
+    border: '#ECECEE',
 
-    text: '#292B31',
-    textSecondary: '#595D6C',
-    textTertiary: '#9397AB',
+    text: '#0A0A0A',
+    textSecondary: '#8A8A8E',
+    textTertiary: '#B4B4B8',
 
-    primary: '#796CBF',
-    primaryPressed: '#5D5294',
+    primary: '#0A0A0A',
+    primaryPressed: '#3A3A3C',
     onPrimary: '#FFFFFF',
 
-    brand: '#796CBF',
-    brandPressed: '#5D5294',
+    brand: '#0A0A0A',
+    brandPressed: '#3A3A3C',
     onBrand: '#FFFFFF',
 
-    statusOk: '#2E7D47',
-    statusSoon: '#B45309',
+    statusOk: '#00A862',
+    statusSoon: '#D97706',
     statusLate: '#DC2626',
     danger: '#DC2626',
     dangerSurface: '#FEE2E2',
+
+    typeVaccine: '#FFD9CF',
+    typeVaccineFg: '#E5532F',
+    typeTreatment: '#FFEBB8',
+    typeTreatmentFg: '#B97A00',
+    typeVisit: '#D5EFE0',
+    typeVisitFg: '#2E8B57',
+    typeWeight: '#DDE4FF',
+    typeWeightFg: '#4B5FD6',
   },
   dark: {
-    surface: '#232532',
-    surfaceElevated: '#2B2D3C',
-    surfaceSunken: '#161826',
-    border: '#3F424D',
+    surface: '#000000',
+    surfaceElevated: '#0E0E10',
+    surfaceSunken: '#1C1C1E',
+    border: '#2C2C2E',
 
-    text: '#E9E9ED',
-    textSecondary: '#9397AB',
-    textTertiary: '#75798C',
+    text: '#FFFFFF',
+    textSecondary: '#8E8E93',
+    textTertiary: '#636366',
 
-    primary: '#9184D9',
-    primaryPressed: '#B5ABFC',
-    onPrimary: '#161826',
+    primary: '#FFFFFF',
+    primaryPressed: '#D1D1D6',
+    onPrimary: '#000000',
 
-    brand: '#9184D9',
-    brandPressed: '#B5ABFC',
-    onBrand: '#161826',
+    brand: '#FFFFFF',
+    brandPressed: '#D1D1D6',
+    onBrand: '#000000',
 
-    statusOk: '#96CCA8',
-    statusSoon: '#DDC98A',
-    statusLate: '#E2919F',
-    danger: '#E2919F',
-    dangerSurface: '#381E27',
+    statusOk: '#2FD27A',
+    statusSoon: '#F5A524',
+    statusLate: '#FF6B6B',
+    danger: '#FF6B6B',
+    dangerSurface: '#3A1414',
+
+    typeVaccine: '#3B2620',
+    typeVaccineFg: '#FF8A6B',
+    typeTreatment: '#3A3018',
+    typeTreatmentFg: '#F2C14E',
+    typeVisit: '#1F3329',
+    typeVisitFg: '#5FD39A',
+    typeWeight: '#232A4A',
+    typeWeightFg: '#8FA0FF',
   },
 } as const;
 
@@ -87,7 +105,7 @@ export const Spacing = {
 } as const;
 
 export const Typography = {
-  metric: { fontSize: 48, lineHeight: 52, fontWeight: '700', letterSpacing: -1.5 },
+  metric: { fontSize: 46, lineHeight: 50, fontWeight: '800', letterSpacing: -1.6 },
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

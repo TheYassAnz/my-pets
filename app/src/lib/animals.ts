@@ -46,3 +46,9 @@ export function computeAge(birthDateIso: string, today: Date = new Date()): stri
   if (months < 24) return `${months} mois`;
   return `${Math.floor(months / 12)} ans`;
 }
+
+// « 4,2 kg » (virgule décimale) ; « — » quand aucun poids n'est connu.
+export function formatKg(kg: number | null | undefined): string {
+  if (kg == null) return '—';
+  return `${String(kg).replace('.', ',')} kg`;
+}

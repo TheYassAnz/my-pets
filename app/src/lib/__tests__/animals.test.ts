@@ -1,4 +1,4 @@
-import { computeAge, resolveSpecies, splitSpecies } from '@/lib/animals';
+import { computeAge, formatKg, resolveSpecies, splitSpecies } from '@/lib/animals';
 
 describe('splitSpecies', () => {
   it('reconnaît une espèce de la liste fermée', () => {
@@ -47,5 +47,17 @@ describe('computeAge', () => {
 
   it('ne rend pas d’âge pour une valeur non parsable', () => {
     expect(computeAge('bancal', today)).toBeNull();
+  });
+});
+
+describe('formatKg', () => {
+  it('formate avec virgule décimale', () => {
+    expect(formatKg(4.2)).toBe('4,2 kg');
+    expect(formatKg(12)).toBe('12 kg');
+  });
+
+  it('renvoie un tiret sans poids', () => {
+    expect(formatKg(null)).toBe('—');
+    expect(formatKg(undefined)).toBe('—');
   });
 });

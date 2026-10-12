@@ -164,9 +164,6 @@ export default function FoyerScreen() {
               <Text className="text-[11px] uppercase tracking-wider font-semibold text-text-tertiary">
                 Membres du foyer
               </Text>
-              <Pressable onPress={() => router.push('/invitation')}>
-                <Text className="text-[12.5px] font-medium text-primary">+ Inviter</Text>
-              </Pressable>
             </View>
 
             <View className="flex-row gap-3">

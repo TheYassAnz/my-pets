@@ -96,7 +96,7 @@ export default function EditAnimalScreen() {
           try {
             await api.deleteAnimal(id);
             // Replace allows us to completely back out of the animal details flow
-            router.replace('/animals');
+            router.replace('/');
           } catch (e) {
             setError(e instanceof ApiError ? e.message : 'Suppression impossible');
           }

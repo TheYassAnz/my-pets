@@ -1,4 +1,10 @@
-import { animalSchema, healthEventSchema, signInSchema, signUpSchema } from '@/lib/forms/schemas';
+import {
+  animalSchema,
+  healthEventSchema,
+  signInSchema,
+  signUpSchema,
+  weightEntrySchema,
+} from '@/lib/forms/schemas';
 
 function messageFor(result: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }, field: string) {
   return result.error?.issues.find((issue) => issue.path[0] === field)?.message;
@@ -105,6 +111,25 @@ describe('healthEventSchema', () => {
   it('exige une date', () => {
     const result = healthEventSchema.safeParse({ ...valid, date: '' });
 
+    expect(messageFor(result, 'date')).toBe('Date requise');
+  });
+});
+
+describe('weightEntrySchema', () => {
+  const parse = (weightKg: string, date = '2026-05-10') =>
+    weightEntrySchema.safeParse({ weightKg, date });
+
+  it('accepte la virgule et le point', () => {
+    expect(parse('4,2')).toMatchObject({ success: true, data: { weightKg: 4.2 } });
+    expect(parse('4.2')).toMatchObject({ success: true, data: { weightKg: 4.2 } });
+  });
+
+  it.each(['0', '250', 'abc', ''])('refuse « %s »', (value) => {
+    expect(parse(value).success).toBe(false);
+  });
+
+  it('refuse une date vide', () => {
+    const result = parse('4,2', '');
     expect(messageFor(result, 'date')).toBe('Date requise');
   });
 });

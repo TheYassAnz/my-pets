@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { OTHER_SPECIES, SPECIES } from '@/lib/animals';
-import { isFutureDate } from '@/lib/dates';
+import { isFutureDate, parseIsoDate } from '@/lib/dates';
 
 export const signInSchema = z.object({
   email: z.string().trim().min(1, 'Email requis'),
@@ -63,3 +63,22 @@ export const healthEventSchema = z.object({
 });
 
 export type HealthEventValues = z.infer<typeof healthEventSchema>;
+
+// Poids saisi en texte (virgule ou point) ; « abc » et « » échouent tous deux.
+export const weightEntrySchema = z.object({
+  weightKg: z
+    .string()
+    .transform((s) => Number(s.trim().replace(',', '.')))
+    .pipe(
+      z
+        .number('Poids invalide')
+        .gt(0, 'Le poids doit être supérieur à 0')
+        .lt(200, 'Le poids doit être inférieur à 200 kg'),
+    ),
+  date: z
+    .string()
+    .min(1, 'Date requise')
+    .refine((d) => parseIsoDate(d) !== null, 'Date invalide'),
+});
+
+export type WeightEntryValues = z.infer<typeof weightEntrySchema>;

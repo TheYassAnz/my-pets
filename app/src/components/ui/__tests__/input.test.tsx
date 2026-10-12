@@ -32,4 +32,17 @@ describe('Input', () => {
 
     expect(screen.queryByText('Nom requis')).toBeNull();
   });
+
+  it('épaissit le filet au focus et le rend danger en erreur', async () => {
+    const { rerender } = await render(<Input label="Nom" value="" onChangeText={jest.fn()} />);
+    expect(screen.getByLabelText('Nom').props.className).toContain('border-border');
+
+    await fireEvent(screen.getByLabelText('Nom'), 'focus');
+    expect(screen.getByLabelText('Nom').props.className).toContain('border-text');
+
+    await rerender(<Input label="Nom" value="" onChangeText={jest.fn()} error="Nom requis" />);
+    expect(screen.getByLabelText('Nom, erreur : Nom requis').props.className).toContain(
+      'border-danger',
+    );
+  });
 });

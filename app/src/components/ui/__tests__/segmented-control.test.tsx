@@ -28,4 +28,13 @@ describe('SegmentedControl', () => {
       screen.getByRole('radio', { name: 'Visite' }).props.accessibilityState.selected,
     ).toBe(false);
   });
+
+  it('met en avant le segment actif sur un fond de surface', async () => {
+    await render(<SegmentedControl options={OPTIONS} value="VACCINE" onChange={jest.fn()} />);
+
+    expect(screen.getByRole('radio', { name: 'Vaccin' }).props.className).toContain('bg-surface');
+    expect(screen.getByRole('radio', { name: 'Visite' }).props.className).not.toContain(
+      'bg-surface',
+    );
+  });
 });

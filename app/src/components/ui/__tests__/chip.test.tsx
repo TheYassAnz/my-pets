@@ -19,4 +19,11 @@ describe('Chip', () => {
       screen.getByRole('checkbox', { name: 'J-15' }).props.accessibilityState.checked,
     ).toBe(true);
   });
+
+  it('inverse les couleurs quand il est sélectionné', async () => {
+    await render(<Chip label="J-15" selected onPress={jest.fn()} />);
+
+    expect(screen.getByRole('checkbox', { name: 'J-15' }).props.className).toContain('bg-text');
+    expect(screen.getByText('J-15').props.className).toContain('text-surface');
+  });
 });

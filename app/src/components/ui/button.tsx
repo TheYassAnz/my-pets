@@ -1,33 +1,34 @@
-import { ActivityIndicator, Pressable, Text, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, Pressable, useColorScheme, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
 import { Icon, type IconName } from './icon';
+import { Text } from './text';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost';
 
 const CONTAINER: Record<ButtonVariant, string> = {
-  primary: 'border border-primary active:bg-primary/15',
-  secondary: 'border border-border active:bg-surface-sunken',
-  destructive: 'border border-danger active:bg-danger-surface',
-  ghost: 'active:bg-primary/10',
+  primary: 'bg-primary',
+  secondary: 'bg-surface-sunken',
+  destructive: '',
+  ghost: '',
 };
 
 const LABEL: Record<ButtonVariant, string> = {
-  primary: 'text-primary',
+  primary: 'text-on-primary',
   secondary: 'text-text',
   destructive: 'text-danger',
-  ghost: 'text-primary',
+  ghost: 'text-text',
 };
 
 // L'icône ne peut pas hériter de la classe du libellé (Text ne transmet pas sa
 // couleur à un enfant Text distinct) : on la résout ici depuis Colors, pour
 // qu'elle reste alignée avec `LABEL` ci-dessus.
 const ICON_COLOR_KEY: Record<ButtonVariant, keyof typeof Colors.light> = {
-  primary: 'primary',
+  primary: 'onPrimary',
   secondary: 'text',
   destructive: 'danger',
-  ghost: 'primary',
+  ghost: 'text',
 };
 
 export type ButtonProps = {
@@ -68,7 +69,7 @@ export function Button({
       disabled={isDisabled}
       onPress={onPress}
       testID={testID}
-      className={`min-h-11 flex-row items-center justify-center gap-2 rounded-md px-4 py-3 ${
+      className={`h-[52px] flex-row items-center justify-center gap-2 rounded-[14px] px-4 active:opacity-70 ${
         CONTAINER[variant]
       } ${isDisabled ? 'opacity-50' : ''} ${className ?? ''}`}>
       {loading ? (
@@ -78,7 +79,7 @@ export function Button({
           {icon ? (
             <Icon name={icon} size={18} decorative color={colors[ICON_COLOR_KEY[variant]]} />
           ) : null}
-          <Text className={`text-body font-semibold ${LABEL[variant]}`}>{label}</Text>
+          <Text className={`text-body font-bold ${LABEL[variant]}`}>{label}</Text>
         </View>
       )}
     </Pressable>

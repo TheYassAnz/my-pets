@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+
+import { Text } from './text';
 
 export type FieldShellProps = {
   label?: string;
@@ -9,13 +11,13 @@ export type FieldShellProps = {
 
 export function FieldShell({ label, error, children }: FieldShellProps) {
   return (
-    <View className="gap-2">
-      {label && <Text className="text-body font-semibold text-text ml-1">{label}</Text>}
+    <View className="gap-1">
+      {label && <Text className="text-caption font-medium text-text-secondary">{label}</Text>}
 
       {children}
 
       {error ? (
-        <Text accessibilityLiveRegion="polite" className="text-caption text-danger ml-1">
+        <Text accessibilityLiveRegion="polite" className="text-caption text-danger">
           {error}
         </Text>
       ) : null}

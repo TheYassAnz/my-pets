@@ -1,4 +1,6 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
+
+import { Text } from './text';
 
 export type SegmentedOption = { value: string; label: string };
 
@@ -10,7 +12,7 @@ export type SegmentedControlProps = {
 
 export function SegmentedControl({ options, value, onChange }: SegmentedControlProps) {
   return (
-    <View accessibilityRole="radiogroup" className="flex-row rounded-full bg-surface p-1 gap-1">
+    <View accessibilityRole="radiogroup" className="flex-row rounded-xl bg-surface-sunken p-[3px]">
       {options.map((option) => {
         const selected = option.value === value;
         return (
@@ -20,13 +22,11 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
             accessibilityLabel={option.label}
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
-            className={`min-h-9 flex-1 items-center justify-center rounded-full py-2 ${
-              selected ? 'bg-brand/20 border border-brand/50' : 'border border-transparent'
+            className={`min-h-11 flex-1 items-center justify-center rounded-[10px] py-2 ${
+              selected ? 'bg-surface' : ''
             }`}>
             <Text
-              className={`text-caption ${
-                selected ? 'font-medium text-brand' : 'text-text-secondary'
-              }`}>
+              className={`text-[14px] font-bold ${selected ? 'text-text' : 'text-text-secondary'}`}>
               {option.label}
             </Text>
           </Pressable>

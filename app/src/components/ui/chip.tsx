@@ -1,4 +1,6 @@
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
+
+import { Text } from './text';
 
 export type ChipProps = {
   label: string;
@@ -13,11 +15,10 @@ export function Chip({ label, selected, onPress }: ChipProps) {
       accessibilityLabel={label}
       accessibilityState={{ checked: selected }}
       onPress={onPress}
-      className={`min-h-11 items-center justify-center rounded-full border px-4 ${
-        selected ? 'border-brand bg-brand/20' : 'border-border bg-surface'
+      className={`min-h-11 items-center justify-center rounded-full px-4 py-2 ${
+        selected ? 'bg-text' : 'bg-surface-sunken'
       }`}>
-      <Text
-        className={`text-body ${selected ? 'font-medium text-brand' : 'text-text-secondary'}`}>
+      <Text className={`text-[14px] font-bold ${selected ? 'text-surface' : 'text-text'}`}>
         {label}
       </Text>
     </Pressable>

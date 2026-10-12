@@ -45,4 +45,17 @@ describe('Button', () => {
 
     expect(screen.getByTestId('save-button')).toBeTruthy();
   });
+
+  it('primary a un fond plein et un texte contrasté, secondary un fond neutre', async () => {
+    await render(
+      <>
+        <Button label="Plein" testID="p" />
+        <Button label="Neutre" variant="secondary" testID="s" />
+      </>,
+    );
+
+    expect(screen.getByTestId('p').props.className).toContain('bg-primary');
+    expect(screen.getByText('Plein').props.className).toContain('text-on-primary');
+    expect(screen.getByTestId('s').props.className).toContain('bg-surface-sunken');
+  });
 });

@@ -58,4 +58,17 @@ describe('Button', () => {
     expect(screen.getByText('Plein').props.className).toContain('text-on-primary');
     expect(screen.getByTestId('s').props.className).toContain('bg-surface-sunken');
   });
+
+  it('ghost et destructive sont sans fond plein', async () => {
+    await render(
+      <>
+        <Button label="Texte" variant="ghost" testID="g" />
+        <Button label="Supprimer" variant="destructive" testID="d" />
+      </>,
+    );
+
+    expect(screen.getByTestId('g').props.className).not.toContain('bg-');
+    expect(screen.getByTestId('d').props.className).not.toContain('bg-');
+    expect(screen.getByText('Supprimer').props.className).toContain('text-danger');
+  });
 });

@@ -70,4 +70,12 @@ describe('DateField', () => {
 
     expect(screen.queryByLabelText('Effacer Prochain rappel')).toBeNull();
   });
+
+  it('souligne le champ : filet danger en erreur, neutre sinon', async () => {
+    const { rerender } = await render(<DateField label="Date" value={null} onChange={jest.fn()} />);
+    expect(screen.getByRole('button', { name: /^Date/ }).props.className).toContain('border-border');
+
+    await rerender(<DateField label="Date" value={null} onChange={jest.fn()} error="Requise" />);
+    expect(screen.getByRole('button', { name: /^Date/ }).props.className).toContain('border-danger');
+  });
 });

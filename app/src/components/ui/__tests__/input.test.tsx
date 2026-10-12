@@ -45,4 +45,14 @@ describe('Input', () => {
       'border-danger',
     );
   });
+
+  it('garde le filet danger quand le champ en erreur est focalisé', async () => {
+    await render(<Input label="Nom" value="" onChangeText={jest.fn()} error="Nom requis" />);
+
+    await fireEvent(screen.getByLabelText('Nom, erreur : Nom requis'), 'focus');
+
+    expect(screen.getByLabelText('Nom, erreur : Nom requis').props.className).toContain(
+      'border-danger',
+    );
+  });
 });

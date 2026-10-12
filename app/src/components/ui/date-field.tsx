@@ -1,12 +1,13 @@
 import { DateTimePicker } from '@expo/ui/community/datetime-picker';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, Text, useColorScheme, View } from 'react-native';
+import { Modal, Platform, Pressable, useColorScheme, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { formatLongDate, parseIsoDate, toIsoDate } from '@/lib/dates';
 
 import { Button } from './button';
 import { FieldShell } from './field-shell';
+import { Text } from './text';
 
 export type DateFieldProps = {
   label: string;
@@ -65,10 +66,15 @@ export function DateField({
               : `${label}, ${value ? formatLongDate(value) : 'aucune date'}`
           }
           onPress={handleOpen}
-          className={`min-h-[56px] flex-1 justify-center rounded-xl px-5 py-4 bg-surface-sunken ${
-            error ? 'border-2 border-danger' : 'border-transparent'
+          className={`min-h-11 flex-1 justify-center pb-2.5 pt-1 ${
+            error
+              ? 'border-b-[1.5px] border-danger'
+              : open
+                ? 'border-b-2 border-text'
+                : 'border-b-[1.5px] border-border'
           }`}>
-          <Text className={`text-headline ${value ? 'text-text' : 'text-text-tertiary'}`}>
+          <Text
+            className={`text-[18px] font-semibold ${value ? 'text-text' : 'text-text-tertiary'}`}>
             {display}
           </Text>
         </Pressable>

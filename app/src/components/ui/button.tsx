@@ -69,11 +69,11 @@ export function Button({
       disabled={isDisabled}
       onPress={onPress}
       testID={testID}
-      className={`h-[52px] flex-row items-center justify-center gap-2 rounded-[14px] px-4 active:opacity-70 ${
+      className={`min-h-[52px] flex-row items-center justify-center gap-2 rounded-lg px-4 py-3 active:opacity-70 ${
         CONTAINER[variant]
       } ${isDisabled ? 'opacity-50' : ''} ${className ?? ''}`}>
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator color={colors[ICON_COLOR_KEY[variant]]} />
       ) : (
         <View className="flex-row items-center gap-2">
           {icon ? (

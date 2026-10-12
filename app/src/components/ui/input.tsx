@@ -33,7 +33,7 @@ export const Input = forwardRef<RNTextInput, InputProps>(function Input(
         accessibilityLabel={error ? `${label ?? 'Champ'}, erreur : ${error}` : (label ?? 'Champ')}
         multiline={multiline}
         placeholderTextColor={colors.textTertiary}
-        className={`min-h-11 pb-2.5 pt-1 text-headline font-semibold text-text ${rule} ${
+        className={`min-h-11 pb-2.5 pt-1 text-[18px] font-semibold text-text ${rule} ${
           multiline ? 'min-h-[100px]' : ''
         } ${className ?? ''}`}
         onFocus={(e) => {

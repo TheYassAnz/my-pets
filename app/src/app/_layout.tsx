@@ -2,6 +2,7 @@ import '@/global.css';
 
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -9,6 +10,7 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { ToastProvider } from '@/components/ui';
 import { AppFontSources } from '@/constants/fonts';
 import { SessionProvider, useSession } from '@/lib/auth-context';
+import { registerServiceWorker } from '@/lib/pwa';
 
 function RootNavigator() {
   const { user, isLoading } = useSession();
@@ -36,6 +38,10 @@ function RootNavigator() {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [fontsLoaded] = useFonts(AppFontSources);
+
+  useEffect(() => {
+    void registerServiceWorker();
+  }, []);
 
   // Pas de texte dans la mauvaise police le temps du chargement.
   if (!fontsLoaded) return null;

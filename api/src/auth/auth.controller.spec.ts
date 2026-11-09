@@ -128,4 +128,12 @@ describe('AuthController (cookie)', () => {
     res = await request(server).post('/auth/login').send(creds);
     expect(res.headers['set-cookie'][0]).toMatch(/Secure/);
   });
+
+  it('cookie mal encodé : refresh → 401, logout → 204, service non appelé', async () => {
+    const bad = 'mypets_rt=%E0%A4%A';
+    await request(server).post('/auth/refresh').set('Cookie', bad).expect(401);
+    await request(server).post('/auth/logout').set('Cookie', bad).expect(204);
+    expect(service.refresh).not.toHaveBeenCalled();
+    expect(service.logout).not.toHaveBeenCalled();
+  });
 });

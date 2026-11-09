@@ -29,7 +29,11 @@ export function readRefreshCookie(req: Request): string | undefined {
   for (const part of (req.headers.cookie ?? '').split(';')) {
     const [name, ...value] = part.trim().split('=');
     if (name === REFRESH_COOKIE) {
-      return decodeURIComponent(value.join('=')) || undefined;
+      try {
+        return decodeURIComponent(value.join('=')) || undefined;
+      } catch {
+        return undefined; // % mal formé : en-tête client non fiable
+      }
     }
   }
   return undefined;

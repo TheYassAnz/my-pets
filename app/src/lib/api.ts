@@ -1,11 +1,3 @@
-import {
-  ACCESS_TOKEN_KEY,
-  REFRESH_TOKEN_KEY,
-  deleteToken,
-  getToken,
-  setToken,
-} from './token-storage';
-
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export type User = {
@@ -16,7 +8,6 @@ export type User = {
 
 export type AuthResponse = {
   accessToken: string;
-  refreshToken: string;
   user: User;
 };
 
@@ -29,32 +20,70 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(
+// L'access token vit en mémoire seulement ; le refresh token est un cookie httpOnly
+let accessToken: string | null = null;
+
+export function setAccessToken(token: string | null): void {
+  accessToken = token;
+}
+
+export function getAccessToken(): string | null {
+  return accessToken;
+}
+
+let refreshing: Promise<boolean> | null = null;
+
+// Vol unique dans l'onglet (promesse partagée) et entre onglets (Web Locks :
+// le suivant rafraîchit avec le cookie déjà tourné).
+export function refreshSession(): Promise<boolean> {
+  refreshing ??= (async () => {
+    const run = async () => {
+      try {
+        const response = await fetch(`${API_URL}/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const body = (await response.json()) as { accessToken: string };
+          accessToken = body.accessToken;
+          return true;
+        }
+      } catch {
+        // réseau coupé : la session est considérée perdue
+      }
+      accessToken = null;
+      return false;
+    };
+    const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
+    return locks ? locks.request('mypets-refresh', run) : run();
+  })().finally(() => {
+    refreshing = null;
+  });
+  return refreshing;
+}
+
+// Les routes /auth/* gèrent elles-mêmes leurs 401 (identifiants invalides)
+async function send(
   path: string,
-  options: RequestInit = {},
-  retryOn401 = true,
-): Promise<T> {
+  init: RequestInit,
+  retryOn401: boolean,
+): Promise<Response> {
   if (!API_URL) {
     throw new ApiError(0, 'EXPO_PUBLIC_API_URL non configurée');
   }
-
-  const accessToken = await getToken(ACCESS_TOKEN_KEY);
   const response = await fetch(`${API_URL}${path}`, {
-    ...options,
+    ...init,
+    credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...options.headers,
+      ...init.headers,
     },
   });
-
-  if (response.status === 401 && retryOn401) {
-    const refreshed = await tryRefresh();
-    if (refreshed) {
-      return request<T>(path, options, false);
+  if (response.status === 401 && retryOn401 && !path.startsWith('/auth/')) {
+    if (await refreshSession()) {
+      return send(path, init, false);
     }
   }
-
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as {
       message?: string | string[];
@@ -64,46 +93,22 @@ async function request<T>(
       : (body?.message ?? `Erreur ${response.status}`);
     throw new ApiError(response.status, message);
   }
+  return response;
+}
 
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const response = await send(
+    path,
+    {
+      ...options,
+      headers: { 'Content-Type': 'application/json', ...options.headers },
+    },
+    true,
+  );
   if (response.status === 204) {
     return undefined as T;
   }
   return (await response.json()) as T;
-}
-
-async function tryRefresh(): Promise<boolean> {
-  const refreshToken = await getToken(REFRESH_TOKEN_KEY);
-  if (!refreshToken || !API_URL) {
-    return false;
-  }
-
-  const response = await fetch(`${API_URL}/auth/refresh`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
-  });
-
-  if (!response.ok) {
-    await clearTokens();
-    return false;
-  }
-
-  const tokens = (await response.json()) as {
-    accessToken: string;
-    refreshToken: string;
-  };
-  await storeTokens(tokens.accessToken, tokens.refreshToken);
-  return true;
-}
-
-export async function storeTokens(accessToken: string, refreshToken: string) {
-  await setToken(ACCESS_TOKEN_KEY, accessToken);
-  await setToken(REFRESH_TOKEN_KEY, refreshToken);
-}
-
-export async function clearTokens() {
-  await deleteToken(ACCESS_TOKEN_KEY);
-  await deleteToken(REFRESH_TOKEN_KEY);
 }
 
 export type Animal = {
@@ -198,40 +203,11 @@ async function uploadFile<T>(
   path: string,
   field: string,
   file: { uri: string; name: string; type: string },
-  retryOn401 = true,
 ): Promise<T> {
-  if (!API_URL) {
-    throw new ApiError(0, 'EXPO_PUBLIC_API_URL non configurée');
-  }
-
-  const accessToken = await getToken(ACCESS_TOKEN_KEY);
   const form = new FormData();
   // @ts-expect-error React Native accepte {uri, name, type} comme valeur de FormData
   form.append(field, { uri: file.uri, name: file.name, type: file.type });
-
-  const response = await fetch(`${API_URL}${path}`, {
-    method: 'POST',
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-    body: form,
-  });
-
-  if (response.status === 401 && retryOn401) {
-    const refreshed = await tryRefresh();
-    if (refreshed) {
-      return uploadFile<T>(path, field, file, false);
-    }
-  }
-
-  if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as {
-      message?: string | string[];
-    } | null;
-    const message = Array.isArray(body?.message)
-      ? body.message.join(', ')
-      : (body?.message ?? `Erreur ${response.status}`);
-    throw new ApiError(response.status, message);
-  }
-
+  const response = await send(path, { method: 'POST', body: form }, true);
   return (await response.json()) as T;
 }
 
@@ -249,16 +225,8 @@ export const api = {
     }),
 
   logout: async () => {
-    const refreshToken = await getToken(REFRESH_TOKEN_KEY);
-    if (refreshToken) {
-      await request<void>('/auth/logout', {
-        method: 'POST',
-        body: JSON.stringify({ refreshToken }),
-      }).catch(() => {
-        // Le logout local doit réussir même si l'API est injoignable
-      });
-    }
-    await clearTokens();
+    // Le logout local doit réussir même si l'API est injoignable
+    await request<void>('/auth/logout', { method: 'POST' }).catch(() => {});
   },
 
   me: () => request<User>('/auth/me'),

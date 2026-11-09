@@ -6,12 +6,8 @@ import {
   useState,
 } from 'react';
 
-import { api, clearTokens, storeTokens, type User } from './api';
-import {
-  registerForPushNotifications,
-  unregisterPushNotifications,
-} from './notifications';
-import { ACCESS_TOKEN_KEY, getToken } from './token-storage';
+import { api, refreshSession, setAccessToken, type User } from './api';
+import { unregisterPushNotifications } from './notifications';
 
 type AuthContextValue = {
   user: User | null;
@@ -35,20 +31,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restauration de session au démarrage : token présent → /auth/me
-  // (le client API tente un refresh automatique si l'access token a expiré)
+  // Restauration de session au démarrage : le cookie refresh donne un access
+  // token, puis /auth/me
   useEffect(() => {
     let cancelled = false;
 
     (async () => {
       try {
-        const token = await getToken(ACCESS_TOKEN_KEY);
-        if (token) {
+        if (await refreshSession()) {
           const me = await api.me();
           if (!cancelled) setUser(me);
         }
       } catch {
-        await clearTokens();
+        setAccessToken(null);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -59,28 +54,22 @@ export function SessionProvider({ children }: PropsWithChildren) {
     };
   }, []);
 
-  // Dès qu'une session est active, on enregistre l'appareil pour les rappels
-  useEffect(() => {
-    if (user) {
-      void registerForPushNotifications();
-    }
-  }, [user]);
-
   const signIn = async (email: string, password: string) => {
     const res = await api.login(email, password);
-    await storeTokens(res.accessToken, res.refreshToken);
+    setAccessToken(res.accessToken);
     setUser(res.user);
   };
 
   const signUp = async (email: string, password: string) => {
     const res = await api.register(email, password);
-    await storeTokens(res.accessToken, res.refreshToken);
+    setAccessToken(res.accessToken);
     setUser(res.user);
   };
 
   const signOut = async () => {
     await unregisterPushNotifications();
     await api.logout();
+    setAccessToken(null);
     setUser(null);
   };
 

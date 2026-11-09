@@ -1,8 +1,7 @@
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
-import { api, ApiError } from './api';
-import { ACCESS_TOKEN_KEY, getToken } from './token-storage';
+import { api, ApiError, getAccessToken } from './api';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -17,7 +16,7 @@ export async function exportAndShareHealthRecord(
 
   // Passe par le client API d'abord : rafraîchit l'access token si expiré
   await api.getAnimal(animalId);
-  const accessToken = await getToken(ACCESS_TOKEN_KEY);
+  const accessToken = getAccessToken();
 
   const filename = `carnet-${animalName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`;
   const destination = new File(Paths.cache, filename);

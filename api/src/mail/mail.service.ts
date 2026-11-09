@@ -32,4 +32,17 @@ export class MailService {
       throw new InternalServerErrorException("Échec de l'envoi de l'email");
     }
   }
+
+  async sendReminderDigest(email: string, lines: string[]): Promise<void> {
+    const { error } = await this.resend.emails.send({
+      from: this.from,
+      to: email,
+      subject: 'Rappels santé my-pets',
+      text: lines.join('\n'),
+    });
+    if (error) {
+      this.logger.error(`Échec envoi email de rappel: ${error.message}`);
+      throw new InternalServerErrorException("Échec de l'envoi de l'email");
+    }
+  }
 }

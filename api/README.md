@@ -57,6 +57,16 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Web Push (rappels)
+
+Générer les clés avec `npx web-push generate-vapid-keys`, puis définir :
+
+- `VAPID_PUBLIC_KEY` : clé publique (aussi utilisée côté app via `EXPO_PUBLIC_VAPID_PUBLIC_KEY`)
+- `VAPID_PRIVATE_KEY` : clé privée
+- `VAPID_SUBJECT` : `mailto:…` de contact
+
+Sans ces variables, les rappels sont envoyés par email uniquement.
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

@@ -1,26 +1,47 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import * as webpush from 'web-push';
+import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma.service';
 
-const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
-
-type ExpoPushMessage = {
-  to: string;
-  title: string;
-  body: string;
-  data?: Record<string, string>;
+type Subscription = {
+  id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
 };
-
-type ExpoPushTicket = {
-  status: 'ok' | 'error';
-  details?: { error?: string };
+type Reminder = { animalId: string; animal: string; body: string };
+type OwnerReminders = {
+  email: string;
+  subscriptions: Subscription[];
+  reminders: Reminder[];
 };
 
 @Injectable()
 export class RemindersService {
   private readonly logger = new Logger(RemindersService.name);
+  private readonly pushEnabled: boolean;
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mail: MailService,
+  ) {
+    const { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT } = process.env;
+    this.pushEnabled = !!(
+      VAPID_PUBLIC_KEY &&
+      VAPID_PRIVATE_KEY &&
+      VAPID_SUBJECT
+    );
+    if (this.pushEnabled) {
+      webpush.setVapidDetails(
+        VAPID_SUBJECT!,
+        VAPID_PUBLIC_KEY!,
+        VAPID_PRIVATE_KEY!,
+      );
+    } else {
+      this.logger.warn('VAPID non configuré : rappels par email uniquement');
+    }
+  }
 
   // Tous les jours à 8h : notifie les échéances qui tombent exactement
   // à J-<leadDay> pour chaque délai configuré par l'utilisateur
@@ -38,14 +59,18 @@ export class RemindersService {
         animal: {
           include: {
             owner: {
-              select: { reminderLeadDays: true, pushSubscriptions: true },
+              select: {
+                email: true,
+                reminderLeadDays: true,
+                pushSubscriptions: true,
+              },
             },
           },
         },
       },
     });
 
-    const messages: ExpoPushMessage[] = [];
+    const byOwner = new Map<string, OwnerReminders>();
     for (const event of events) {
       const dueDate = new Date(event.nextDueDate as Date);
       dueDate.setUTCHours(0, 0, 0, 0);
@@ -59,54 +84,59 @@ export class RemindersService {
         daysUntil === 0
           ? "aujourd'hui"
           : `dans ${daysUntil} jour${daysUntil > 1 ? 's' : ''}`;
-      for (const pushToken of owner.pushSubscriptions) {
-        messages.push({
-          to: pushToken.endpoint,
-          title: `Rappel santé — ${event.animal.name}`,
-          body: `${event.title} ${when}`,
-          data: { animalId: event.animalId, eventId: event.id },
-        });
-      }
-    }
-
-    if (messages.length === 0) return;
-    await this.sendPushMessages(messages);
-    this.logger.log(`${messages.length} rappel(s) envoyé(s)`);
-  }
-
-  private async sendPushMessages(messages: ExpoPushMessage[]): Promise<void> {
-    // L'API push Expo accepte 100 messages max par requête
-    for (let i = 0; i < messages.length; i += 100) {
-      const chunk = messages.slice(i, i + 100);
-      try {
-        const response = await fetch(EXPO_PUSH_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(chunk),
-        });
-        if (!response.ok) {
-          this.logger.error(`Expo push HTTP ${response.status}`);
-          continue;
-        }
-        const { data } = (await response.json()) as { data: ExpoPushTicket[] };
-        await this.cleanupInvalidTokens(chunk, data);
-      } catch (e) {
-        this.logger.error('Envoi push Expo impossible', e as Error);
-      }
-    }
-  }
-
-  private async cleanupInvalidTokens(
-    chunk: ExpoPushMessage[],
-    tickets: ExpoPushTicket[],
-  ): Promise<void> {
-    const invalid = chunk
-      .filter((_, i) => tickets[i]?.details?.error === 'DeviceNotRegistered')
-      .map((m) => m.to);
-    if (invalid.length > 0) {
-      await this.prisma.pushSubscription.deleteMany({
-        where: { endpoint: { in: invalid } },
+      const entry = byOwner.get(owner.email) ?? {
+        email: owner.email,
+        subscriptions: owner.pushSubscriptions,
+        reminders: [],
+      };
+      entry.reminders.push({
+        animalId: event.animalId,
+        animal: event.animal.name,
+        body: `${event.title} ${when}`,
       });
+      byOwner.set(owner.email, entry);
+    }
+
+    for (const { email, subscriptions, reminders } of byOwner.values()) {
+      if (this.pushEnabled) {
+        for (const r of reminders) {
+          const payload = JSON.stringify({
+            title: `Rappel santé — ${r.animal}`,
+            body: r.body,
+            url: `/animals/${r.animalId}`,
+          });
+          for (const s of subscriptions) await this.push(s, payload);
+        }
+      }
+      try {
+        await this.mail.sendReminderDigest(
+          email,
+          reminders.map((r) => `${r.animal} — ${r.body}`),
+        );
+      } catch (e) {
+        this.logger.error('Envoi email de rappel impossible', e as Error);
+      }
+    }
+    if (byOwner.size > 0) {
+      this.logger.log(`Rappels envoyés à ${byOwner.size} propriétaire(s)`);
+    }
+  }
+
+  private async push(s: Subscription, payload: string): Promise<void> {
+    try {
+      await webpush.sendNotification(
+        { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+        payload,
+      );
+    } catch (e) {
+      const statusCode = (e as { statusCode?: number }).statusCode;
+      if (statusCode === 404 || statusCode === 410) {
+        await this.prisma.pushSubscription
+          .delete({ where: { id: s.id } })
+          .catch(() => undefined);
+      } else {
+        this.logger.error('Envoi Web Push impossible', e as Error);
+      }
     }
   }
 }

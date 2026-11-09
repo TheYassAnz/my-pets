@@ -317,6 +317,9 @@ export const api = {
   deleteEvent: (animalId: string, id: string) =>
     request<void>(`/animals/${animalId}/events/${id}`, { method: 'DELETE' }),
 
+  downloadHealthRecord: async (animalId: string) =>
+    (await send(`/animals/${animalId}/export`, {}, true)).blob(),
+
   listWeights: (animalId: string) =>
     request<WeightRecord[]>(`/animals/${animalId}/weights`),
 

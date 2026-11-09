@@ -27,6 +27,16 @@ export function useSession(): AuthContextValue {
   return value;
 }
 
+// Tokens de l'ancienne version (localStorage) : à purger, jamais bloquant
+export function clearLegacyTokens(): void {
+  try {
+    localStorage.removeItem('mypets.accessToken');
+    localStorage.removeItem('mypets.refreshToken');
+  } catch {
+    // localStorage absent ou inaccessible
+  }
+}
+
 export function SessionProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +46,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     let cancelled = false;
 
+    clearLegacyTokens();
     (async () => {
       try {
         if (await refreshSession()) {

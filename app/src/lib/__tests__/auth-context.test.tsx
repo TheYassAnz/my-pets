@@ -1,7 +1,7 @@
 import { act, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
-import { SessionProvider, useSession } from '@/lib/auth-context';
+import { clearLegacyTokens, SessionProvider, useSession } from '@/lib/auth-context';
 
 const mockLogout = jest.fn();
 
@@ -34,4 +34,30 @@ it('signOut rejette et garde la session si api.logout échoue', async () => {
     await expect(session.signOut()).rejects.toThrow('500');
   });
   expect(screen.getByText('a@b.c')).toBeTruthy();
+});
+
+describe('clearLegacyTokens', () => {
+  afterEach(() => {
+    delete (global as { localStorage?: unknown }).localStorage;
+  });
+
+  it('supprime les deux clés héritées', () => {
+    const store: Record<string, string> = {
+      'mypets.accessToken': 'a',
+      'mypets.refreshToken': 'r',
+      autre: 'x',
+    };
+    (global as { localStorage?: unknown }).localStorage = {
+      removeItem: (k: string) => {
+        delete store[k];
+      },
+    };
+    clearLegacyTokens();
+    expect(store).toEqual({ autre: 'x' });
+  });
+
+  it('ne lève pas sans localStorage', () => {
+    delete (global as { localStorage?: unknown }).localStorage;
+    expect(() => clearLegacyTokens()).not.toThrow();
+  });
 });

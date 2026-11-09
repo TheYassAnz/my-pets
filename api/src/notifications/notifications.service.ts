@@ -5,19 +5,24 @@ import { PrismaService } from '../prisma.service';
 export class NotificationsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Un token Expo identifie un appareil : s'il change de compte
+  // Un endpoint identifie un appareil : s'il change de compte
   // (déconnexion/reconnexion), on le rattache au nouvel utilisateur
-  async registerToken(userId: string, token: string) {
-    await this.prisma.pushToken.upsert({
-      where: { token },
-      create: { token, userId },
-      update: { userId },
+  async saveSubscription(
+    userId: string,
+    sub: { endpoint: string; p256dh: string; auth: string },
+  ) {
+    await this.prisma.pushSubscription.upsert({
+      where: { endpoint: sub.endpoint },
+      create: { ...sub, userId },
+      update: { p256dh: sub.p256dh, auth: sub.auth, userId },
     });
     return { ok: true };
   }
 
-  async removeToken(userId: string, token: string): Promise<void> {
-    await this.prisma.pushToken.deleteMany({ where: { token, userId } });
+  async removeSubscription(userId: string, endpoint: string): Promise<void> {
+    await this.prisma.pushSubscription.deleteMany({
+      where: { endpoint, userId },
+    });
   }
 
   async getSettings(userId: string) {

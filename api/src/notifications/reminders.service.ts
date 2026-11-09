@@ -38,7 +38,7 @@ export class RemindersService {
         animal: {
           include: {
             owner: {
-              select: { reminderLeadDays: true, pushTokens: true },
+              select: { reminderLeadDays: true, pushSubscriptions: true },
             },
           },
         },
@@ -59,9 +59,9 @@ export class RemindersService {
         daysUntil === 0
           ? "aujourd'hui"
           : `dans ${daysUntil} jour${daysUntil > 1 ? 's' : ''}`;
-      for (const pushToken of owner.pushTokens) {
+      for (const pushToken of owner.pushSubscriptions) {
         messages.push({
-          to: pushToken.token,
+          to: pushToken.endpoint,
           title: `Rappel santé — ${event.animal.name}`,
           body: `${event.title} ${when}`,
           data: { animalId: event.animalId, eventId: event.id },
@@ -104,8 +104,8 @@ export class RemindersService {
       .filter((_, i) => tickets[i]?.details?.error === 'DeviceNotRegistered')
       .map((m) => m.to);
     if (invalid.length > 0) {
-      await this.prisma.pushToken.deleteMany({
-        where: { token: { in: invalid } },
+      await this.prisma.pushSubscription.deleteMany({
+        where: { endpoint: { in: invalid } },
       });
     }
   }

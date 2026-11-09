@@ -21,12 +21,14 @@ model User {
   animals            Animal[]
   refreshTokens      RefreshToken[]
   passwordResetCodes PasswordResetCode[]
-  pushTokens         PushToken[]
+  pushSubscriptions  PushSubscription[]
 }
 
-model PushToken {
+model PushSubscription {
   id        String   @id @default(uuid())
-  token     String   @unique
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

@@ -131,51 +131,6 @@ export type WeightRecord = {
   animalId: string;
 };
 
-export type TodayTask = {
-  id: string;
-  routineId: string;
-  title: string;
-  subtitle: string;
-  animal: string;
-  animalId: string;
-  checked: boolean;
-  doneBy: string | null;
-};
-
-export type Routine = {
-  id: string;
-  title: string;
-  description: string | null;
-  frequency: string;
-  animalId: string;
-  animal: { id: string; name: string };
-  taskLogs: { id: string; date: string; isDone: boolean; doneBy: string | null }[];
-};
-
-export type DocumentItem = {
-  id: string;
-  title: string;
-  category: string;
-  fileUrl: string | null;
-  fileSize: string | null;
-  animalId: string | null;
-  createdAt: string;
-};
-
-export type HouseholdMember = {
-  id: string;
-  name: string;
-  role: string;
-  email?: string;
-  isOwner: boolean;
-};
-
-export type HouseholdStats = {
-  animalsCount: number;
-  membersCount: number;
-  remindersCount: number;
-};
-
 // GET /animals renvoie chaque animal enrichi — jamais GET /animals/:id,
 // une requête à la fois n'a pas besoin de ce résumé.
 export type AnimalWithUpcoming = Animal & {
@@ -402,33 +357,4 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ weightKg, date }),
     }),
-
-  listTodayTasks: () =>
-    request<TodayTask[]>('/routines/today'),
-
-  toggleTask: (routineId: string, userName?: string) =>
-    request<{ id: string; isDone: boolean; doneBy: string | null }>(
-      `/routines/${routineId}/toggle`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ userName }),
-      },
-    ),
-
-  listRoutines: () =>
-    request<Routine[]>('/routines'),
-
-  listDocuments: (animalId?: string, category?: string) => {
-    const params = new URLSearchParams();
-    if (animalId) params.append('animalId', animalId);
-    if (category && category !== 'Tous') params.append('category', category);
-    const qs = params.toString();
-    return request<DocumentItem[]>(`/documents${qs ? `?${qs}` : ''}`);
-  },
-
-  getHouseholdMembers: () =>
-    request<HouseholdMember[]>('/household/members'),
-
-  getHouseholdStats: () =>
-    request<HouseholdStats>('/household/stats'),
 };

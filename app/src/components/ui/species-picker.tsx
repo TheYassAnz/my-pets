@@ -11,9 +11,7 @@ export type SpeciesPickerProps = {
   error?: string;
 };
 
-// Variante par défaut : menu déroulant Material 3 sur Android, `<select>` natif
-// sur web. iOS est traité dans `species-picker.ios.tsx`, la variante commune y
-// imposant une roue dépliée en permanence.
+// Sur web, rendu en `<select>` natif.
 export function SpeciesPicker({ label, value, onChange, error }: SpeciesPickerProps) {
   return (
     <FieldShell label={label} error={error}>

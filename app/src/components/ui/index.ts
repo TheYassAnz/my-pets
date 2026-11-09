@@ -28,6 +28,4 @@ export { SpeciesPicker, type SpeciesPickerProps } from './species-picker';
 export { TypeIcon, type TypeIconProps, type TypeIconType } from './type-icon';
 export { Text, TextInput } from './text';
 export { ToastProvider, useToast } from './toast';
-export { OfflineBanner, type OfflineBannerProps } from './offline-banner';
-export { SyncErrorBanner, type SyncErrorBannerProps } from './sync-error-banner';
 export * from './wizard';

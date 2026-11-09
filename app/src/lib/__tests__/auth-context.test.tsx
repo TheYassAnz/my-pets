@@ -4,16 +4,19 @@ import { Text } from 'react-native';
 import { clearLegacyTokens, SessionProvider, useSession } from '@/lib/auth-context';
 
 const mockLogout = jest.fn();
+const mockSave = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('@/lib/api', () => ({
   api: {
+    savePushSubscription: (...a: unknown[]) => mockSave(...a),
     me: async () => ({ id: 'u', email: 'a@b.c', createdAt: '' }),
     logout: () => mockLogout(),
   },
   refreshSession: async () => true,
   setAccessToken: jest.fn(),
 }));
-jest.mock('@/lib/notifications', () => ({ unregisterPushNotifications: async () => {} }));
+const mockSub = { toJSON: () => ({ endpoint: 'e' }), unsubscribe: jest.fn().mockResolvedValue(true) };
+jest.mock('@/lib/notifications', () => ({ detachPushSubscription: async () => mockSub }));
 
 let session: ReturnType<typeof useSession>;
 function Probe() {
@@ -34,6 +37,8 @@ it('signOut rejette et garde la session si api.logout échoue', async () => {
     await expect(session.signOut()).rejects.toThrow('500');
   });
   expect(screen.getByText('a@b.c')).toBeTruthy();
+  expect(mockSave).toHaveBeenCalledWith({ endpoint: 'e' });
+  expect(mockSub.unsubscribe).not.toHaveBeenCalled();
 });
 
 describe('clearLegacyTokens', () => {

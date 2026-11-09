@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ReminderPrompt } from '@/components/reminder-prompt';
 import {
   Avatar,
   EmptyState,
@@ -149,6 +150,7 @@ export default function MyAnimalsScreen() {
           Impossible d&apos;actualiser. Réessayez.
         </Text>
       ) : null}
+      <ReminderPrompt />
       {body}
     </ScrollView>
   );

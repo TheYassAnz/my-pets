@@ -7,7 +7,7 @@ import {
 } from 'react';
 
 import { api, refreshSession, setAccessToken, type User } from './api';
-import { unregisterPushNotifications } from './notifications';
+import { detachPushSubscription } from './notifications';
 
 type AuthContextValue = {
   user: User | null;
@@ -78,8 +78,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const signOut = async () => {
-    await unregisterPushNotifications();
-    await api.logout();
+    // Suppression serveur avant le logout (session requise) ; désabonnement local après succès
+    const sub = await detachPushSubscription();
+    try {
+      await api.logout();
+    } catch (e) {
+      // Session conservée : on remet l'abonnement côté serveur pour ne pas perdre les rappels
+      if (sub) await api.savePushSubscription(sub.toJSON() as PushSubscriptionJSON).catch(() => {});
+      throw e;
+    }
+    await sub?.unsubscribe().catch(() => {});
     setAccessToken(null);
     setUser(null);
   };

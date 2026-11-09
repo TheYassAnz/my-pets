@@ -272,16 +272,16 @@ export const api = {
       file,
     ),
 
-  registerPushToken: (token: string) =>
-    request<{ ok: boolean }>('/notifications/token', {
+  savePushSubscription: (sub: PushSubscriptionJSON) =>
+    request<void>('/notifications/subscription', {
       method: 'PUT',
-      body: JSON.stringify({ token }),
+      body: JSON.stringify(sub),
     }),
 
-  removePushToken: (token: string) =>
-    request<void>('/notifications/token', {
+  removePushSubscription: (endpoint: string) =>
+    request<void>('/notifications/subscription', {
       method: 'DELETE',
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ endpoint }),
     }),
 
   getReminderSettings: () =>

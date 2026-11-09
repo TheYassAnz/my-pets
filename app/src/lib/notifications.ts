@@ -1,64 +1,56 @@
-import Constants from 'expo-constants';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
-
 import { api } from './api';
+import { registerServiceWorker } from './pwa';
 
-// Notifications affichées même app au premier plan
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+export function pushSupported(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    'PushManager' in window &&
+    typeof Notification !== 'undefined' &&
+    !!process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY
+  );
+}
 
-let registeredToken: string | null = null;
+// applicationServerKey attend des octets, la clé VAPID est en base64url
+function urlBase64ToBytes(b64: string): Uint8Array<ArrayBuffer> {
+  const std = (b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from(atob(std), (c) => c.charCodeAt(0));
+}
 
-// Demande la permission, récupère le token Expo et l'enregistre auprès de
-// l'API. Silencieux en cas d'échec : les rappels sont un plus, pas un bloquant
-// (simulateur, permission refusée, projectId EAS absent en dev...).
-export async function registerForPushNotifications(): Promise<void> {
+/** À appeler uniquement depuis un clic (exigence iOS/Safari). */
+export async function enablePushReminders(): Promise<'granted' | 'denied' | 'unsupported'> {
+  if (!pushSupported()) return 'unsupported';
+  if ((await Notification.requestPermission()) !== 'granted') return 'denied';
+  const reg = await registerServiceWorker();
+  if (!reg) return 'unsupported';
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToBytes(process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY as string),
+  });
+  await api.savePushSubscription(sub.toJSON() as PushSubscriptionJSON);
+  return 'granted';
+}
+
+async function currentSubscription(): Promise<PushSubscription | null> {
   try {
-    if (!Device.isDevice) return;
-
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'Rappels santé',
-        importance: Notifications.AndroidImportance.HIGH,
-      });
-    }
-
-    const existing = await Notifications.getPermissionsAsync();
-    const permission = existing.granted
-      ? existing
-      : await Notifications.requestPermissionsAsync();
-    if (!permission.granted) return;
-
-    const projectId = Constants.expoConfig?.extra?.eas?.projectId as
-      | string
-      | undefined;
-    if (!projectId) return;
-
-    const { data: token } = await Notifications.getExpoPushTokenAsync({
-      projectId,
-    });
-    await api.registerPushToken(token);
-    registeredToken = token;
+    if (!pushSupported()) return null;
+    const reg = await registerServiceWorker();
+    return (await reg?.pushManager.getSubscription()) ?? null;
   } catch {
-    // Jamais bloquant pour le reste de l'app
+    return null;
   }
 }
 
-export async function unregisterPushNotifications(): Promise<void> {
-  if (!registeredToken) return;
-  try {
-    await api.removePushToken(registeredToken);
-  } catch {
-    // La déconnexion locale doit réussir même si l'API est injoignable
-  } finally {
-    registeredToken = null;
-  }
+/**
+ * Supprime l'abonnement côté serveur (session valide requise) et renvoie
+ * l'abonnement local, à désabonner une fois la déconnexion réussie. Ne lève jamais.
+ */
+export async function detachPushSubscription(): Promise<PushSubscription | null> {
+  const sub = await currentSubscription();
+  if (sub) await api.removePushSubscription(sub.endpoint).catch(() => {});
+  return sub;
+}
+
+export async function disablePushReminders(): Promise<void> {
+  const sub = await detachPushSubscription();
+  await sub?.unsubscribe().catch(() => {});
 }

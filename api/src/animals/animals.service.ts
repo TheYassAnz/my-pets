@@ -69,7 +69,6 @@ export class AnimalsService {
           orderBy: { date: 'desc' },
           take: 10,
         },
-        documents: true,
       },
     });
     this.assertOwned(animal, ownerId);

@@ -11,9 +11,6 @@ import { HealthEventsModule } from './health-events/health-events.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaService } from './prisma.service';
 import { WeightsModule } from './weights/weights.module';
-import { RoutinesModule } from './routines/routines.module';
-import { DocumentsModule } from './documents/documents.module';
-import { HouseholdModule } from './household/household.module';
 
 @Module({
   imports: [
@@ -23,9 +20,6 @@ import { HouseholdModule } from './household/household.module';
     AnimalsModule,
     HealthEventsModule,
     WeightsModule,
-    RoutinesModule,
-    DocumentsModule,
-    HouseholdModule,
     ExtractionModule,
     NotificationsModule,
     ExportModule,

@@ -33,20 +33,6 @@ async function main() {
     });
   }
 
-  // 2. Membre du foyer Léa
-  const existingLea = await prisma.householdMember.findFirst({
-    where: { userId: user.id, name: 'Léa' },
-  });
-  if (!existingLea) {
-    await prisma.householdMember.create({
-      data: {
-        userId: user.id,
-        name: 'Léa',
-        role: 'Peut modifier',
-      },
-    });
-  }
-
   // Nettoyage des animaux existants de cet utilisateur pour éviter les doublons lors des re-seed
   await prisma.animal.deleteMany({ where: { ownerId: user.id } });
 
@@ -81,43 +67,6 @@ async function main() {
       data: { animalId: pilou.id, weightKg: w.weightKg, date: w.date },
     });
   }
-
-  // Routines de Pilou
-  const croquettesMatin = await prisma.routine.create({
-    data: {
-      animalId: pilou.id,
-      title: 'Croquettes du matin',
-      description: '170 g · fait par Léa',
-      frequency: 'DAILY',
-    },
-  });
-  // Log d'aujourd'hui déjà fait
-  await prisma.taskLog.create({
-    data: {
-      routineId: croquettesMatin.id,
-      date: new Date(),
-      isDone: true,
-      doneBy: 'Léa',
-    },
-  });
-
-  await prisma.routine.create({
-    data: {
-      animalId: pilou.id,
-      title: 'Vermifuge du mois',
-      description: 'Milbemax · 1 comprimé',
-      frequency: 'MONTHLY',
-    },
-  });
-
-  await prisma.routine.create({
-    data: {
-      animalId: pilou.id,
-      title: 'Complément articulaire',
-      description: 'Pilou · en pause depuis juin',
-      frequency: 'DAILY',
-    },
-  });
 
   // Événements de santé de Pilou
   await prisma.healthEvent.create({
@@ -185,26 +134,6 @@ async function main() {
     },
   });
 
-  // Documents de Pilou
-  await prisma.document.create({
-    data: {
-      ownerId: user.id,
-      animalId: pilou.id,
-      title: 'Carnet de santé — Pilou',
-      category: 'Carnets',
-      fileSize: '2.4 Mo · mis à jour le 3 mars',
-    },
-  });
-  await prisma.document.create({
-    data: {
-      ownerId: user.id,
-      animalId: pilou.id,
-      title: "Attestation d'assurance",
-      category: 'Assurance',
-      fileSize: "Mutuelle Animo · valide jusqu'au 31 déc",
-    },
-  });
-
   // 4. Nala (Chat)
   const nala = await prisma.animal.create({
     data: {
@@ -222,15 +151,6 @@ async function main() {
     data: { animalId: nala.id, weightKg: 4.1, date: new Date('2026-09-01') },
   });
 
-  await prisma.routine.create({
-    data: {
-      animalId: nala.id,
-      title: 'Litière — changement',
-      description: 'Tous les 3 jours',
-      frequency: 'THREE_DAYS',
-    },
-  });
-
   await prisma.healthEvent.create({
     data: {
       animalId: nala.id,
@@ -238,16 +158,6 @@ async function main() {
       title: 'Contrôle dentaire',
       date: new Date('2026-09-22T17:00:00'),
       nextDueDate: new Date('2026-09-22T17:00:00'),
-    },
-  });
-
-  await prisma.document.create({
-    data: {
-      ownerId: user.id,
-      animalId: nala.id,
-      title: 'Ordonnance — Nala',
-      category: 'Ordonnances',
-      fileSize: 'PDF · 12 nov 2025',
     },
   });
 
@@ -268,15 +178,6 @@ async function main() {
     data: { animalId: miso.id, weightKg: 3.4, date: new Date('2026-09-05') },
   });
 
-  await prisma.routine.create({
-    data: {
-      animalId: miso.id,
-      title: 'Peser Miso',
-      description: 'Suivi de croissance · hebdo',
-      frequency: 'WEEKLY',
-    },
-  });
-
   await prisma.healthEvent.create({
     data: {
       animalId: miso.id,
@@ -284,16 +185,6 @@ async function main() {
       title: 'Stérilisation — bilan',
       date: new Date('2026-10-28T11:15:00'),
       nextDueDate: new Date('2026-10-28T11:15:00'),
-    },
-  });
-
-  await prisma.document.create({
-    data: {
-      ownerId: user.id,
-      animalId: miso.id,
-      title: "Certificat d'identification",
-      category: 'Carnets',
-      fileSize: 'Photo · puce 250269…',
     },
   });
 

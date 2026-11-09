@@ -22,8 +22,6 @@ model User {
   refreshTokens      RefreshToken[]
   passwordResetCodes PasswordResetCode[]
   pushTokens         PushToken[]
-  householdMembers   HouseholdMember[]
-  documents          Document[]
 }
 
 model PushToken {
@@ -61,17 +59,6 @@ model PasswordResetCode {
   @@index([userId])
 }
 
-model HouseholdMember {
-  id        String   @id @default(uuid())
-  name      String
-  role      String   @default("Peut modifier")
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@index([userId])
-}
-
 enum Gender {
   MALE
   FEMALE
@@ -96,8 +83,6 @@ model Animal {
   owner         User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   healthEvents  HealthEvent[]
   weightRecords WeightRecord[]
-  routines      Routine[]
-  documents     Document[]
   createdAt     DateTime       @default(now())
 
   @@index([ownerId])
@@ -136,42 +121,3 @@ model WeightRecord {
   @@index([animalId])
 }
 
-model Routine {
-  id          String     @id @default(uuid())
-  title       String
-  description String?
-  frequency   String     // e.g., "DAILY", "WEEKLY", "MONTHLY"
-  animalId    String
-  animal      Animal     @relation(fields: [animalId], references: [id], onDelete: Cascade)
-  taskLogs    TaskLog[]
-  createdAt   DateTime   @default(now())
-
-  @@index([animalId])
-}
-
-model TaskLog {
-  id        String   @id @default(uuid())
-  routineId String
-  routine   Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
-  date      DateTime @default(now())
-  isDone    Boolean  @default(false)
-  doneBy    String?
-
-  @@index([routineId])
-}
-
-model Document {
-  id        String   @id @default(uuid())
-  title     String
-  category  String   @default("Carnets")
-  fileUrl   String?
-  fileSize  String?
-  animalId  String?
-  animal    Animal?  @relation(fields: [animalId], references: [id], onDelete: Cascade)
-  ownerId   String
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@index([ownerId])
-  @@index([animalId])
-}

@@ -225,8 +225,8 @@ export const api = {
     }),
 
   logout: async () => {
-    // Le logout local doit réussir même si l'API est injoignable
-    await request<void>('/auth/logout', { method: 'POST' }).catch(() => {});
+    // Le cookie refresh est httpOnly : si l'API échoue, la session reste ouverte
+    await request<void>('/auth/logout', { method: 'POST' });
   },
 
   me: () => request<User>('/auth/me'),

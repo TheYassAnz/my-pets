@@ -83,12 +83,24 @@ describe('session par cookie', () => {
     expect(request).toHaveBeenCalledWith('mypets-refresh', expect.any(Function));
   });
 
-  it('ne laisse aucune clé mypets.* dans localStorage', async () => {
+  it('api.logout rejette quand le serveur répond 500 ou que fetch rejette', async () => {
+    fetchMock.mockResolvedValueOnce(json(500, {}));
+    await expect(mod.api.logout()).rejects.toMatchObject({ status: 500 });
+    fetchMock.mockRejectedValueOnce(new Error('réseau'));
+    await expect(mod.api.logout()).rejects.toThrow('réseau');
+  });
+
+  it('n’écrit jamais dans localStorage', async () => {
+    const setItem = jest.fn();
+    Object.defineProperty(globalThis, 'localStorage', {
+      value: { setItem, getItem: jest.fn(), removeItem: jest.fn() },
+      configurable: true,
+    });
     fetchMock.mockResolvedValue(json(200, { accessToken: 'a', user: {} }));
     await mod.api.login('a@b.c', 'pw');
     mod.setAccessToken('a');
     await mod.refreshSession();
-    const keys = Object.keys(globalThis.localStorage ?? {});
-    expect(keys.filter((k) => k.startsWith('mypets.'))).toEqual([]);
+    expect(setItem).not.toHaveBeenCalled();
+    delete (globalThis as { localStorage?: unknown }).localStorage;
   });
 });

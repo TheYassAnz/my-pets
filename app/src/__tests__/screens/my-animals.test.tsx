@@ -31,7 +31,10 @@ const animal = (o: object) => ({
   ...o,
 });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockSignOut.mockResolvedValue(undefined);
+});
 
 describe('Mes animaux', () => {
   it('affiche les animaux, poids en virgule et « — » sans poids', async () => {
@@ -99,5 +102,20 @@ describe('Mes animaux', () => {
     expect(mockSignOut).not.toHaveBeenCalled();
     alert.mock.calls[0][2]![1].onPress!();
     expect(mockSignOut).toHaveBeenCalled();
+  });
+
+  it('affiche un message si la déconnexion échoue', async () => {
+    mockListAnimals.mockResolvedValue([]);
+    mockSignOut.mockRejectedValue(new Error('500'));
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await render(<MyAnimalsScreen />);
+    await fireEvent.press(await screen.findByLabelText('Compte et déconnexion'));
+    await act(async () => {
+      alert.mock.calls[0][2]![1].onPress!();
+    });
+    expect(alert).toHaveBeenLastCalledWith(
+      'Déconnexion impossible',
+      'Déconnexion impossible. Vérifiez votre connexion et réessayez.',
+    );
   });
 });

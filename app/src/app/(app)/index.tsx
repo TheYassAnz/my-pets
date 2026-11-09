@@ -53,7 +53,14 @@ export default function MyAnimalsScreen() {
   const confirmSignOut = () =>
     Alert.alert('Se déconnecter', 'Voulez-vous vraiment vous déconnecter ?', [
       { text: 'Annuler', style: 'cancel' },
-      { text: 'Se déconnecter', style: 'destructive', onPress: () => signOut() },
+      { text: 'Se déconnecter', style: 'destructive', onPress: () =>
+          signOut().catch(() =>
+            Alert.alert(
+              'Déconnexion impossible',
+              'Déconnexion impossible. Vérifiez votre connexion et réessayez.',
+            ),
+          ),
+      },
     ]);
 
   const initial = user?.email?.[0]?.toUpperCase() ?? '?';

@@ -42,14 +42,18 @@ function notify() {
   listeners.forEach((l) => l());
 }
 
-// L'écouteur matchMedia vit tant qu'il y a des abonnés (pas de fuite au chargement).
 function subscribe(listener: () => void) {
   const mq = media();
-  mq?.addEventListener?.('change', notify);
+  // Un gestionnaire par abonné : se désabonner ne retire que le sien.
+  const onChange = () => {
+    applyToDocument();
+    listener();
+  };
+  mq?.addEventListener?.('change', onChange);
   listeners.add(listener);
   return () => {
     listeners.delete(listener);
-    mq?.removeEventListener?.('change', notify);
+    mq?.removeEventListener?.('change', onChange);
   };
 }
 

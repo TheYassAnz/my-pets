@@ -37,21 +37,22 @@ function freshPreference() {
 }
 
 let matches: boolean;
-let changeListener: (() => void) | undefined;
+let changeListeners: Set<() => void>;
+const fireChange = () => changeListeners.forEach((l) => l());
 
 beforeEach(() => {
   matches = false;
-  changeListener = undefined;
+  changeListeners = new Set();
   mockStorage();
   g.matchMedia = jest.fn(() => ({
     get matches() {
       return matches;
     },
     addEventListener: (_: string, l: () => void) => {
-      changeListener = l;
+      changeListeners.add(l);
     },
-    removeEventListener: () => {
-      changeListener = undefined;
+    removeEventListener: (_: string, l: () => void) => {
+      changeListeners.delete(l);
     },
   }));
 });
@@ -118,9 +119,21 @@ describe('useResolvedColorScheme', () => {
     expect(result.current).toBe('light');
     await act(async () => {
       matches = true;
-      changeListener?.();
+      fireChange();
     });
     expect(result.current).toBe('dark');
+  });
+
+  it('garde les autres abonnés à jour après un démontage', async () => {
+    setThemePreference('system');
+    const first = await renderHook(() => useResolvedColorScheme());
+    const second = await renderHook(() => useResolvedColorScheme());
+    await act(async () => first.unmount());
+    await act(async () => {
+      matches = true;
+      fireChange();
+    });
+    expect(second.result.current).toBe('dark');
   });
 
   it('ignore le système en préférence light', async () => {
@@ -128,7 +141,7 @@ describe('useResolvedColorScheme', () => {
     const { result } = await renderHook(() => useResolvedColorScheme());
     await act(async () => {
       matches = true;
-      changeListener?.();
+      fireChange();
     });
     expect(result.current).toBe('light');
   });

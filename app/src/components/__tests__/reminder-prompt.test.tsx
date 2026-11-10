@@ -48,9 +48,40 @@ it('iPadOS (Mac tactile) non installé : consigne', async () => {
   expect(screen.getByText(IOS_TEXT)).toBeTruthy();
 });
 
+beforeEach(() => jest.clearAllMocks());
+
+it('permission granted : rien rendu, ré-abonnement unique', async () => {
+  setup({ supported: true, permission: 'granted' });
+  (enablePushReminders as jest.Mock).mockResolvedValue('granted');
+  await render(<ReminderPrompt />);
+  expect(screen.toJSON()).toBeNull();
+  expect(enablePushReminders).toHaveBeenCalledTimes(1);
+});
+
+it('permission granted : un rejet au montage est ignoré', async () => {
+  setup({ supported: true, permission: 'granted' });
+  (enablePushReminders as jest.Mock).mockRejectedValue(new Error('boom'));
+  await render(<ReminderPrompt />);
+  expect(screen.toJSON()).toBeNull();
+});
+
+it('permission denied : rien rendu, aucun appel', async () => {
+  setup({ supported: true, permission: 'denied' });
+  await render(<ReminderPrompt />);
+  expect(screen.toJSON()).toBeNull();
+  expect(enablePushReminders).not.toHaveBeenCalled();
+});
+
+it("clic renvoyant 'unsupported' : bouton conservé et erreur affichée", async () => {
+  setup({ supported: true });
+  (enablePushReminders as jest.Mock).mockResolvedValue('unsupported');
+  await render(<ReminderPrompt />);
+  await fireEvent.press(screen.getByText('Activer les rappels'));
+  expect(await screen.findByText("Impossible d'activer les rappels. Réessayez.")).toBeTruthy();
+  expect(screen.getByText('Activer les rappels')).toBeTruthy();
+});
+
 it.each([
-  ['permission granted', { supported: true, permission: 'granted' }],
-  ['permission denied', { supported: true, permission: 'denied' }],
   ['non supporté hors iOS', { supported: false }],
   ['iOS installé', { supported: false, ua: 'iPhone', standalone: true }],
 ])('ne rend rien : %s', async (_n, opts) => {

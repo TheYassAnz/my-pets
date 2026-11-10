@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { Button, Card, Text } from '@/components/ui';
@@ -18,6 +18,12 @@ export function ReminderPrompt() {
   const [done, setDone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+
+  // Permission déjà accordée (ex. après une reconnexion) : ré-abonnement silencieux, idempotent
+  useEffect(() => {
+    if (typeof window === 'undefined' || !pushSupported()) return;
+    if (Notification.permission === 'granted') enablePushReminders().catch(() => {});
+  }, []);
 
   if (typeof window === 'undefined' || done) return null;
 
@@ -39,8 +45,9 @@ export function ReminderPrompt() {
     setBusy(true);
     setFailed(false);
     try {
-      await enablePushReminders();
-      setDone(true);
+      const res = await enablePushReminders();
+      if (res === 'unsupported') setFailed(true);
+      else setDone(true);
     } catch {
       setFailed(true);
     } finally {

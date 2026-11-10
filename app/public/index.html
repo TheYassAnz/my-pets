@@ -42,6 +42,45 @@
         flex: 1;
       }
     </style>
+    <style id="splash-style">
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        color: #8a8a8e;
+        font-family: -apple-system, system-ui, sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) #splash {
+          background: #000000;
+          color: #8e8e93;
+        }
+      }
+      :root[data-theme="dark"] #splash {
+        background: #000000;
+        color: #8e8e93;
+      }
+      #splash img {
+        border-radius: 22px;
+      }
+      #splash.splash-hide {
+        opacity: 0;
+        transition: opacity 200ms;
+        pointer-events: none;
+      }
+      #splash-msg {
+        margin: 24px 0 0;
+        max-width: 280px;
+        text-align: center;
+        font-size: 14px;
+        line-height: 20px;
+      }
+    </style>
   </head>
 
   <body>
@@ -49,7 +88,21 @@
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
+    <div id="splash" role="status" aria-label="Chargement">
+      <img src="/icons/icon-192.png" width="96" height="96" alt="" />
+      <p id="splash-msg" hidden></p>
+    </div>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
+    <script>
+      // Réveil du serveur (Render free) : on rassure si le splash est encore là après 6 s.
+      setTimeout(function () {
+        var splash = document.getElementById('splash');
+        var msg = document.getElementById('splash-msg');
+        if (!splash || !msg) return;
+        msg.textContent = "Un instant… le serveur se réveille, cela peut prendre jusqu'à une minute.";
+        msg.hidden = false;
+      }, 6000);
+    </script>
   </body>
 </html>

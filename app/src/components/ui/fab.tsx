@@ -1,4 +1,4 @@
-import { type StyleProp, type ViewStyle, Pressable, useColorScheme } from 'react-native';
+import { type StyleProp, type ViewStyle, Pressable, StyleSheet, useColorScheme } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
@@ -41,7 +41,8 @@ export function FAB({
       accessibilityLabel={label}
       onPress={onPress}
       testID={testID}
-      style={[
+      // Objet et non tableau : voir la note dans text.tsx (classes empilées sur le web).
+      style={StyleSheet.flatten([
         isNocturne
           ? {
               shadowColor: colors.brand,
@@ -57,7 +58,7 @@ export function FAB({
               elevation: 6,
             },
         style,
-      ]}
+      ])}
       className={`${
         isNocturne
           ? 'h-[52px] w-[52px] items-center justify-center rounded-full border border-brand bg-brand/15 active:bg-brand/25'

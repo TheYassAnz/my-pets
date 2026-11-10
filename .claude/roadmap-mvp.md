@@ -72,7 +72,7 @@ Roadmap pensée pour un développement solo à temps partiel (soirs/weekends), e
 - Recrutement de 5-10 beta testeurs (entourage propriétaires d'animaux, groupes Facebook de niche)
 - Itération sur les retours utilisateurs
 - Monitoring/logs de base sur l'API en production (essentiel avec une infra custom à maintenir)
-- ~~Préparation des assets stores et soumission App Store / Play Store~~ → remplacé par le déploiement de la PWA (API Railway servant le front, icônes PWA, test d'installation sur iOS et Android)
+- ~~Préparation des assets stores et soumission App Store / Play Store~~ → remplacé par le déploiement de la PWA (API déployée sur Render, PWA déployée sur Vercel avec proxy `/api` vers Render, icônes PWA, test d'installation sur iOS et Android)
 
 ## Conseil stratégique
 

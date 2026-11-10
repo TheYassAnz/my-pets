@@ -92,14 +92,18 @@
   - importer le dépôt `my-pets`, Root Directory `app` ;
   - ajouter la variable `EXPO_PUBLIC_VAPID_PUBLIC_KEY` (la clé publique de `app/.env`) pour Production et Preview ;
   - déployer. L'aperçu de la PR se construit.
+> **Note :** les aperçus de PR proxifient vers l'API Render de production et la vraie base. Les données créées sur un aperçu sont donc réelles : utiliser un compte jetable et le supprimer après les vérifications.
+
 - [ ] **Step 5 (Yassine), sur l'URL d'aperçu** :
   1. inscription puis connexion ;
   2. ajout d'un animal ;
   3. rechargement de `/animals/<id>` : la page s'affiche et la session est toujours ouverte (Review Focus 1 et 4) ;
   4. dans DevTools > Network, les appels `/api/...` sont en 200 sur le domaine Vercel, sans erreur CORS ;
-  5. dans DevTools > Application, `sw.js` est actif.
+  5. dans DevTools > Application, `sw.js` est actif ;
+  6. upload d'une photo de profil d'environ 4,8 Mo sur un animal : la requête répond 201. Vercel peut plafonner la taille des corps de requête passant par le proxy ; en cas d'échec, le noter comme suite à traiter (réduction côté client ou baisse de `MAX_PHOTO_SIZE`).
 - [ ] **Step 6 (Yassine), après au moins 15 min d'inactivité de Render** : ouvrir l'aperçu et se connecter. Noter si le premier appel échoue (Review Focus 5).
 - [ ] **Step 7 (Yassine):** fusionner la PR. Vercel déploie en production, Render redéploie l'API sans front. Ensuite :
   - vérifier `https://<projet>.vercel.app` ;
   - vérifier que `https://my-pets.onrender.com/api` renvoie `{status:'ok'}` ;
-  - partager désormais l'URL Vercel.
+  - partager désormais l'URL Vercel ;
+  - note : `https://my-pets.onrender.com/` ne sert plus l'application après la fusion ; toute personne qui utilisait cette URL doit passer à l'URL Vercel.

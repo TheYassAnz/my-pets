@@ -71,6 +71,7 @@ app/          Expo front, web target only (Expo Router, NativeWind)
                          notifications.ts (Web Push subscription), pwa.ts (service worker registration),
                          dialog.ts (confirm/alert), export.ts (PDF browser download)
   public/                manifest.json, sw.js, icons, index.html template
+  vercel.json            Vercel config: build:web, /api/* proxy to Render, SPA fallback, cache headers
   src/components/        shared UI incl. health-event-form.tsx
 ```
 

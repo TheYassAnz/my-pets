@@ -25,7 +25,11 @@ function RootNavigator() {
   }, [isLoading]);
 
   if (restoreFailed) {
-    return <ErrorState message="Impossible de joindre le serveur. Réessayez dans un instant." onRetry={retryRestore} />;
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ErrorState message="Impossible de joindre le serveur. Réessayez dans un instant." onRetry={retryRestore} />
+      </View>
+    );
   }
 
   // Invisible au premier chargement (le splash le recouvre), visible pendant un « Réessayer ».

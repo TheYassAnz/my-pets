@@ -111,6 +111,27 @@ describe('NotificationsController (abonnements Web Push)', () => {
     expect(ctx.service.saveSubscription).not.toHaveBeenCalled();
   });
 
+  it('rejette un endpoint ou des clés trop longs', async () => {
+    const endpoint = `https://fcm.googleapis.com/${'a'.repeat(3000)}`;
+    await request(ctx.server)
+      .put('/notifications/subscription')
+      .send({ endpoint, keys })
+      .expect(400);
+    await request(ctx.server)
+      .put('/notifications/subscription')
+      .send({
+        endpoint: 'https://fcm.googleapis.com/x',
+        keys: { p256dh: 'p'.repeat(257), auth: 'a' },
+      })
+      .expect(400);
+    await request(ctx.server)
+      .delete('/notifications/subscription')
+      .send({ endpoint })
+      .expect(400);
+    expect(ctx.service.saveSubscription).not.toHaveBeenCalled();
+    expect(ctx.service.removeSubscription).not.toHaveBeenCalled();
+  });
+
   it('supprime un abonnement (204)', async () => {
     await request(ctx.server)
       .delete('/notifications/subscription')

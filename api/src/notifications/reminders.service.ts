@@ -127,6 +127,7 @@ export class RemindersService {
       await webpush.sendNotification(
         { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
         payload,
+        { timeout: 10_000 },
       );
     } catch (e) {
       const statusCode = (e as { statusCode?: number }).statusCode;

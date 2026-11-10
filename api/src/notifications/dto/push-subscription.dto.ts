@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsDefined,
   IsString,
+  MaxLength,
   MinLength,
   ValidateBy,
   ValidateNested,
@@ -43,15 +44,18 @@ const IsPushEndpoint = () =>
 class PushKeysDto {
   @IsString()
   @MinLength(1)
+  @MaxLength(256)
   p256dh: string;
 
   @IsString()
   @MinLength(1)
+  @MaxLength(256)
   auth: string;
 }
 
 export class PushSubscriptionDto {
   @IsPushEndpoint()
+  @MaxLength(2048)
   endpoint: string;
 
   @IsDefined()
@@ -63,5 +67,6 @@ export class PushSubscriptionDto {
 export class RemoveSubscriptionDto {
   @IsString()
   @MinLength(1)
+  @MaxLength(2048)
   endpoint: string;
 }

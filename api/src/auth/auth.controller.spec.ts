@@ -102,6 +102,15 @@ describe('AuthController (cookie)', () => {
     expect(res.headers['set-cookie'][0]).toMatch(/^mypets_rt=;.*Max-Age=0/);
   });
 
+  it('refresh : erreur transitoire → 500 et cookie conservé', async () => {
+    service.refresh.mockRejectedValue(new Error('db down'));
+    const res = await request(server)
+      .post('/auth/refresh')
+      .set('Cookie', 'mypets_rt=old')
+      .expect(500);
+    expect(res.headers['set-cookie']).toBeUndefined();
+  });
+
   it('logout avec cookie → 204, service.logout("old"), cookie effacé', async () => {
     const res = await request(server)
       .post('/auth/logout')

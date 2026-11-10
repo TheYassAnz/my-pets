@@ -9,7 +9,13 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService, PrismaService],
+      providers: [
+        AppService,
+        {
+          provide: PrismaService,
+          useValue: { $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]) },
+        },
+      ],
     }).compile();
 
     appController = app.get<AppController>(AppController);
@@ -18,8 +24,7 @@ describe('AppController', () => {
   describe('root', () => {
     it('should return health check response', async () => {
       const result = await appController.healthCheck();
-      expect(result).toHaveProperty('status');
-      expect(result).toHaveProperty('db');
+      expect(result).toEqual({ status: 'ok', db: true });
     });
   });
 });

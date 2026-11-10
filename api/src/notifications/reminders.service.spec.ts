@@ -90,6 +90,7 @@ describe('RemindersService', () => {
         body: 'Vaccin rage dans 15 jours',
         url: '/animals/a1',
       }),
+      { timeout: 10_000 },
     );
     expect(mail.sendReminderDigest).toHaveBeenCalledTimes(1);
     expect(mail.sendReminderDigest).toHaveBeenCalledWith('a@b.fr', [

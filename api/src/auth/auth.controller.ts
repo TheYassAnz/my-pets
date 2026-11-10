@@ -77,7 +77,8 @@ export class AuthController {
       this.setCookie(res, refreshToken);
       return body;
     } catch (err) {
-      clearRefreshCookie(res);
+      // Une panne transitoire (500) ne doit pas déconnecter l'utilisateur.
+      if (err instanceof UnauthorizedException) clearRefreshCookie(res);
       throw err;
     }
   }

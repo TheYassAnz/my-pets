@@ -124,4 +124,24 @@ describe('Mes animaux', () => {
       ),
     );
   });
+
+  it('n’affiche pas l’invite « Activer les rappels » tant que les rappels sont coupés', async () => {
+    // Stubs pour que pushSupported() soit vrai : l'invite s'afficherait si elle était montée.
+    const w = window as unknown as Record<string, unknown>;
+    const g = globalThis as unknown as Record<string, unknown>;
+    const prev = { pm: w.PushManager, n: g.Notification, key: process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY };
+    w.PushManager = function PushManager() {};
+    g.Notification = { permission: 'default', requestPermission: jest.fn() };
+    process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY = 'test-key';
+    try {
+      mockListAnimals.mockResolvedValue([]);
+      await render(<MyAnimalsScreen />);
+      expect(await screen.findByText('Mes animaux')).toBeTruthy();
+      expect(screen.queryByText('Activer les rappels')).toBeNull();
+    } finally {
+      if (prev.pm === undefined) delete w.PushManager; else w.PushManager = prev.pm;
+      if (prev.n === undefined) delete g.Notification; else g.Notification = prev.n;
+      if (prev.key === undefined) delete process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY; else process.env.EXPO_PUBLIC_VAPID_PUBLIC_KEY = prev.key;
+    }
+  });
 });

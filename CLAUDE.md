@@ -11,13 +11,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Layer              | Technology                                          |
 | ------------------ | --------------------------------------------------- |
 | Front (PWA)        | Expo (TypeScript) exported for **web only** (react-native-web), Expo Router, NativeWind; hand-written service worker + manifest |
-| Backend API        | NestJS + Prisma (TypeScript), deployed on Railway   |
+| Backend API        | NestJS + Prisma (TypeScript), deployed on Render (free plan: sleeps after 15 min, ~1 min wake-up) |
 | Database           | Supabase PostgreSQL (**DB + Storage only** — no Supabase Auth, no RLS; `supabase-js` used **server-side only** in the API for Storage uploads, never in the front) |
 | Auth               | Custom JWT (argon2); access token in memory, rotated refresh token in an httpOnly cookie (`mypets_rt`) |
 | AI extraction      | Claude API (vision)                                 |
 | Reminders          | Web Push (VAPID, `web-push`) + daily email digest (Resend) |
 
 > **PWA pivot (2026-11-09)**: the project is no longer an iOS/Android app. The Expo front is exported as a single-page web app and **served by the NestJS API on the same origin** (SPA at `/`, API under `/api`). Native code and non-MVP screens/modules (routines, documents, fake household) were removed. Since 2026-11-10 `api/` and `app/` live in **one git repo at the root** (`main`), with both former histories (my-pets_api, my-pets_app) imported under their folder; the old `.git` dirs are kept in `.git-backup/` (ignored). Plan: `docs/superpowers/plans/2026-11-09-refonte-pwa.md`. Not yet done: desktop layout (plan 2) and real multi-user household (plan 3).
+
+> **Hosting (2026-11-10)**: Railway replaced by Render (`render.yaml` at the root, free plan, reminders disabled).
 
 > **Pivot note**: the project moved from a Supabase BaaS design to a **custom NestJS + Prisma API**. Supabase is now used only as a managed Postgres database and object storage. Multi-tenant isolation is enforced in the API (ownership checks on `ownerId`), **not** by RLS. The authoritative roadmap lives in `.claude/roadmap-mvp.md`.
 
@@ -29,13 +31,13 @@ The app follows a three-tier flow, with a custom API layer between the web front
 
 2. **AI extraction** — When a user photographs a prescription or paper health booklet: the front uploads the image to the API → API sends it to Claude vision → receives structured JSON (date, product, dosage, vet) → returns it to pre-fill the form → user validates before the API saves. **Auto-save without human confirmation is never acceptable.**
 
-3. **Notifications** — An internal API cron job (`@nestjs/schedule`) runs daily, scans upcoming vaccine/treatment deadlines, and sends reminders by Web Push (to every stored browser subscription) and one digest email per owner, with configurable lead times (e.g. D-15, D-1). Push is enabled by a user click in the browser; on iOS it only works once the PWA is installed, email covers the rest.
+3. **Notifications** — An internal API cron job (`@nestjs/schedule`) runs daily, scans upcoming vaccine/treatment deadlines, and sends reminders by Web Push (to every stored browser subscription) and one digest email per owner, with configurable lead times (e.g. D-15, D-1). Push is enabled by a user click in the browser; on iOS it only works once the PWA is installed, email covers the rest. The cron is off unless `REMINDERS_ENABLED=true`; on the Render free plan it would not run anyway if the service is asleep at 8 am.
 
 ```
 PWA (Expo web export, Expo Router, service worker)
         │  same origin: /api (JWT Bearer + httpOnly refresh cookie)
         ▼
-API NestJS + Prisma (Railway)
+API NestJS + Prisma (Render)
    ├─ Auth JWT custom (argon2, refresh rotation)
    ├─ Ownership checks (ownerId) — no RLS
    ├─ serves the built front from api/client (SPA fallback)
@@ -89,7 +91,7 @@ npm run lint / npm test
 npm run deploy:web       # export the PWA and copy it into ../api/client (then commit in api/)
 ```
 
-API env vars (`api/.env`): `DATABASE_URL`, `DIRECT_URL`, `PORT`, `JWT_ACCESS_SECRET`, `JWT_ACCESS_TTL`, `REFRESH_TOKEN_TTL_DAYS`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANIMAL_PHOTOS_BUCKET`, `RESEND_API_KEY`, `EMAIL_FROM`, `ANTHROPIC_API_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CORS_ORIGIN` (dev only, `http://localhost:8081`).
+API env vars (`api/.env`): `DATABASE_URL`, `DIRECT_URL`, `PORT`, `JWT_ACCESS_SECRET`, `JWT_ACCESS_TTL`, `REFRESH_TOKEN_TTL_DAYS`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANIMAL_PHOTOS_BUCKET`, `RESEND_API_KEY`, `EMAIL_FROM`, `ANTHROPIC_API_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `REMINDERS_ENABLED` (reminders run only when `true`), `CORS_ORIGIN` (dev only, `http://localhost:8081`).
 
 Front env vars (`app/.env`): `EXPO_PUBLIC_API_URL` (`http://localhost:3000/api` in dev; forced to `/api` by `deploy:web`), `EXPO_PUBLIC_VAPID_PUBLIC_KEY`.
 
@@ -104,7 +106,7 @@ Authoritative source: `.claude/roadmap-mvp.md`. Summary (8 phases, 0→7):
 - **Phase 4** — AI extraction: camera/gallery via expo-image-picker, API endpoint → Claude vision → structured JSON, mandatory validation/correction UI before save ✅ *(code complete — **temporarily disabled**: API returns 503 without `ANTHROPIC_API_KEY`, mobile UI hidden behind `AI_EXTRACTION_ENABLED = false` in `app/src/lib/features.ts`)*
 - **Phase 5** — Notifications: internal API cron (`@nestjs/schedule`) scanning deadlines, Expo Notifications + permissions, configurable reminders (D-15, D-1) ✅ *(code complete — push requires EAS projectId + development build)*
 - **Phase 6** — PDF export of full health record (pdfkit) + share sheet + simple onboarding + UI polish ✅ *(code complete)*
-- **Phase 7** — Beta testing (5-10 users), production monitoring/logs, PWA deployment on Railway (no store submission since the 2026-11-09 PWA pivot)
+- **Phase 7** — Beta testing (5-10 users), production monitoring/logs, PWA deployment on Render, free plan, Blueprint `render.yaml` (no store submission since the 2026-11-09 PWA pivot)
 
 > Phase descriptions above predate the PWA pivot: "mobile" screens are now web screens, Phase 5 push is Web Push + email (no EAS), Phase 1 token storage is an httpOnly cookie.
 

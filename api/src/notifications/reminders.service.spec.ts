@@ -174,4 +174,39 @@ describe('RemindersService', () => {
     expect(sendNotification).not.toHaveBeenCalled();
     expect(mail.sendReminderDigest).toHaveBeenCalledTimes(1);
   });
+
+  describe('runDaily', () => {
+    afterEach(() => {
+      delete process.env.REMINDERS_ENABLED;
+    });
+
+    it('ne fait rien quand REMINDERS_ENABLED est absent', async () => {
+      const service = make();
+      const spy = jest.spyOn(service, 'sendDueReminders');
+      await service.runDaily();
+      expect(spy).not.toHaveBeenCalled();
+      expect(prisma.healthEvent.findMany).not.toHaveBeenCalled();
+    });
+
+    it.each(['false', 'TRUE', '1', ''])(
+      'ne fait rien quand REMINDERS_ENABLED=%p',
+      async (v) => {
+        process.env.REMINDERS_ENABLED = v;
+        const service = make();
+        const spy = jest.spyOn(service, 'sendDueReminders');
+        await service.runDaily();
+        expect(spy).not.toHaveBeenCalled();
+      },
+    );
+
+    it('envoie les rappels quand REMINDERS_ENABLED=true', async () => {
+      process.env.REMINDERS_ENABLED = 'true';
+      const service = make();
+      const spy = jest
+        .spyOn(service, 'sendDueReminders')
+        .mockResolvedValue();
+      await service.runDaily();
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+  });
 });

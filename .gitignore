@@ -1,0 +1,12 @@
+# Sauvegardes des anciens dépôts my-pets_api et my-pets_app (avant fusion)
+.git-backup/
+
+# Outils locaux
+.superpowers/
+graphify-out/
+.claude/settings.local.json
+
+.DS_Store
+node_modules/
+.env
+.env*.local

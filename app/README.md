@@ -18,7 +18,7 @@ npx tsc --noEmit
 npm run deploy:web
 ```
 
-Exporte la PWA avec `EXPO_PUBLIC_API_URL=/api` (`npx expo export -p web`), puis remplace le contenu de `../api/client/` par le build (en conservant `.gitkeep`). Le dossier `client/` se committe dans le dépôt `api/`.
+Exporte la PWA avec `EXPO_PUBLIC_API_URL=/api` (`npx expo export -p web`), puis remplace le contenu de `../api/client/` par le build (en conservant `.gitkeep`). Le dossier `api/client/` se committe avec le reste du dépôt.
 
 ## Variables d'environnement
 

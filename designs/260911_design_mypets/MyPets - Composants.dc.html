@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/nocturne-316c0700-932b-4f06-a048-fc3b7c211c98/styles.css">
+  <script src="_ds/nocturne-316c0700-932b-4f06-a048-fc3b7c211c98/_ds_bundle.js"></script>
+  <style>
+    body { margin: 0; background: #12131f; }
+    a { color: var(--color-accent-300); text-decoration: none; }
+    a:hover { color: var(--color-accent); }
+  </style>
+</helmet>
+
+<div style="min-height:100%;background:#12131f;color:var(--color-text);font-family:var(--font-body);padding:40px 32px 64px">
+  <div style="max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:30px">
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-300)">MyPets · React Native / Expo</div>
+      <div style="font-size:34px;font-weight:500;letter-spacing:-.03em;line-height:1.1">Bibliothèque de composants</div>
+      <div style="font-size:14.5px;color:var(--color-neutral-400);line-height:1.6;max-width:660px;text-wrap:pretty">Les briques réutilisables des 26 écrans, sur les jetons Nocturne. Un seul jeu pour iOS et Android : la plateforme ne change que les zones sûres, le retour physique et les notifications. Chaque composant est nommé comme dans le code.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px"><span class="tag tag-neutral">Rayons 8 / 14 / 20 px</span><span class="tag tag-neutral">Cible tactile ≥ 44 px</span><span class="tag tag-neutral">Texte ≥ 11 px, corps 14 px</span><span class="tag tag-neutral">Densité 0,7×</span></div>
+    </div>
+
+    <div style="height:1px;background:var(--color-divider)"></div>
+
+    <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-500)">1 — Actions</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Bouton</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Button variant size /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+          <span class="btn btn-primary" style="font-size:14px">Primaire</span>
+          <span class="btn btn-secondary" style="font-size:14px">Secondaire</span>
+          <span class="btn btn-ghost" style="font-size:14px">Fantôme</span>
+          <span style="padding:10px 16px;border-radius:var(--radius-md);font-size:14px;box-shadow:inset 0 0 0 1px #6a3040;color:#e2919f">Destructif</span>
+          <span style="padding:10px 16px;border-radius:var(--radius-md);font-size:14px;border:1px solid var(--color-accent);color:var(--color-accent);opacity:.45">Désactivé</span>
+          <span style="display:inline-flex;align-items:center;gap:9px;padding:10px 16px;border-radius:var(--radius-md);font-size:14px;border:1px solid var(--color-accent-700);color:var(--color-accent-300)"><span style="width:13px;height:13px;border-radius:50%;border:1.6px solid currentColor;border-top-color:transparent;display:inline-block"></span>En cours</span>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Hauteur 44 px, 52 px en pleine largeur au bas d'une feuille. Jamais de fond plein : l'accent est un trait. Pressé = accent-400 ; désactivé = 45 % d'opacité, jamais masqué.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Bouton icône &amp; FAB</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;IconButton /&gt; &lt;Fab /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-wrap:wrap;gap:14px;align-items:center">
+          <span style="width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--color-divider);color:var(--color-neutral-300)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z"></path><path d="M10 20a2.5 2.5 0 0 0 4 0"></path></svg></span>
+          <span style="width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--color-surface);color:var(--color-neutral-300)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 8 12l6 6"></path></svg></span>
+          <span style="width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--color-neutral-900);color:var(--color-neutral-400)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"></path></svg></span>
+          <span style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--color-accent);color:var(--color-accent);background:rgba(145,132,217,.14)"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Le FAB fait 52 px, ancré à 20 px du bord droit et 12 px au-dessus de la barre d'onglets. Il ouvre la feuille de création contextuelle à l'onglet courant.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Étiquette</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Tag tone /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          <span class="tag tag-accent">Pilou</span><span class="tag tag-neutral">Nala</span><span class="tag tag-outline">+ Ajouter</span>
+          <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:rgba(72,120,88,.22);color:#96cca8">Actif</span>
+          <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:rgba(120,48,64,.2);color:#e2919f">En retard</span>
+          <span style="font-size:11px;padding:3px 9px;border-radius:999px;background:var(--color-neutral-900);color:var(--color-neutral-500)">Terminé</span>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Deux usages : l'animal concerné (accent si sélectionné) et le statut. Jamais plus d'une étiquette de statut par ligne.</div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-500);margin-top:8px">2 — Saisie</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Champ de texte</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Field label error /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-500)">Repos</span><div style="padding:11px 12px;border-radius:var(--radius-md);background:var(--color-surface);box-shadow:inset 0 0 0 1px var(--color-divider);font-size:14px;color:var(--color-neutral-600)">Nom de l'animal</div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-500)">Focus</span><div style="padding:11px 12px;border-radius:var(--radius-md);background:var(--color-surface);box-shadow:inset 0 0 0 1px var(--color-accent);font-size:14px">Pilou<span style="display:inline-block;width:1px;height:15px;background:var(--color-accent);margin-left:1px;vertical-align:-3px"></span></div></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#e2919f">Erreur</span><div style="padding:11px 12px;border-radius:var(--radius-md);background:rgba(120,48,64,.16);box-shadow:inset 0 0 0 1px #a4485e;font-size:14px;color:#e2919f">Dim. 7 septembre</div><span style="font-size:12px;color:#e2919f">Cette date est passée.</span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Validation à la sortie du champ. Le message remplace l'aide, il ne s'ajoute pas — la hauteur ne saute pas.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Segmenté</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Segmented options /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;padding:3px;gap:3px;border-radius:999px;background:var(--color-surface)"><span style="flex:1;text-align:center;padding:9px 0;border-radius:999px;font-size:13px;background:var(--color-accent-900);color:var(--color-accent-300)">Chien</span><span style="flex:1;text-align:center;padding:9px 0;font-size:13px;color:var(--color-neutral-500)">Chat</span></div>
+          <div style="display:flex;padding:3px;gap:3px;border-radius:999px;background:var(--color-surface)"><span style="flex:1;text-align:center;padding:8px 0;border-radius:999px;font-size:12px;background:var(--color-accent-900);color:var(--color-accent-300)">Matin</span><span style="flex:1;text-align:center;padding:8px 0;font-size:12px;color:var(--color-neutral-500)">Midi</span><span style="flex:1;text-align:center;padding:8px 0;font-size:12px;color:var(--color-neutral-500)">Soir</span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">2 à 4 options courtes maximum. Au-delà, liste déroulante. La position active glisse en 180 ms.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Interrupteur, case, radio</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Toggle /&gt; &lt;Check /&gt; &lt;Radio /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+          <span style="width:44px;height:26px;border-radius:999px;background:var(--color-accent);position:relative;display:inline-block"><span style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#161826"></span></span>
+          <span style="width:44px;height:26px;border-radius:999px;background:var(--color-neutral-800);position:relative;display:inline-block"><span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--color-neutral-600)"></span></span>
+          <span style="width:21px;height:21px;border-radius:6px;background:var(--color-accent);display:grid;place-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#161826" stroke-width="3.4" stroke-linecap="round"><path d="M4 12.5 9.5 18 20 6.5"></path></svg></span>
+          <span style="width:21px;height:21px;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--color-neutral-700)"></span>
+          <span style="width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--color-accent);display:grid;place-items:center"><span style="width:9px;height:9px;border-radius:50%;background:var(--color-accent)"></span></span>
+          <span style="width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--color-neutral-700)"></span>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Zone tactile 44 px même quand la pastille est plus petite. Retour haptique léger à chaque bascule.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Pas-à-pas numérique</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Stepper step unit /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:var(--radius-md);background:var(--color-surface)"><span style="width:34px;height:34px;border-radius:var(--radius-md);display:grid;place-items:center;background:var(--color-neutral-900);color:var(--color-neutral-300);font-size:17px">−</span><span style="flex:1;text-align:center;font-size:22px;font-weight:500;letter-spacing:-.02em">19,4 <span style="font-size:13px;color:var(--color-neutral-500);font-weight:400">kg</span></span><span style="width:34px;height:34px;border-radius:var(--radius-md);display:grid;place-items:center;background:var(--color-accent-900);color:var(--color-accent-300);font-size:17px">+</span></div>
+          <span style="font-size:11px;color:var(--color-neutral-600)">Pas : 10 g chat · 100 g chien · 5 g ration</span>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Appui long = défilement accéléré. Le clavier numérique reste accessible en tapant sur la valeur.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Sélecteur date / heure</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;DateWheel mode /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg)">
+          <div style="border-radius:var(--radius-md);background:var(--color-surface);padding:8px 10px"><div style="display:flex;gap:6px;text-align:center">
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px;color:var(--color-neutral-700)"><span style="font-size:12px">13</span><span style="color:var(--color-text);font-size:15px;padding:3px 0;border-radius:6px;background:var(--color-accent-900)">14</span><span style="font-size:12px">15</span></div>
+            <div style="flex:1.4;display:flex;flex-direction:column;gap:2px;color:var(--color-neutral-700)"><span style="font-size:12px">août</span><span style="color:var(--color-text);font-size:15px;padding:3px 0;border-radius:6px;background:var(--color-accent-900)">sept.</span><span style="font-size:12px">oct.</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px;color:var(--color-neutral-700)"><span style="font-size:12px">2025</span><span style="color:var(--color-text);font-size:15px;padding:3px 0;border-radius:6px;background:var(--color-accent-900)">2026</span><span style="font-size:12px">2027</span></div>
+          </div></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Roue native en ligne dans la feuille, jamais en modale empilée. Locale fr, semaine au lundi.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Récurrence</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;RecurrencePicker /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:center;gap:9px"><span style="font-size:14px;color:var(--color-neutral-400)">Tous les</span><span style="width:52px;text-align:center;padding:9px 0;border-radius:var(--radius-md);background:var(--color-surface);box-shadow:inset 0 0 0 1px var(--color-accent);font-size:15px">1</span><span style="flex:1;display:flex;padding:3px;gap:3px;border-radius:999px;background:var(--color-surface)"><span style="flex:1;text-align:center;padding:7px 0;font-size:12px;color:var(--color-neutral-500)">jours</span><span style="flex:1;text-align:center;padding:7px 0;font-size:12px;color:var(--color-neutral-500)">sem.</span><span style="flex:1;text-align:center;padding:7px 0;border-radius:999px;font-size:12px;background:var(--color-accent-900);color:var(--color-accent-300)">mois</span></span></div>
+          <span style="font-size:11px;color:var(--color-neutral-600)">Prochaine occurrence : jeudi 10 octobre</span>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Toujours afficher la prochaine occurrence calculée : c'est la seule vérification possible par l'utilisateur.</div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-500);margin-top:8px">3 — Affichage</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Pastille animal</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;PetChip size selected /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:9px"><span style="flex:1;display:flex;align-items:center;gap:9px;padding:7px 11px 7px 7px;border-radius:999px;background:var(--color-surface);box-shadow:inset 0 0 0 1px var(--color-accent-700)"><span style="width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--color-accent-900);color:var(--color-accent-300)">P</span><span style="font-size:13px">Pilou</span></span><span style="flex:1;display:flex;align-items:center;gap:9px;padding:7px 11px 7px 7px;border-radius:999px;background:var(--color-surface)"><span style="width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:var(--color-neutral-800);color:var(--color-neutral-300)">N</span><span style="font-size:13px;color:var(--color-neutral-400)">Nala</span></span></div>
+          <div style="display:flex;gap:12px;align-items:center"><span style="width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:10px;background:var(--color-accent-900);color:var(--color-accent-300)">P</span><span style="width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:14px;background:var(--color-accent-900);color:var(--color-accent-300)">P</span><span style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:19px;background:var(--color-accent-900);color:var(--color-accent-300)">P</span><span style="font-size:11px;color:var(--color-neutral-600)">24 / 38 / 56 px</span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Monogramme à défaut de photo, teinte accent pour l'animal actif et neutre pour les autres. Un seul animal au foyer : le sélecteur disparaît.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Ligne de tâche</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;TaskRow done pet /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--radius-md);background:var(--color-surface)"><span style="width:20px;height:20px;flex:none;border-radius:50%;border:1.5px solid var(--color-neutral-700)"></span><span style="flex:1"><span style="display:block;font-size:14px">Vermifuge du mois</span><span style="display:block;font-size:11px;color:var(--color-neutral-500)">Milbemax · 1 comprimé</span></span><span class="tag tag-accent">Pilou</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--radius-md);background:var(--color-surface)"><span style="width:20px;height:20px;flex:none;border-radius:50%;background:var(--color-accent);display:grid;place-items:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#161826" stroke-width="3.4" stroke-linecap="round"><path d="M4 12.5 9.5 18 20 6.5"></path></svg></span><span style="flex:1"><span style="display:block;font-size:14px;color:var(--color-neutral-600);text-decoration:line-through">Croquettes du matin</span><span style="display:block;font-size:11px;color:var(--color-neutral-600)">170 g · fait par Léa</span></span><span class="tag tag-neutral">Pilou</span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">La coche est optimiste : l'état change avant la synchro. Balayage vers la gauche pour reporter, vers la droite pour marquer fait.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Ligne de réglage</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;ListRow accessory /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg)">
+          <div style="border-radius:var(--radius-md);background:var(--color-surface);overflow:hidden">
+            <div style="display:flex;align-items:center;padding:13px 14px;font-size:14px;border-bottom:1px solid rgba(233,233,237,.07)"><span style="flex:1">Notifications</span><span style="width:42px;height:24px;border-radius:999px;background:var(--color-accent);position:relative"><span style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:#161826"></span></span></div>
+            <div style="display:flex;align-items:center;padding:13px 14px;font-size:14px;border-bottom:1px solid rgba(233,233,237,.07)"><span style="flex:1">Unités</span><span style="font-size:13px;color:var(--color-neutral-500)">kg · g</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:13px 14px;font-size:14px"><span style="flex:1">Clinique référente</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-600)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"></path></svg></div>
+          </div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Trois accessoires : interrupteur, valeur, chevron. Groupées en carte, séparées par un filet à 7 % — jamais de filet sous la dernière ligne.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Carte en avant</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;HighlightCard /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg)">
+          <div style="border-radius:var(--radius-lg);padding:16px;background:linear-gradient(150deg,#262a60,#1d2040)"><div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent-300)">Prochain rendez-vous</div><div style="font-size:19px;font-weight:500;margin-top:6px">Rappel vaccin — Pilou</div><div style="font-size:13px;color:var(--color-neutral-400);margin-top:2px">Lundi 14 sept · 09:30</div><div style="display:flex;gap:8px;margin-top:14px"><span class="btn btn-primary" style="font-size:13px">Au calendrier</span><span class="btn btn-secondary" style="font-size:13px">Déplacer</span></div></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Une seule par écran : le dégradé indigo est la seule surface saturée admise, réservée à l'échéance la plus proche.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Progression</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;ProgressBar /&gt; &lt;Ring /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;align-items:center;gap:18px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--color-neutral-500)"><span>À faire aujourd'hui</span><span style="color:var(--color-accent)">1 / 4</span></div><div style="height:2px;border-radius:2px;background:var(--color-neutral-900);overflow:hidden"><div style="height:100%;width:25%;background:var(--color-accent)"></div></div></div>
+          <div style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--color-accent) 0turn .25turn, var(--color-neutral-900) .25turn 1turn)"><span style="width:42px;height:42px;border-radius:50%;background:var(--color-bg);display:grid;place-items:center;font-size:12px">25%</span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Barre de 2 px sous un titre de section ; anneau sur les cartes animal. Toujours doublée d'un compte chiffré.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Frise d'historique</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;TimelineItem /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg)">
+          <div style="display:flex;gap:14px"><span style="width:1px;background:var(--color-neutral-800);position:relative;flex:none;margin-left:5px"><span style="position:absolute;left:-4px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--color-accent)"></span></span><span style="flex:1;padding-bottom:16px"><span style="display:block;font-size:13.5px">Vaccin CHPPiL — rappel annuel</span><span style="display:block;font-size:11.5px;color:var(--color-neutral-500);margin-top:2px">14 sept. · à venir</span></span></div>
+          <div style="display:flex;gap:14px"><span style="width:1px;background:transparent;position:relative;flex:none;margin-left:5px"><span style="position:absolute;left:-3px;top:4px;width:7px;height:7px;border-radius:50%;background:var(--color-neutral-600)"></span></span><span style="flex:1"><span style="display:block;font-size:13.5px">Consultation — boiterie</span><span style="display:block;font-size:11.5px;color:var(--color-neutral-500);margin-top:2px">3 août · anti-inflammatoire</span></span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Point plein accent pour l'à-venir, point neutre pour le passé. Le filet s'arrête au dernier élément.</div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-500);margin-top:8px">4 — Navigation et structure</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Barre d'onglets</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;TabBar active /&gt;</span></div>
+        <div style="padding:0;background:var(--color-bg)">
+          <div style="height:92px;position:relative"><dc-import name="PetTabBar" active="accueil" hint-size="100%,92px"></dc-import></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Quatre onglets fixes : Accueil, Foyer, Agenda, Profil. Hauteur 92 px zone sûre comprise ; sur Android elle flotte 26 px au-dessus de la barre de gestes.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">En-têtes</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;ScreenHeader variant /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:16px">
+          <div><div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-500)">Jeudi 10 septembre</div><div style="font-size:26px;font-weight:500;letter-spacing:-.02em;margin-top:3px">Bonjour Camille</div></div>
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--color-surface);color:var(--color-neutral-300)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6 8 12l6 6"></path></svg></span><span style="flex:1;font-size:20px;font-weight:500;letter-spacing:-.02em">Historique</span><span style="font-size:12.5px;color:var(--color-accent-300)">Exporter</span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Grand titre pour une racine d'onglet, en-tête compact avec retour pour un écran poussé. Une seule action textuelle à droite.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Feuille modale</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Sheet height=85% /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg)">
+          <div style="border-radius:14px 14px 0 0;background:var(--color-surface);box-shadow:var(--shadow-md);overflow:hidden">
+            <div style="display:grid;place-items:center;padding:8px 0 4px"><span style="width:36px;height:4px;border-radius:2px;background:var(--color-neutral-700)"></span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:6px 14px 12px"><span style="flex:1;font-size:16px;font-weight:500">Titre de la feuille</span><span style="width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--color-neutral-900);color:var(--color-neutral-400)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"></path></svg></span></div>
+            <div style="padding:0 14px 14px;display:flex;flex-direction:column;gap:8px"><span style="height:38px;border-radius:var(--radius-md);background:var(--color-bg)"></span><span style="height:38px;border-radius:var(--radius-md);background:var(--color-bg)"></span></div>
+            <div style="padding:12px 14px;box-shadow:inset 0 1px 0 var(--color-divider)"><span class="btn btn-primary" style="display:block;text-align:center;font-size:13px">Action principale</span></div>
+          </div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Poignée, titre, corps défilant, pied collé. 85 % de hauteur, glisser pour fermer — confirmation si le formulaire a été modifié.</div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-500);margin-top:8px">5 — Retours et états</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Bandeaux</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Banner tone /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:var(--radius-md);background:rgba(120,105,48,.18);box-shadow:inset 0 0 0 1px #7d6a34;color:#ddc98a;font-size:12.5px">Hors ligne — dernière synchro il y a 2 h</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:var(--radius-md);background:rgba(120,48,64,.18);box-shadow:inset 0 0 0 1px #a4485e;color:#e2919f;font-size:12.5px">Import impossible — réessayer</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:var(--radius-md);background:rgba(72,120,88,.2);box-shadow:inset 0 0 0 1px #4b7d5c;color:#96cca8;font-size:12.5px">Pesée enregistrée</div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Trois tons seulement : attention, erreur, succès. Le succès s'efface après 2 s, les deux autres restent tant que la cause dure.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">État vide</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;EmptyState /&gt;</span></div>
+        <div style="padding:26px 16px;background:var(--color-bg);display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center">
+          <span style="width:52px;height:52px;border-radius:var(--radius-md);display:grid;place-items:center;background:var(--color-surface);color:var(--color-neutral-600)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 3.5H7A1.5 1.5 0 0 0 5.5 5v14A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V8Z"></path><path d="M14 3.5V8h4.5"></path></svg></span>
+          <span style="font-size:15px;font-weight:500">Aucun document</span>
+          <span style="font-size:12.5px;color:var(--color-neutral-500);line-height:1.5;max-width:230px">Ordonnances et factures, photographiées ou importées.</span>
+          <span class="btn btn-primary" style="font-size:13px;margin-top:4px">Ajouter un document</span>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">L'action de création vit dans le vide, pas seulement dans le FAB. Une phrase qui dit à quoi sert la section, jamais « rien à afficher ».</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Squelette</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;Skeleton rows /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg);display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:center;gap:11px;padding:12px;border-radius:var(--radius-md);background:var(--color-surface)"><span style="width:34px;height:42px;border-radius:4px;background:var(--color-neutral-900);flex:none"></span><span style="flex:1;display:flex;flex-direction:column;gap:7px"><span style="height:11px;width:62%;border-radius:6px;background:var(--color-neutral-900)"></span><span style="height:9px;width:40%;border-radius:6px;background:var(--color-neutral-900);opacity:.6"></span></span></div>
+          <div style="display:flex;align-items:center;gap:11px;padding:12px;border-radius:var(--radius-md);background:var(--color-surface);opacity:.55"><span style="width:34px;height:42px;border-radius:4px;background:var(--color-neutral-900);flex:none"></span><span style="flex:1;display:flex;flex-direction:column;gap:7px"><span style="height:11px;width:74%;border-radius:6px;background:var(--color-neutral-900)"></span><span style="height:9px;width:34%;border-radius:6px;background:var(--color-neutral-900);opacity:.6"></span></span></div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Aux dimensions réelles du contenu attendu, pulsation 1,4 s. Pas d'indicateur tournant au-delà de 300 ms d'attente.</div>
+      </div>
+
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column">
+        <div style="padding:15px 16px 11px;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-size:14.5px;font-weight:500">Dialogue</span><span style="font-size:11px;color:var(--color-neutral-600);font-family:ui-monospace,SFMono-Regular,monospace">&lt;ConfirmDialog destructive /&gt;</span></div>
+        <div style="padding:18px 16px;background:var(--color-bg)">
+          <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-lg);padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div><div style="font-size:15px;font-weight:500">Supprimer Pilou ?</div><div style="font-size:12.5px;color:var(--color-neutral-400);line-height:1.5;margin-top:5px">12 pesées, 4 rendez-vous et 9 documents seront effacés pour tout le foyer.</div></div>
+            <div style="display:flex;gap:9px"><span class="btn btn-secondary" style="flex:1;justify-content:center;font-size:13px">Annuler</span><span style="flex:1;text-align:center;padding:10px;border-radius:var(--radius-md);font-size:13px;box-shadow:inset 0 0 0 1px #6a3040;color:#e2919f">Supprimer</span></div>
+          </div>
+        </div>
+        <div style="padding:13px 16px;font-size:12px;color:var(--color-neutral-500);line-height:1.55">Le bouton nomme l'acte (« Supprimer »), jamais « OK ». Les conséquences sont chiffrées. L'action destructive n'est jamais à droite par défaut sur Android.</div>
+      </div>
+    </div>
+
+    <div style="height:1px;background:var(--color-divider);margin-top:10px"></div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-500)">Échelle de texte</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:26px;font-weight:500;letter-spacing:-.02em">Titre d'écran</span><span style="font-size:11px;color:var(--color-neutral-600)">26 / 500</span></div>
+          <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:19px;font-weight:500">Titre de carte</span><span style="font-size:11px;color:var(--color-neutral-600)">19 / 500</span></div>
+          <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:14px">Corps de liste</span><span style="font-size:11px;color:var(--color-neutral-600)">14 / 400</span></div>
+          <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:12px;color:var(--color-neutral-500)">Secondaire</span><span style="font-size:11px;color:var(--color-neutral-600)">12 / 400</span></div>
+          <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-500)">Intitulé de section</span><span style="font-size:11px;color:var(--color-neutral-600)">10 / .1em</span></div>
+        </div>
+      </div>
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-500)">Surfaces et rayons</div>
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <span style="width:56px;height:44px;border-radius:8px;background:var(--color-bg)"></span>
+          <span style="width:56px;height:44px;border-radius:14px;background:var(--color-neutral-900)"></span>
+          <span style="width:56px;height:44px;border-radius:20px;background:var(--color-neutral-800)"></span>
+        </div>
+        <div style="font-size:12px;color:var(--color-neutral-500);line-height:1.55">8 px champs et petits boutons · 14 px cartes et lignes · 20 px feuilles et grandes cartes. Élévation = un bord plus clair et une ombre douce, jamais deux ombres empilées.</div>
+      </div>
+      <div style="border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-sm);padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-neutral-500)">Ce qui reste plateforme</div>
+        <div style="font-size:12.5px;color:var(--color-neutral-400);line-height:1.6">Zones sûres (encoche, barre de gestes), bouton retour physique Android, notifications locales, sélecteurs natifs date / heure, haptique, et l'ordre des boutons dans les dialogues. Tout le reste est un composant partagé.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>

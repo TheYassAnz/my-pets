@@ -43,9 +43,18 @@ export class RemindersService {
     }
   }
 
-  // Tous les jours à 8h : notifie les échéances qui tombent exactement
-  // à J-<leadDay> pour chaque délai configuré par l'utilisateur
+  // Tous les jours à 8h. Désactivé sauf si REMINDERS_ENABLED=true (lu à chaque run)
   @Cron('0 8 * * *')
+  async runDaily(): Promise<void> {
+    if (process.env.REMINDERS_ENABLED !== 'true') {
+      this.logger.log('Rappels désactivés (REMINDERS_ENABLED)');
+      return;
+    }
+    await this.sendDueReminders();
+  }
+
+  // Notifie les échéances qui tombent exactement à J-<leadDay>
+  // pour chaque délai configuré par l'utilisateur
   async sendDueReminders(): Promise<void> {
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);

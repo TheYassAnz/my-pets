@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export type User = {
@@ -205,8 +207,14 @@ async function uploadFile<T>(
   file: { uri: string; name: string; type: string },
 ): Promise<T> {
   const form = new FormData();
-  // @ts-expect-error React Native accepte {uri, name, type} comme valeur de FormData
-  form.append(field, { uri: file.uri, name: file.name, type: file.type });
+  if (Platform.OS === 'web') {
+    // Le navigateur n'accepte que des Blob : l'URI du sélecteur de fichiers est un blob:/data: URL.
+    const blob = await (await fetch(file.uri)).blob();
+    form.append(field, new File([blob], file.name, { type: file.type }));
+  } else {
+    // @ts-expect-error React Native accepte {uri, name, type} comme valeur de FormData
+    form.append(field, { uri: file.uri, name: file.name, type: file.type });
+  }
   const response = await send(path, { method: 'POST', body: form }, true);
   return (await response.json()) as T;
 }

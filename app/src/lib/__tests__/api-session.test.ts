@@ -104,3 +104,26 @@ describe('session par cookie', () => {
     delete (globalThis as { localStorage?: unknown }).localStorage;
   });
 });
+
+describe('upload de fichier sur le web', () => {
+  it('envoie un vrai fichier (pas un objet {uri}) dans le FormData', async () => {
+    const { Platform } = jest.requireActual('react-native');
+    const original = Platform.OS;
+    Platform.OS = 'web';
+    try {
+      fetchMock.mockImplementation(async (url: string) =>
+        url === 'blob:photo'
+          ? ({ blob: async () => new Blob(['x'], { type: 'image/png' }) } as Response)
+          : json(200, { id: 'a1' }),
+      );
+      await mod.api.uploadAnimalPhoto('a1', { uri: 'blob:photo', name: 'chat.png', type: 'image/png' });
+      const body = (fetchMock.mock.calls[1][1] as RequestInit).body as FormData;
+      const sent = body.get('photo') as File;
+      expect(sent).toBeInstanceOf(File);
+      expect(sent.name).toBe('chat.png');
+      expect(sent.type).toBe('image/png');
+    } finally {
+      Platform.OS = original;
+    }
+  });
+});

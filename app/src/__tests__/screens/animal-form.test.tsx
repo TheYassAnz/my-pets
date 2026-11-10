@@ -1,5 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert } from 'react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
 import EditAnimalScreen from '@/app/(app)/animals/[id]/edit';
@@ -55,6 +54,12 @@ const animal = {
 };
 
 beforeEach(() => jest.clearAllMocks());
+
+// jest-expo n'expose pas window.confirm/alert : on les définit avant de les espionner.
+function spyDialog(name: 'confirm' | 'alert') {
+  (window as unknown as Record<string, unknown>)[name] = () => undefined;
+  return jest.spyOn(window, name);
+}
 
 describe('Nouvel animal', () => {
   it('crée l’animal avec nom, espèce et naissance puis revient', async () => {
@@ -115,15 +120,16 @@ describe('Modifier un animal', () => {
   it('suppression : confirmation puis deleteAnimal et retour à l’accueil', async () => {
     mockApi.getAnimal.mockResolvedValue(animal);
     mockApi.deleteAnimal.mockResolvedValue(undefined);
-    const alert = jest.spyOn(Alert, 'alert');
+    const confirm = spyDialog('confirm').mockReturnValueOnce(false).mockReturnValue(true);
     await render(<EditAnimalScreen />);
-    await fireEvent.press(await screen.findByRole('button', { name: "Supprimer l'animal" }));
+    const del = await screen.findByRole('button', { name: "Supprimer l'animal" });
 
-    expect(alert).toHaveBeenCalled();
+    await fireEvent.press(del);
+    expect(confirm).toHaveBeenCalledTimes(1);
     expect(mockApi.deleteAnimal).not.toHaveBeenCalled();
-    const buttons = alert.mock.calls[0][2]!;
-    await buttons.find((b) => b.style === 'destructive')!.onPress!();
-    expect(mockApi.deleteAnimal).toHaveBeenCalledWith('a1');
+
+    await fireEvent.press(del);
+    await waitFor(() => expect(mockApi.deleteAnimal).toHaveBeenCalledWith('a1'));
     expect(router.replace).toHaveBeenCalledWith('/');
   });
 });

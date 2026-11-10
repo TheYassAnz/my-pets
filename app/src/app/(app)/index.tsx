@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ReminderPrompt } from '@/components/reminder-prompt';
@@ -16,6 +16,7 @@ import {
 import { computeAge, formatKg } from '@/lib/animals';
 import { api, type AnimalWithUpcoming } from '@/lib/api';
 import { useSession } from '@/lib/auth-context';
+import { confirmAction, notifyError } from '@/lib/dialog';
 
 export default function MyAnimalsScreen() {
   const insets = useSafeAreaInsets();
@@ -51,18 +52,14 @@ export default function MyAnimalsScreen() {
     load();
   };
 
-  const confirmSignOut = () =>
-    Alert.alert('Se déconnecter', 'Voulez-vous vraiment vous déconnecter ?', [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Se déconnecter', style: 'destructive', onPress: () =>
-          signOut().catch(() =>
-            Alert.alert(
-              'Déconnexion impossible',
-              'Déconnexion impossible. Vérifiez votre connexion et réessayez.',
-            ),
-          ),
-      },
-    ]);
+  const confirmSignOut = async () => {
+    if (!(await confirmAction('Se déconnecter', 'Voulez-vous vraiment vous déconnecter ?'))) return;
+    try {
+      await signOut();
+    } catch {
+      notifyError('Déconnexion impossible. Vérifiez votre connexion et réessayez.');
+    }
+  };
 
   const initial = user?.email?.[0]?.toUpperCase() ?? '?';
 

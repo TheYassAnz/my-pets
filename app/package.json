@@ -46,6 +46,7 @@
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "web": "expo start --web",
+    "deploy:web": "bash scripts/deploy-web.sh",
     "lint": "expo lint",
     "test": "jest --forceExit",
     "test:watch": "jest --watch"

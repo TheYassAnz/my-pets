@@ -1,9 +1,10 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { HealthEventForm } from '@/components/health-event-form';
 import { Button, ErrorState, Skeleton, useToast } from '@/components/ui';
+import { confirmAction } from '@/lib/dialog';
 import { api, ApiError, type HealthEvent, type HealthEventInput } from '@/lib/api';
 
 export default function EditHealthEventScreen() {
@@ -36,22 +37,14 @@ export default function EditHealthEventScreen() {
     router.back();
   };
 
-  const onDelete = () => {
-    Alert.alert('Supprimer cet événement ?', 'Cette action est irréversible.', [
-      { text: 'Annuler', style: 'cancel' },
-      {
-        text: 'Supprimer',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await api.deleteEvent(id, eventId);
-            router.back();
-          } catch (e) {
-            setError(e instanceof ApiError ? e.message : 'Suppression impossible');
-          }
-        },
-      },
-    ]);
+  const onDelete = async () => {
+    if (!(await confirmAction('Supprimer cet événement ?', 'Cette action est irréversible.'))) return;
+    try {
+      await api.deleteEvent(id, eventId);
+      router.back();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Suppression impossible');
+    }
   };
 
   if (error) {

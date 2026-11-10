@@ -2,12 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { AnimalForm, pickAnimalPhoto } from '@/components/animal-form';
 import { ErrorState, Skeleton, Text, useToast } from '@/components/ui';
 import { resolveSpecies, splitSpecies } from '@/lib/animals';
 import { api, ApiError, type Animal } from '@/lib/api';
+import { confirmAction } from '@/lib/dialog';
 import { animalSchema, type AnimalValues } from '@/lib/forms/schemas';
 
 export default function EditAnimalScreen() {
@@ -63,23 +64,15 @@ export default function EditAnimalScreen() {
     }
   });
 
-  const onDelete = () => {
-    Alert.alert('Supprimer cet animal ?', 'Cette action est irréversible.', [
-      { text: 'Annuler', style: 'cancel' },
-      {
-        text: 'Supprimer',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await api.deleteAnimal(id);
-            // Replace allows us to completely back out of the animal details flow
-            router.replace('/');
-          } catch (e) {
-            setError(e instanceof ApiError ? e.message : 'Suppression impossible');
-          }
-        },
-      },
-    ]);
+  const onDelete = async () => {
+    if (!(await confirmAction('Supprimer cet animal ?', 'Cette action est irréversible.'))) return;
+    try {
+      await api.deleteAnimal(id);
+      // Replace allows us to completely back out of the animal details flow
+      router.replace('/');
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Suppression impossible');
+    }
   };
 
   const onPickPhoto = async () => {

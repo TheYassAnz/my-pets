@@ -1,5 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert } from 'react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
 import MyAnimalsScreen from '@/app/(app)/index';
@@ -35,6 +34,12 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockSignOut.mockResolvedValue(undefined);
 });
+
+// jest-expo n'expose pas window.confirm/alert : on les définit avant de les espionner.
+function spyDialog(name: 'confirm' | 'alert') {
+  (window as unknown as Record<string, unknown>)[name] = () => undefined;
+  return jest.spyOn(window, name);
+}
 
 describe('Mes animaux', () => {
   it('affiche les animaux, poids en virgule et « — » sans poids', async () => {
@@ -93,29 +98,30 @@ describe('Mes animaux', () => {
     expect(router.push).toHaveBeenCalledWith('/animals/new');
   });
 
-  it('la déconnexion demande confirmation', async () => {
+  it('la déconnexion ne se fait qu’après confirmation', async () => {
     mockListAnimals.mockResolvedValue([]);
-    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    const confirm = spyDialog('confirm').mockReturnValue(false);
     await render(<MyAnimalsScreen />);
     await fireEvent.press(await screen.findByLabelText('Compte et déconnexion'));
-    expect(alert).toHaveBeenCalled();
+    expect(confirm).toHaveBeenCalled();
     expect(mockSignOut).not.toHaveBeenCalled();
-    alert.mock.calls[0][2]![1].onPress!();
-    expect(mockSignOut).toHaveBeenCalled();
+
+    confirm.mockReturnValue(true);
+    await fireEvent.press(screen.getByLabelText('Compte et déconnexion'));
+    await waitFor(() => expect(mockSignOut).toHaveBeenCalled());
   });
 
   it('affiche un message si la déconnexion échoue', async () => {
     mockListAnimals.mockResolvedValue([]);
     mockSignOut.mockRejectedValue(new Error('500'));
-    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    spyDialog('confirm').mockReturnValue(true);
+    const alert = spyDialog('alert').mockImplementation(() => {});
     await render(<MyAnimalsScreen />);
     await fireEvent.press(await screen.findByLabelText('Compte et déconnexion'));
-    await act(async () => {
-      alert.mock.calls[0][2]![1].onPress!();
-    });
-    expect(alert).toHaveBeenLastCalledWith(
-      'Déconnexion impossible',
-      'Déconnexion impossible. Vérifiez votre connexion et réessayez.',
+    await waitFor(() =>
+      expect(alert).toHaveBeenCalledWith(
+        'Déconnexion impossible. Vérifiez votre connexion et réessayez.',
+      ),
     );
   });
 });

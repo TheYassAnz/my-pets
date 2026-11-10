@@ -15,6 +15,7 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
     <View accessibilityRole="radiogroup" className="flex-row rounded-xl bg-surface-sunken p-[3px]">
       {options.map((option) => {
         const selected = option.value === value;
+        // rayon = rayon du conteneur (24) − padding (3) : angles concentriques
         return (
           <Pressable
             key={option.value}
@@ -22,7 +23,7 @@ export function SegmentedControl({ options, value, onChange }: SegmentedControlP
             accessibilityLabel={option.label}
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
-            className={`min-h-11 flex-1 items-center justify-center rounded-[10px] py-2 ${
+            className={`min-h-11 flex-1 items-center justify-center rounded-[21px] py-2 ${
               selected ? 'bg-surface' : ''
             }`}>
             <Text

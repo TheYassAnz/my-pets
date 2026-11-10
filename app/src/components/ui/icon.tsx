@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useColorScheme } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import { Colors } from '@/constants/theme';
 
@@ -23,6 +23,8 @@ const IONICONS = {
   trash: 'trash-outline',
   edit: 'create-outline',
   search: 'search-outline',
+  sun: 'sunny-outline',
+  moon: 'moon-outline',
 } as const;
 
 const MATERIAL = {

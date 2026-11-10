@@ -1,6 +1,7 @@
 import { DateTimePicker } from '@expo/ui/community/datetime-picker';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, useColorScheme, View } from 'react-native';
+import { Modal, Platform, Pressable, View } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import { Colors } from '@/constants/theme';
 import { formatLongDate, parseIsoDate, toIsoDate } from '@/lib/dates';

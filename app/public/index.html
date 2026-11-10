@@ -2,6 +2,21 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
+    <script>
+      // Anti-flash : la clé doit rester égale à THEME_STORAGE_KEY (src/lib/color-scheme.ts).
+      (function () {
+        try {
+          var pref = 'system';
+          try {
+            var v = localStorage.getItem('mypets.theme');
+            if (v === 'light' || v === 'dark') pref = v;
+          } catch (e) {}
+          var t = pref === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : pref;
+          document.documentElement.setAttribute('data-theme', t);
+          document.documentElement.style.colorScheme = t;
+        } catch (e) {}
+      })();
+    </script>
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="manifest" href="/manifest.json" />

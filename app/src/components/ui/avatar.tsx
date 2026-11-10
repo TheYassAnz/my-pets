@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
-import { useColorScheme, View } from "react-native";
+import { View } from "react-native";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 
 import { Colors } from "@/constants/theme";
 

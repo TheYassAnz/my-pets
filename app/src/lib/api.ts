@@ -33,28 +33,38 @@ export function getAccessToken(): string | null {
   return accessToken;
 }
 
-let refreshing: Promise<boolean> | null = null;
+// 'denied' : le serveur a refusé le cookie (session perdue) ;
+// 'unreachable' : API endormie/coupée, on ne sait pas si la session est valide.
+export type RefreshOutcome = 'ok' | 'denied' | 'unreachable';
+
+// Marge au-dessus du réveil de Render (~1 min) pour ne pas couper un démarrage à froid
+export const REFRESH_TIMEOUT_MS = 90_000;
+
+let refreshing: Promise<RefreshOutcome> | null = null;
 
 // Vol unique dans l'onglet (promesse partagée) et entre onglets (Web Locks :
 // le suivant rafraîchit avec le cookie déjà tourné).
-export function refreshSession(): Promise<boolean> {
+export function refreshOutcome(): Promise<RefreshOutcome> {
   refreshing ??= (async () => {
-    const run = async () => {
+    const run = async (): Promise<RefreshOutcome> => {
       try {
         const response = await fetch(`${API_URL}/auth/refresh`, {
           method: 'POST',
           credentials: 'include',
+          signal: AbortSignal.timeout(REFRESH_TIMEOUT_MS),
         });
         if (response.ok) {
           const body = (await response.json()) as { accessToken: string };
           accessToken = body.accessToken;
-          return true;
+          return 'ok';
         }
+        accessToken = null;
+        return response.status >= 500 ? 'unreachable' : 'denied';
       } catch {
-        // réseau coupé : la session est considérée perdue
+        // réseau coupé ou délai dépassé
+        accessToken = null;
+        return 'unreachable';
       }
-      accessToken = null;
-      return false;
     };
     const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
     return locks ? locks.request('mypets-refresh', run) : run();
@@ -62,6 +72,10 @@ export function refreshSession(): Promise<boolean> {
     refreshing = null;
   });
   return refreshing;
+}
+
+export async function refreshSession(): Promise<boolean> {
+  return (await refreshOutcome()) === 'ok';
 }
 
 // Les routes /auth/* gèrent elles-mêmes leurs 401 (identifiants invalides)

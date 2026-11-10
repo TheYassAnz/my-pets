@@ -83,6 +83,37 @@ describe('session par cookie', () => {
     expect(request).toHaveBeenCalledWith('mypets-refresh', expect.any(Function));
   });
 
+  it("refreshOutcome renvoie 'ok' et mémorise le token sur 200", async () => {
+    fetchMock.mockResolvedValue(json(200, { accessToken: 'new' }));
+    expect(await mod.refreshOutcome()).toBe('ok');
+    expect(mod.getAccessToken()).toBe('new');
+  });
+
+  it("refreshOutcome renvoie 'denied' sur 401", async () => {
+    mod.setAccessToken('old');
+    fetchMock.mockResolvedValue(json(401, {}));
+    expect(await mod.refreshOutcome()).toBe('denied');
+    expect(mod.getAccessToken()).toBeNull();
+  });
+
+  it.each([503, 502])("refreshOutcome renvoie 'unreachable' sur %i", async (status) => {
+    mod.setAccessToken('old');
+    fetchMock.mockResolvedValue(json(status, {}));
+    expect(await mod.refreshOutcome()).toBe('unreachable');
+    expect(mod.getAccessToken()).toBeNull();
+  });
+
+  it("refreshOutcome renvoie 'unreachable' quand fetch rejette", async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
+    expect(await mod.refreshOutcome()).toBe('unreachable');
+  });
+
+  it("le refresh est plafonné par un signal d'abandon", async () => {
+    fetchMock.mockResolvedValue(json(200, { accessToken: 'a' }));
+    await mod.refreshOutcome();
+    expect((fetchMock.mock.calls[0][1] as RequestInit).signal).toBeInstanceOf(AbortSignal);
+  });
+
   it('api.logout rejette quand le serveur répond 500 ou que fetch rejette', async () => {
     fetchMock.mockResolvedValueOnce(json(500, {}));
     await expect(mod.api.logout()).rejects.toMatchObject({ status: 500 });

@@ -17,6 +17,7 @@ import { computeAge, formatKg } from '@/lib/animals';
 import { api, type AnimalWithUpcoming } from '@/lib/api';
 import { useSession } from '@/lib/auth-context';
 import { confirmAction, notifyError } from '@/lib/dialog';
+import { REMINDERS_ENABLED } from '@/lib/features';
 
 export default function MyAnimalsScreen() {
   const insets = useSafeAreaInsets();
@@ -147,7 +148,7 @@ export default function MyAnimalsScreen() {
           Impossible d&apos;actualiser. Réessayez.
         </Text>
       ) : null}
-      <ReminderPrompt />
+      {REMINDERS_ENABLED ? <ReminderPrompt /> : null}
       {body}
     </ScrollView>
   );

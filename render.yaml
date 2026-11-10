@@ -6,7 +6,7 @@ services:
     region: frankfurt
     branch: main
     rootDir: api
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run start:prod
     healthCheckPath: /api
     autoDeployTrigger: commit

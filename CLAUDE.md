@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > **PWA pivot (2026-11-09)**: the project is no longer an iOS/Android app. The Expo front is exported as a single-page web app and **served by Vercel**, which proxies `/api/*` to the NestJS API on Render (so the browser stays same-origin; the API only answers under `/api`). Native code and non-MVP screens/modules (routines, documents, fake household) were removed. Since 2026-11-10 `api/` and `app/` live in **one git repo at the root** (`main`), with both former histories (my-pets_api, my-pets_app) imported under their folder; the old `.git` dirs are kept in `.git-backup/` (ignored). Plan: `docs/superpowers/plans/2026-11-09-refonte-pwa.md`. Not yet done: desktop layout (plan 2) and real multi-user household (plan 3).
 
-> **Hosting (2026-11-10)**: Railway replaced by Render (`render.yaml` at the root, free plan, reminders disabled). Front moved to Vercel (Root Directory `app`, `app/vercel.json` rewrites `/api/:path*` to `https://my-pets.onrender.com/api/:path*`); Render serves the API only.
+> **Hosting (2026-11-10)**: Railway replaced by Render (`render.yaml` at the root, free plan, reminders disabled). Front moved to Vercel (Root Directory `app`, `app/vercel.json` rewrites `/api/:path*` to `https://my-pets-6j9p.onrender.com/api/:path*`); Render serves the API only.
 
 > **Pivot note**: the project moved from a Supabase BaaS design to a **custom NestJS + Prisma API**. Supabase is now used only as a managed Postgres database and object storage. Multi-tenant isolation is enforced in the API (ownership checks on `ownerId`), **not** by RLS. The authoritative roadmap lives in `.claude/roadmap-mvp.md`.
 

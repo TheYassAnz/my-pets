@@ -12,7 +12,7 @@ describe('vercel.json', () => {
     const { rewrites } = config;
     expect(rewrites[0]).toEqual({
       source: '/api/:path*',
-      destination: 'https://my-pets.onrender.com/api/:path*',
+      destination: 'https://my-pets-6j9p.onrender.com/api/:path*',
     });
     expect(rewrites[rewrites.length - 1]).toEqual({ source: '/(.*)', destination: '/index.html' });
     expect(rewrites.slice(0, -1).some((r) => r.source === '/(.*)')).toBe(false);

@@ -71,10 +71,6 @@ export function setThemePreference(pref: ThemePreference): void {
   notify();
 }
 
-export function useThemePreference(): ThemePreference {
-  return useSyncExternalStore(subscribe, getThemePreference, () => 'system');
-}
-
 export function useResolvedColorScheme(): 'light' | 'dark' {
   return useSyncExternalStore(
     subscribe,

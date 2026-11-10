@@ -10,31 +10,21 @@ import {
   ErrorState,
   Icon,
   ListRow,
-  SegmentedControl,
   Skeleton,
   Text,
 } from '@/components/ui';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { computeAge, formatKg } from '@/lib/animals';
 import { api, type AnimalWithUpcoming } from '@/lib/api';
 import { useSession } from '@/lib/auth-context';
+import { setThemePreference } from '@/lib/color-scheme';
 import { confirmAction, notifyError } from '@/lib/dialog';
 import { REMINDERS_ENABLED } from '@/lib/features';
-import {
-  setThemePreference,
-  useThemePreference,
-  type ThemePreference,
-} from '@/lib/color-scheme';
-
-const THEME_OPTIONS = [
-  { value: 'system', label: 'Système' },
-  { value: 'light', label: 'Clair' },
-  { value: 'dark', label: 'Sombre' },
-];
 
 export default function MyAnimalsScreen() {
   const insets = useSafeAreaInsets();
   const { user, signOut } = useSession();
-  const pref = useThemePreference();
+  const scheme = useColorScheme();
   const [animals, setAnimals] = useState<AnimalWithUpcoming[] | null>(null);
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -143,7 +133,16 @@ export default function MyAnimalsScreen() {
       contentContainerStyle={{ paddingTop: insets.top + 12 }}
       contentContainerClassName="px-5 pb-36"
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View className="flex-row justify-end">
+      <View className="flex-row justify-end gap-2">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={scheme === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'}
+          hitSlop={8}
+          onPress={() => setThemePreference(scheme === 'dark' ? 'light' : 'dark')}
+          className="h-11 w-11 items-center justify-center rounded-full bg-surface-sunken">
+          {/* Icône de l'action à venir : lune en clair, soleil en sombre */}
+          <Icon name={scheme === 'dark' ? 'sun' : 'moon'} decorative />
+        </Pressable>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Compte et déconnexion"
@@ -163,12 +162,6 @@ export default function MyAnimalsScreen() {
       ) : null}
       {REMINDERS_ENABLED ? <ReminderPrompt /> : null}
       {body}
-      <Text className="mb-2 mt-10 text-[13px] text-text-secondary">Apparence</Text>
-      <SegmentedControl
-        options={THEME_OPTIONS}
-        value={pref}
-        onChange={(v) => setThemePreference(v as ThemePreference)}
-      />
     </ScrollView>
   );
 }

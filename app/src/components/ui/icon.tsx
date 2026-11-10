@@ -23,6 +23,8 @@ const IONICONS = {
   trash: 'trash-outline',
   edit: 'create-outline',
   search: 'search-outline',
+  sun: 'sunny-outline',
+  moon: 'moon-outline',
 } as const;
 
 const MATERIAL = {

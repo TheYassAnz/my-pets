@@ -15,10 +15,10 @@ npx tsc --noEmit
 ## Déploiement web
 
 ```bash
-npm run deploy:web
+npm run build:web
 ```
 
-Exporte la PWA avec `EXPO_PUBLIC_API_URL=/api` (`npx expo export -p web`), puis remplace le contenu de `../api/client/` par le build (en conservant `.gitkeep`). Le dossier `api/client/` se committe avec le reste du dépôt.
+Exporte la PWA dans `dist/` avec `EXPO_PUBLIC_API_URL=/api` (`npx expo export -p web`). Le front est déployé par Vercel (Root Directory `app`), qui proxifie `/api` vers Render.
 
 ## Variables d'environnement
 

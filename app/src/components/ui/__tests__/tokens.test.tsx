@@ -32,10 +32,10 @@ describe('tokens de couleur', () => {
 describe('synchronisation Colors (theme.ts) / global.css', () => {
   const css = fs.readFileSync(path.join(__dirname, '../../../global.css'), 'utf8');
 
-  const DARK_MEDIA_MARKER = '@media (prefers-color-scheme: dark)';
-  const darkMarkerIndex = css.indexOf(DARK_MEDIA_MARKER);
+  const DARK_MARKER = ":root[data-theme='dark']";
+  const darkMarkerIndex = css.indexOf(DARK_MARKER);
   if (darkMarkerIndex === -1) {
-    throw new Error(`Bloc "${DARK_MEDIA_MARKER}" introuvable dans global.css`);
+    throw new Error(`Bloc "${DARK_MARKER}" introuvable dans global.css`);
   }
   // Bloc clair : tout ce qui précède le bloc dark (contient le :root de base).
   const lightBlock = css.slice(0, darkMarkerIndex);

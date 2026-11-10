@@ -1,5 +1,5 @@
 import { Pressable } from 'react-native';
-import { useColorScheme } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Icon } from './icon';
 import { Colors } from '@/constants/theme';
 

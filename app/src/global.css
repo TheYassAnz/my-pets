@@ -41,33 +41,31 @@
     --color-type-weight-fg: 75 95 214;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-surface: 0 0 0;
-      --color-surface-elevated: 14 14 16;
-      --color-surface-sunken: 28 28 30;
-      --color-border: 44 44 46;
-      --color-text: 255 255 255;
-      --color-text-secondary: 142 142 147;
-      --color-text-tertiary: 99 99 102;
-      --color-primary: 255 255 255;
-      --color-primary-pressed: 209 209 214;
-      --color-on-primary: 0 0 0;
-      --color-brand: 255 255 255;
-      --color-brand-pressed: 209 209 214;
-      --color-on-brand: 0 0 0;
-      --color-status-ok: 47 210 122;
-      --color-status-soon: 245 165 36;
-      --color-status-late: 255 107 107;
-      --color-danger-surface: 58 20 20;
-      --color-type-vaccine: 59 38 32;
-      --color-type-vaccine-fg: 255 138 107;
-      --color-type-treatment: 58 48 24;
-      --color-type-treatment-fg: 242 193 78;
-      --color-type-visit: 31 51 41;
-      --color-type-visit-fg: 95 211 154;
-      --color-type-weight: 35 42 74;
-      --color-type-weight-fg: 143 160 255;
-    }
+  :root[data-theme='dark'] {
+    --color-surface: 0 0 0;
+    --color-surface-elevated: 14 14 16;
+    --color-surface-sunken: 28 28 30;
+    --color-border: 44 44 46;
+    --color-text: 255 255 255;
+    --color-text-secondary: 142 142 147;
+    --color-text-tertiary: 99 99 102;
+    --color-primary: 255 255 255;
+    --color-primary-pressed: 209 209 214;
+    --color-on-primary: 0 0 0;
+    --color-brand: 255 255 255;
+    --color-brand-pressed: 209 209 214;
+    --color-on-brand: 0 0 0;
+    --color-status-ok: 47 210 122;
+    --color-status-soon: 245 165 36;
+    --color-status-late: 255 107 107;
+    --color-danger-surface: 58 20 20;
+    --color-type-vaccine: 59 38 32;
+    --color-type-vaccine-fg: 255 138 107;
+    --color-type-treatment: 58 48 24;
+    --color-type-treatment-fg: 242 193 78;
+    --color-type-visit: 31 51 41;
+    --color-type-visit-fg: 95 211 154;
+    --color-type-weight: 35 42 74;
+    --color-type-weight-fg: 143 160 255;
   }
 }

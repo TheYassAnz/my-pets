@@ -1,5 +1,6 @@
 import { forwardRef, useState } from 'react';
-import { useColorScheme, type TextInput as RNTextInput, type TextInputProps } from 'react-native';
+import { type TextInput as RNTextInput, type TextInputProps } from 'react-native';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 
 import { Colors } from '@/constants/theme';
 

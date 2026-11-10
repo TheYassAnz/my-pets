@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>my-pets · maquettes MVP</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap">
+<style>
+:root{--page:#E9E9EC;--ptx:#0A0A0A}
+body.dark{--page:#111113;--ptx:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ptx);font-family:'Inter Tight',system-ui,sans-serif;padding:32px 24px 64px;transition:background .2s}
+header{display:flex;align-items:center;gap:16px;justify-content:space-between;max-width:1300px;margin:0 auto 28px}
+h1{font-size:20px;margin:0;font-weight:600}
+.tg{display:flex;background:rgba(128,128,128,.2);border-radius:10px;padding:3px}
+.tg button{border:0;background:none;color:inherit;font:inherit;font-size:14px;padding:6px 14px;border-radius:8px;cursor:pointer}
+.tg button.on{background:#fff;color:#0A0A0A;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:36px;justify-content:center;max-width:1300px;margin:0 auto}
+figure{margin:0}
+figcaption{text-align:center;font-size:14px;margin-top:12px;opacity:.7}
+
+.phone{--bg:#fff;--tx:#0A0A0A;--sec:#8A8A8E;--hl:#ECECEE;--cr:#F2F2F4;--gr:#00A862;--am:#D97706;--btn:#0A0A0A;--bt:#fff;
+ width:375px;height:780px;background:var(--bg);color:var(--tx);border-radius:44px;border:1px solid #D5D5D9;overflow:hidden;display:flex;flex-direction:column;font-size:16px;line-height:1.35;position:relative}
+body.dark .phone{--bg:#000;--tx:#fff;--sec:#8E8E93;--hl:#1C1C1E;--cr:#1C1C1E;--gr:#2FD27A;--am:#F5A524;--btn:#fff;--bt:#000;border-color:#2A2A2D}
+.sb{display:flex;justify-content:space-between;font-size:15px;font-weight:600;padding:16px 30px 0;height:50px;flex:none}
+.pd{padding:0 24px}
+.nav{display:flex;justify-content:space-between;align-items:center;height:44px;font-size:24px}
+.h{font-size:32px;font-weight:700;letter-spacing:-1px;line-height:1.1}
+.s{color:var(--sec)}
+.hr{border-top:1px solid var(--hl)}
+.r{display:flex;align-items:center;gap:14px}
+.ic{width:44px;height:44px;border-radius:50%;background:var(--cr);display:flex;align-items:center;justify-content:center;font-size:21px;flex:none}
+.item{padding:14px 0}
+.t1{font-size:17px;font-weight:600}
+.t2{font-size:14px;color:var(--sec)}
+.val{text-align:right}
+.btn{background:var(--btn);color:var(--bt);border-radius:12px;height:50px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px}
+.foot{margin-top:auto;padding:0 24px 34px}
+.fd{border-bottom:1px solid var(--hl);padding:6px 0 10px;margin-bottom:14px}
+.fd .l{font-size:13px;color:var(--sec)}
+.fd .v{font-size:18px;font-weight:500;margin-top:2px}
+.fd.on{border-bottom:2px solid var(--tx)}
+.chip{background:var(--cr);border-radius:999px;padding:7px 15px;font-size:14px;font-weight:500;white-space:nowrap}
+.chip.on{background:var(--tx);color:var(--bg)}
+.seg{display:flex;background:var(--cr);border-radius:10px;padding:3px}
+.seg div{flex:1;text-align:center;padding:8px 0;border-radius:8px;font-size:14px;font-weight:500;color:var(--sec)}
+.seg .on{background:var(--bg);color:var(--tx);font-weight:600}
+.up{color:var(--gr);font-weight:600;font-size:15px}
+.am{color:var(--am)}
+</style>
+</head>
+<body>
+<header>
+  <h1>my-pets · maquettes MVP (taille réelle, 375 × 780)</h1>
+  <div class="tg" role="group" aria-label="Thème">
+    <button class="on" data-t="light">Clair</button><button data-t="dark">Noir</button>
+  </div>
+</header>
+
+<div class="row">
+
+<figure><div class="phone">
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd" style="margin-top:64px">
+    <div class="h">Connexion</div>
+    <div class="s" style="margin:10px 0 40px;font-size:17px">Retrouvez le carnet de vos animaux.</div>
+    <div class="fd on"><div class="l">E-mail</div><div class="v">yassine@mail.com</div></div>
+    <div class="fd"><div class="l">Mot de passe</div><div class="v">••••••••••</div></div>
+  </div>
+  <div class="foot"><div class="btn">Continuer</div>
+    <div class="s" style="text-align:center;margin-top:16px;font-size:15px">Pas encore de compte ? <b style="color:var(--tx)">Créer un compte</b></div></div>
+</div><figcaption>1 · Connexion</figcaption></figure>
+
+<figure><div class="phone">
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd">
+    <div class="nav" style="justify-content:flex-end"><span class="ic" style="width:36px;height:36px;font-size:18px"><i class="ti ti-user" aria-label="Compte"></i></span></div>
+    <div class="h" style="margin:8px 0 20px">Mes animaux</div>
+    <div class="r item"><span class="ic"><i class="ti ti-cat" aria-hidden="true"></i></span><div style="flex:1"><div class="t1">Nala</div><div class="t2">Chat · 3 ans</div></div><div class="val"><div class="t1">4,2 kg</div><div class="t2" style="font-size:13px">8 oct.</div></div></div><div class="hr"></div>
+    <div class="r item"><span class="ic"><i class="ti ti-dog" aria-hidden="true"></i></span><div style="flex:1"><div class="t1">Miko</div><div class="t2">Chien · 6 ans</div></div><div class="val"><div class="t1">18,6 kg</div><div class="t2" style="font-size:13px">2 sept.</div></div></div><div class="hr"></div>
+    <div class="r item" style="font-weight:600"><span class="ic"><i class="ti ti-plus" aria-hidden="true"></i></span>Ajouter un animal</div>
+  </div>
+</div><figcaption>2 · Mes animaux</figcaption></figure>
+
+<figure><div class="phone">
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd">
+    <div class="nav"><i class="ti ti-arrow-left" aria-label="Retour"></i></div>
+    <div class="h" style="margin:10px 0 22px;font-size:30px">Nouvel animal</div>
+    <div style="text-align:center;margin-bottom:22px"><span class="ic" style="width:84px;height:84px;font-size:32px;margin:0 auto"><i class="ti ti-camera" aria-hidden="true"></i></span></div>
+    <div class="r" style="gap:8px;margin-bottom:22px"><span class="chip on">Chat</span><span class="chip">Chien</span><span class="chip">Autre</span></div>
+    <div class="fd on"><div class="l">Nom</div><div class="v">Nala</div></div>
+    <div class="fd"><div class="l">Date de naissance</div><div class="v">14 mars 2023</div></div>
+  </div>
+  <div class="foot"><div class="btn">Enregistrer</div></div>
+</div><figcaption>3 · Animal (création / modification)</figcaption></figure>
+
+<figure><div class="phone">
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd">
+    <div class="nav"><i class="ti ti-arrow-left" aria-label="Retour"></i><i class="ti ti-pencil" aria-label="Modifier" style="font-size:22px"></i></div>
+    <div class="s" style="font-size:15px;margin-top:8px">Nala · Chat · 3 ans</div>
+    <div style="font-size:48px;font-weight:700;letter-spacing:-1.8px;line-height:1.1">4,2 kg</div>
+    <div class="up" style="margin-bottom:20px">+0,1 kg depuis juillet</div>
+    <div class="r" style="gap:8px;margin-bottom:12px;overflow:hidden"><span class="chip on">Tout</span><span class="chip">Vaccins</span><span class="chip">Soins</span><span class="chip">Visites</span></div>
+    <div class="hr"></div>
+    <div class="r item"><span class="ic"><i class="ti ti-vaccine" aria-hidden="true"></i></span><div style="flex:1"><div class="t1">Typhus-coryza</div><div class="t2">Prochain : 3 mars 2027</div></div><span class="t2" style="font-size:13px">3 mars</span></div><div class="hr"></div>
+    <div class="r item"><span class="ic"><i class="ti ti-pill" aria-hidden="true"></i></span><div style="flex:1"><div class="t1">Milbemax</div><div class="t2 am">Prochain : 12 avr.</div></div><span class="t2" style="font-size:13px">12 janv.</span></div><div class="hr"></div>
+    <div class="r item"><span class="ic"><i class="ti ti-stethoscope" aria-hidden="true"></i></span><div style="flex:1"><div class="t1">Visite annuelle</div><div class="t2">Dr Martin</div></div><span class="t2" style="font-size:13px">8 oct. 25</span></div>
+  </div>
+  <div class="foot"><div class="btn">Ajouter une entrée</div></div>
+</div><figcaption>4 · Fiche animal</figcaption></figure>
+
+<figure><div class="phone">
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd">
+    <div class="nav"><i class="ti ti-arrow-left" aria-label="Retour"></i></div>
+    <div class="h" style="margin:10px 0 22px;font-size:30px">Nouvelle entrée</div>
+    <div class="seg" style="margin-bottom:26px"><div class="on">Vaccin</div><div>Soin</div><div>Visite</div><div>Poids</div></div>
+    <div class="fd"><div class="l">Date</div><div class="v">12 octobre 2026</div></div>
+    <div class="fd on"><div class="l">Produit</div><div class="v">Rappel annuel</div></div>
+    <div class="fd"><div class="l">Prochaine échéance · facultatif</div><div class="v s">12 octobre 2027</div></div>
+    <div class="fd"><div class="l">Note · facultatif</div><div class="v s">Dr Martin</div></div>
+  </div>
+  <div class="foot"><div class="btn">Enregistrer</div></div>
+</div><figcaption>5 · Nouvelle entrée</figcaption></figure>
+
+</div>
+
+<script>
+document.querySelectorAll('.tg button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.body.classList.toggle('dark',b.dataset.t==='dark');
+    document.querySelectorAll('.tg button').forEach(function(x){x.classList.toggle('on',x===b)});
+  });
+});
+</script>
+</body>
+</html>

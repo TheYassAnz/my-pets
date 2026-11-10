@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>my-pets · 6 variantes</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Fredoka:wght@400;500;600&family=Baloo+2:wght@500;600;700&family=Quicksand:wght@500;600;700&family=Varela+Round&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#E9E9EC;color:#111;font-family:system-ui,sans-serif;padding:28px 24px 64px}
+header{max-width:1300px;margin:0 auto 26px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+h1{font-size:20px;margin:0;font-weight:600}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{border:0;background:#fff;font:inherit;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer}
+.tabs button.on{background:#111;color:#fff}
+.grid{display:flex;flex-wrap:wrap;gap:36px;justify-content:center;max-width:1300px;margin:0 auto}
+figure{margin:0}
+figcaption{text-align:center;margin-top:12px;font-size:14px}
+figcaption b{display:block;font-size:16px}
+figcaption span{opacity:.65}
+
+.phone{width:375px;height:780px;background:var(--bg);color:var(--tx);border-radius:44px;border:1px solid rgba(0,0,0,.12);overflow:hidden;display:flex;flex-direction:column;font-family:var(--ff),system-ui,sans-serif;font-size:16px;line-height:1.35}
+.sb{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:16px 30px 0;height:50px;flex:none}
+.pd{padding:0 24px}
+.nav{display:flex;justify-content:space-between;align-items:center;height:44px;font-size:24px}
+.h{font-size:32px;font-weight:var(--fw);letter-spacing:-.6px;line-height:1.1}
+.s{color:var(--sec)}
+.hr{border-top:1.5px solid var(--hl)}
+.r{display:flex;align-items:center;gap:14px}
+.ic{width:46px;height:46px;border-radius:50%;background:var(--c,var(--cr));color:var(--i,var(--tx));display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.card{background:var(--card);border-radius:var(--rad);box-shadow:var(--sh);padding:var(--cpad)}
+.item{padding:13px 0}
+.t1{font-size:17px;font-weight:700}
+.t2{font-size:14px;color:var(--sec)}
+.val{text-align:right}
+.btn{background:var(--ac);color:var(--on);border-radius:var(--rb);border-bottom:var(--bb);height:54px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px}
+.foot{margin-top:auto;padding:0 24px 34px}
+.fd{background:var(--fbg);border:var(--fbord);border-bottom:var(--fbot);border-radius:var(--fr);padding:var(--fp);margin-bottom:14px}
+.fd .l{font-size:13px;color:var(--sec)}
+.fd .v{font-size:18px;font-weight:600;margin-top:1px}
+.fd.on{border-color:var(--ac)}
+.chip{background:var(--cr);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:700;white-space:nowrap}
+.chip.on{background:var(--ac);color:var(--on)}
+.seg{display:flex;background:var(--cr);border-radius:16px;padding:4px}
+.seg div{flex:1;text-align:center;padding:9px 0;border-radius:12px;font-size:14px;font-weight:700;color:var(--sec)}
+.seg .on{background:var(--ac);color:var(--on)}
+.hero{background:var(--hero);border-radius:var(--rad);padding:var(--hpad);margin-bottom:16px}
+.up{color:var(--gr);font-weight:700;font-size:15px}
+.am{color:var(--am)}
+</style>
+</head>
+<body>
+<header>
+  <h1>my-pets · 6 variantes (taille réelle)</h1>
+  <div class="tabs" id="tabs"></div>
+</header>
+<div class="grid" id="grid"></div>
+
+<script>
+const V = [
+ {n:'A · Pêche', d:'Crème et corail, Nunito, bouton relief',
+  v:{bg:'#FFF6EE',tx:'#2D1B14',sec:'#9A7F72',hl:'#F3E3D6',cr:'#FFE6D5',ac:'#FF6B4A',on:'#fff',card:'#fff',sh:'0 4px 14px rgba(255,107,74,.10)',cpad:'4px 16px',rad:'24px',rb:'999px',bb:'4px solid #D9502F',ff:'Nunito',fw:800,fbg:'#fff',fbord:'1.5px solid #F3E3D6',fbot:'1.5px solid #F3E3D6',fr:'16px',fp:'10px 16px',hero:'#FFE6D5',hpad:'18px 20px',c1:'#FFE0D2',i1:'#E5532F',c2:'#FFEFC9',i2:'#B97A00',c3:'#DDF0E0',i3:'#2E8B57',c4:'#FFDDEA',i4:'#C23A6B',gr:'#2E8B57',am:'#C26A00'}},
+ {n:'B · Menthe', d:'Vert menthe, Fredoka, cartes douces',
+  v:{bg:'#EFF9F4',tx:'#0F2A22',sec:'#6E8C80',hl:'#D6EBE1',cr:'#DDF2E8',ac:'#1FA97A',on:'#fff',card:'#fff',sh:'0 3px 12px rgba(31,169,122,.10)',cpad:'4px 16px',rad:'26px',rb:'18px',bb:'4px solid #168560',ff:'Fredoka',fw:600,fbg:'#fff',fbord:'1.5px solid #D6EBE1',fbot:'1.5px solid #D6EBE1',fr:'14px',fp:'10px 16px',hero:'#D2F0E2',hpad:'18px 20px',c1:'#CDEFE0',i1:'#168560',c2:'#FDE9C4',i2:'#B07300',c3:'#D8E8FF',i3:'#2F6FD0',c4:'#FFDCE6',i4:'#C23A6B',gr:'#168560',am:'#B07300'}},
+ {n:'C · Lavande', d:'Violet doux, Baloo 2, bouton bombé',
+  v:{bg:'#F5F2FF',tx:'#1E1740',sec:'#8680A8',hl:'#E4DEFA',cr:'#E8E1FF',ac:'#7C5CFF',on:'#fff',card:'#fff',sh:'0 4px 14px rgba(124,92,255,.12)',cpad:'4px 16px',rad:'22px',rb:'16px',bb:'5px solid #5B3FD6',ff:'Baloo 2',fw:700,fbg:'#fff',fbord:'2px solid #E4DEFA',fbot:'2px solid #E4DEFA',fr:'16px',fp:'9px 16px',hero:'#E8E1FF',hpad:'18px 20px',c1:'#E3DBFF',i1:'#5B3FD6',c2:'#FFE3F0',i2:'#C23A8A',c3:'#D6F0FF',i3:'#1F7FB8',c4:'#FFF0C9',i4:'#B07300',gr:'#1F8F5F',am:'#B07300'}},
+ {n:'D · Soleil', d:'Jaune beurre, Quicksand, très rond',
+  v:{bg:'#FFFBEA',tx:'#2B2200',sec:'#9A8A4A',hl:'#F5EBB8',cr:'#FFF0B3',ac:'#FFC83D',on:'#2B2200',card:'#fff',sh:'0 3px 10px rgba(255,200,61,.25)',cpad:'4px 16px',rad:'26px',rb:'999px',bb:'4px solid #E0A400',ff:'Quicksand',fw:700,fbg:'#fff',fbord:'2px solid #F5EBB8',fbot:'2px solid #F5EBB8',fr:'18px',fp:'10px 18px',hero:'#FFF0B3',hpad:'18px 20px',c1:'#FFE8A0',i1:'#9A6A00',c2:'#E1F4D8',i2:'#3E8E2F',c3:'#DDEBFF',i3:'#2F6FD0',c4:'#FFDDE6',i4:'#C23A6B',gr:'#3E8E2F',am:'#B07300'}},
+ {n:'E · Ciel', d:'Bleu clair, Varela Round, ombres légères',
+  v:{bg:'#EEF5FF',tx:'#0E2140',sec:'#6B84A8',hl:'#D6E4FA',cr:'#DCEAFF',ac:'#2F7DF6',on:'#fff',card:'#fff',sh:'0 4px 14px rgba(47,125,246,.10)',cpad:'4px 16px',rad:'20px',rb:'14px',bb:'4px solid #1F5FCC',ff:'Varela Round',fw:400,fbg:'#fff',fbord:'1.5px solid #D6E4FA',fbot:'1.5px solid #D6E4FA',fr:'14px',fp:'10px 16px',hero:'#DCEAFF',hpad:'18px 20px',c1:'#D0E3FF',i1:'#1F5FCC',c2:'#E6DCFF',i2:'#6B49D6',c3:'#D5F2E5',i3:'#1F8F5F',c4:'#FFE4CC',i4:'#C26A00',gr:'#1F8F5F',am:'#C26A00'}},
+ {n:'F · Confettis', d:'Blanc et noir comme avant, icônes pastel',
+  v:{bg:'#fff',tx:'#0A0A0A',sec:'#8A8A8E',hl:'#ECECEE',cr:'#F2F2F4',ac:'#0A0A0A',on:'#fff',card:'transparent',sh:'none',cpad:'0',rad:'0',rb:'14px',bb:'0 solid transparent',ff:'Nunito',fw:800,fbg:'transparent',fbord:'0 solid transparent',fbot:'1.5px solid #ECECEE',fr:'0',fp:'6px 0 10px',hero:'transparent',hpad:'0',c1:'#FFD9CF',i1:'#E5532F',c2:'#FFEBB8',i2:'#B97A00',c3:'#D5EFE0',i3:'#2E8B57',c4:'#DDE4FF',i4:'#4B5FD6',gr:'#00A862',am:'#D97706'}}
+];
+const col = k => `--c:var(--c${k});--i:var(--i${k})`;
+const S = {
+ login: () => `
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd" style="margin-top:36px">
+   <span class="ic" style="width:64px;height:64px;font-size:30px;background:var(--ac);color:var(--on);margin-bottom:22px"><i class="ti ti-paw"></i></span>
+   <div class="h">Connexion</div>
+   <div class="s" style="margin:10px 0 32px;font-size:17px">Retrouvez le carnet de vos animaux.</div>
+   <div class="fd on"><div class="l">E-mail</div><div class="v">yassine@mail.com</div></div>
+   <div class="fd"><div class="l">Mot de passe</div><div class="v">••••••••••</div></div></div>
+  <div class="foot"><div class="btn">Continuer</div><div class="s" style="text-align:center;margin-top:16px;font-size:15px">Pas encore de compte ? <b style="color:var(--tx)">Créer un compte</b></div></div>`,
+ animaux: () => `
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd"><div class="nav" style="justify-content:flex-end"><span class="ic" style="width:38px;height:38px;font-size:19px"><i class="ti ti-user"></i></span></div>
+   <div class="h" style="margin:8px 0 20px">Mes animaux</div>
+   <div class="card">
+    <div class="r item"><span class="ic" style="${col(1)}"><i class="ti ti-cat"></i></span><div style="flex:1"><div class="t1">Nala</div><div class="t2">Chat · 3 ans</div></div><div class="val"><div class="t1">4,2 kg</div><div class="t2" style="font-size:13px">8 oct.</div></div></div><div class="hr"></div>
+    <div class="r item"><span class="ic" style="${col(3)}"><i class="ti ti-dog"></i></span><div style="flex:1"><div class="t1">Miko</div><div class="t2">Chien · 6 ans</div></div><div class="val"><div class="t1">18,6 kg</div><div class="t2" style="font-size:13px">2 sept.</div></div></div><div class="hr"></div>
+    <div class="r item" style="font-weight:700"><span class="ic"><i class="ti ti-plus"></i></span>Ajouter un animal</div></div></div>`,
+ animal: () => `
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd"><div class="nav"><i class="ti ti-arrow-left"></i></div>
+   <div class="h" style="margin:10px 0 20px;font-size:30px">Nouvel animal</div>
+   <div style="text-align:center;margin-bottom:20px"><span class="ic" style="width:88px;height:88px;font-size:34px;margin:0 auto;${col(1)}"><i class="ti ti-camera"></i></span></div>
+   <div class="r" style="gap:8px;margin-bottom:20px"><span class="chip on">Chat</span><span class="chip">Chien</span><span class="chip">Autre</span></div>
+   <div class="fd on"><div class="l">Nom</div><div class="v">Nala</div></div>
+   <div class="fd"><div class="l">Date de naissance</div><div class="v">14 mars 2023</div></div></div>
+  <div class="foot"><div class="btn">Enregistrer</div></div>`,
+ fiche: () => `
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd"><div class="nav"><i class="ti ti-arrow-left"></i><i class="ti ti-pencil" style="font-size:22px"></i></div>
+   <div class="hero" style="margin-top:6px"><div class="r" style="gap:12px"><div style="flex:1"><div class="s" style="font-size:15px">Nala · Chat · 3 ans</div><div style="font-size:46px;font-weight:var(--fw);letter-spacing:-1.5px;line-height:1.1">4,2 kg</div><div class="up">+0,1 kg depuis juillet</div></div><span class="ic" style="width:64px;height:64px;font-size:30px;${col(1)}"><i class="ti ti-cat"></i></span></div></div>
+   <div class="r" style="gap:8px;margin-bottom:14px;overflow:hidden"><span class="chip on">Tout</span><span class="chip">Vaccins</span><span class="chip">Soins</span><span class="chip">Visites</span></div>
+   <div class="card">
+    <div class="r item"><span class="ic" style="${col(1)}"><i class="ti ti-vaccine"></i></span><div style="flex:1"><div class="t1">Typhus-coryza</div><div class="t2">Prochain : 3 mars 2027</div></div><span class="t2" style="font-size:13px">3 mars</span></div><div class="hr"></div>
+    <div class="r item"><span class="ic" style="${col(2)}"><i class="ti ti-pill"></i></span><div style="flex:1"><div class="t1">Milbemax</div><div class="t2 am">Prochain : 12 avr.</div></div><span class="t2" style="font-size:13px">12 janv.</span></div><div class="hr"></div>
+    <div class="r item"><span class="ic" style="${col(3)}"><i class="ti ti-stethoscope"></i></span><div style="flex:1"><div class="t1">Visite annuelle</div><div class="t2">Dr Martin</div></div><span class="t2" style="font-size:13px">8 oct. 25</span></div></div></div>
+  <div class="foot"><div class="btn">Ajouter une entrée</div></div>`,
+ entree: () => `
+  <div class="sb"><span>9:41</span><span>5G</span></div>
+  <div class="pd"><div class="nav"><i class="ti ti-arrow-left"></i></div>
+   <div class="h" style="margin:10px 0 20px;font-size:30px">Nouvelle entrée</div>
+   <div class="seg" style="margin-bottom:24px"><div class="on">Vaccin</div><div>Soin</div><div>Visite</div><div>Poids</div></div>
+   <div class="fd"><div class="l">Date</div><div class="v">12 octobre 2026</div></div>
+   <div class="fd on"><div class="l">Produit</div><div class="v">Rappel annuel</div></div>
+   <div class="fd"><div class="l">Prochaine échéance · facultatif</div><div class="v s">12 octobre 2027</div></div>
+   <div class="fd"><div class="l">Note · facultatif</div><div class="v s">Dr Martin</div></div></div>
+  <div class="foot"><div class="btn">Enregistrer</div></div>`
+};
+const NAMES = {login:'Connexion',animaux:'Mes animaux',animal:'Animal',fiche:'Fiche animal',entree:'Nouvelle entrée'};
+let cur = 'fiche';
+const grid = document.getElementById('grid'), tabs = document.getElementById('tabs');
+const styleOf = o => Object.entries(o).map(([k,v]) => `--${k}:${v}`).join(';');
+function render(){
+  grid.innerHTML = V.map(x => `<figure><div class="phone" style="${styleOf(x.v)}">${S[cur]()}</div><figcaption><b>${x.n}</b><span>${x.d}</span></figcaption></figure>`).join('');
+  tabs.innerHTML = Object.keys(NAMES).map(k => `<button class="${k===cur?'on':''}" data-k="${k}">${NAMES[k]}</button>`).join('');
+}
+tabs.addEventListener('click', e => { const k = e.target.dataset.k; if (k) { cur = k; render(); } });
+render();
+</script>
+</body>
+</html>

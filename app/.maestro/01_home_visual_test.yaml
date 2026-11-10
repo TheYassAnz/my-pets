@@ -1,0 +1,7 @@
+appId: com.ysma.app
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Welcome" # Ceci sera à adapter selon le premier écran
+    timeout: 5000
+- takeScreenshot: "home_screen"

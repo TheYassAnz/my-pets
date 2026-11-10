@@ -3,21 +3,43 @@ import '@/global.css';
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useEffect } from 'react';
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import { ToastProvider } from '@/components/ui';
+import { ErrorState, ToastProvider } from '@/components/ui';
 import { AppFontSources } from '@/constants/fonts';
+import { Colors } from '@/constants/theme';
 import { SessionProvider, useSession } from '@/lib/auth-context';
 import { registerServiceWorker } from '@/lib/pwa';
+import { hideSplash } from '@/lib/splash';
 
 function RootNavigator() {
-  const { user, isLoading } = useSession();
+  const { user, isLoading, restoreFailed, retryRestore } = useSession();
+  const scheme = useColorScheme();
 
-  // Pas de flash d'UI tant que la session n'est pas restaurée
-  if (isLoading) return null;
+  // Le splash HTML couvre l'écran jusqu'à ce que la session soit restaurée (ou en échec).
+  useEffect(() => {
+    if (!isLoading) hideSplash();
+  }, [isLoading]);
+
+  if (restoreFailed) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ErrorState message="Impossible de joindre le serveur. Réessayez dans un instant." onRetry={retryRestore} />
+      </View>
+    );
+  }
+
+  // Invisible au premier chargement (le splash le recouvre), visible pendant un « Réessayer ».
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator color={Colors[scheme === 'dark' ? 'dark' : 'light'].textSecondary} />
+      </View>
+    );
+  }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -38,14 +60,14 @@ function RootNavigator() {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [fontsLoaded] = useFonts(AppFontSources);
+  const [fontsLoaded, fontError] = useFonts(AppFontSources);
 
   useEffect(() => {
     void registerServiceWorker();
   }, []);
 
-  // Pas de texte dans la mauvaise police le temps du chargement.
-  if (!fontsLoaded) return null;
+  // Pas de texte dans la mauvaise police le temps du chargement (police système si l'échec persiste).
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <SafeAreaProvider>

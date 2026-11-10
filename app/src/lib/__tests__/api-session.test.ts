@@ -77,10 +77,66 @@ describe('session par cookie', () => {
     fetchMock.mockResolvedValue(json(200, { accessToken: 'a' }));
     await expect(mod.refreshSession()).resolves.toBe(true);
 
-    const request = jest.fn((_name: string, cb: () => Promise<unknown>) => cb());
+    const request = jest.fn((_name: string, _options: unknown, cb: () => Promise<unknown>) => cb());
     Object.defineProperty(navigator, 'locks', { value: { request }, configurable: true });
     await expect(mod.refreshSession()).resolves.toBe(true);
-    expect(request).toHaveBeenCalledWith('mypets-refresh', expect.any(Function));
+    expect(request).toHaveBeenCalledWith(
+      'mypets-refresh',
+      { signal: expect.any(AbortSignal) },
+      expect.any(Function),
+    );
+  });
+
+  it("refreshOutcome renvoie 'ok' et mémorise le token sur 200", async () => {
+    fetchMock.mockResolvedValue(json(200, { accessToken: 'new' }));
+    expect(await mod.refreshOutcome()).toBe('ok');
+    expect(mod.getAccessToken()).toBe('new');
+  });
+
+  it("refreshOutcome renvoie 'denied' sur 401", async () => {
+    mod.setAccessToken('old');
+    fetchMock.mockResolvedValue(json(401, {}));
+    expect(await mod.refreshOutcome()).toBe('denied');
+    expect(mod.getAccessToken()).toBeNull();
+  });
+
+  it.each([503, 502])("refreshOutcome renvoie 'unreachable' sur %i", async (status) => {
+    mod.setAccessToken('old');
+    fetchMock.mockResolvedValue(json(status, {}));
+    expect(await mod.refreshOutcome()).toBe('unreachable');
+    expect(mod.getAccessToken()).toBeNull();
+  });
+
+  it("refreshOutcome renvoie 'unreachable' quand fetch rejette", async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
+    expect(await mod.refreshOutcome()).toBe('unreachable');
+  });
+
+  it("le refresh est plafonné par un signal d'abandon", async () => {
+    fetchMock.mockResolvedValue(json(200, { accessToken: 'a' }));
+    await mod.refreshOutcome();
+    expect((fetchMock.mock.calls[0][1] as RequestInit).signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it("sans AbortSignal.timeout (anciens navigateurs), le refresh part quand même", async () => {
+    const original = AbortSignal.timeout;
+    (AbortSignal as { timeout?: unknown }).timeout = undefined;
+    try {
+      fetchMock.mockResolvedValue(json(200, { accessToken: 'a' }));
+      expect(await mod.refreshOutcome()).toBe('ok');
+      expect((fetchMock.mock.calls[0][1] as RequestInit).signal).toBeUndefined();
+    } finally {
+      AbortSignal.timeout = original;
+    }
+  });
+
+  it("une attente du verrou abandonnée donne 'unreachable' sans token", async () => {
+    mod.setAccessToken('old');
+    const request = jest.fn(() => Promise.reject(new DOMException('x', 'AbortError')));
+    Object.defineProperty(navigator, 'locks', { value: { request }, configurable: true });
+    expect(await mod.refreshOutcome()).toBe('unreachable');
+    expect(mod.getAccessToken()).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('api.logout rejette quand le serveur répond 500 ou que fetch rejette', async () => {

@@ -6,12 +6,15 @@ import {
   useState,
 } from 'react';
 
-import { api, refreshSession, setAccessToken, type User } from './api';
+import { api, ApiError, refreshOutcome, setAccessToken, type User } from './api';
 import { detachPushSubscription } from './notifications';
 
 type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
+  // Restauration impossible (réseau, serveur) : distinct d'une session refusée
+  restoreFailed: boolean;
+  retryRestore: () => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -40,21 +43,28 @@ export function clearLegacyTokens(): void {
 export function SessionProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [restoreFailed, setRestoreFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   // Restauration de session au démarrage : le cookie refresh donne un access
-  // token, puis /auth/me
+  // token, puis /auth/me. Un refus (cookie invalide, 401) = anonyme ; tout
+  // autre échec = restoreFailed, pour ne pas déconnecter à tort.
   useEffect(() => {
     let cancelled = false;
 
     clearLegacyTokens();
     (async () => {
       try {
-        if (await refreshSession()) {
+        const outcome = await refreshOutcome();
+        if (outcome === 'unreachable') {
+          if (!cancelled) setRestoreFailed(true);
+        } else if (outcome === 'ok') {
           const me = await api.me();
           if (!cancelled) setUser(me);
         }
-      } catch {
-        setAccessToken(null);
+      } catch (e) {
+        if (e instanceof ApiError && e.status === 401) setAccessToken(null);
+        else if (!cancelled) setRestoreFailed(true);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -63,7 +73,13 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [attempt]);
+
+  const retryRestore = () => {
+    setRestoreFailed(false);
+    setIsLoading(true);
+    setAttempt((n) => n + 1);
+  };
 
   const signIn = async (email: string, password: string) => {
     const res = await api.login(email, password);
@@ -93,7 +109,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, isLoading, restoreFailed, retryRestore, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

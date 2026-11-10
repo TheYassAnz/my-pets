@@ -19,7 +19,9 @@ function urlBase64ToBytes(b64: string): Uint8Array<ArrayBuffer> {
 /** À appeler uniquement depuis un clic (exigence iOS/Safari). */
 export async function enablePushReminders(): Promise<'granted' | 'denied' | 'unsupported'> {
   if (!pushSupported()) return 'unsupported';
-  if ((await Notification.requestPermission()) !== 'granted') return 'denied';
+  const permission =
+    Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  if (permission !== 'granted') return 'denied';
   const reg = await registerServiceWorker();
   if (!reg) return 'unsupported';
   const sub = await reg.pushManager.subscribe({

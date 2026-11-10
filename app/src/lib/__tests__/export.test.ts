@@ -5,7 +5,8 @@ const json = (status: number, body?: unknown) =>
   ({ ok: status >= 200 && status < 300, status, json: async () => body }) as Response;
 
 let fetchMock: jest.Mock;
-let link: { href: string; download: string; click: jest.Mock };
+let link: { href: string; download: string; click: jest.Mock; remove: jest.Mock };
+let appendChild: jest.Mock;
 let createElement: jest.Mock;
 
 beforeEach(() => {
@@ -18,15 +19,18 @@ beforeEach(() => {
   /* eslint-enable @typescript-eslint/no-require-imports */
   fetchMock = jest.fn();
   global.fetch = fetchMock as unknown as typeof fetch;
-  link = { href: '', download: '', click: jest.fn() };
+  jest.useFakeTimers();
+  link = { href: '', download: '', click: jest.fn(), remove: jest.fn() };
   createElement = jest.fn(() => link);
-  (global as unknown as { document: unknown }).document = { createElement };
+  appendChild = jest.fn();
+  (global as unknown as { document: unknown }).document = { createElement, body: { appendChild } };
   URL.createObjectURL = jest.fn(() => 'blob:pdf');
   URL.revokeObjectURL = jest.fn();
   api.setAccessToken('tok');
 });
 
 afterEach(() => {
+  jest.useRealTimers();
   delete (global as unknown as { document?: unknown }).document;
 });
 
@@ -44,6 +48,23 @@ it('télécharge le PDF avec le Bearer, clique le lien et révoque l’URL', asy
   expect(link.href).toBe('blob:pdf');
   expect(link.download).toBe('carnet-rex-le-chien.pdf');
   expect(link.click).toHaveBeenCalledTimes(1);
+  expect(appendChild).toHaveBeenCalledWith(link);
+  expect(link.remove).toHaveBeenCalledTimes(1);
+  expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+  jest.advanceTimersByTime(1000);
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:pdf');
+});
+
+it('révoque quand même l’URL après le délai si click() lève', async () => {
+  fetchMock.mockResolvedValue({ ...json(200), blob: async () => new Blob(['%PDF']) });
+  link.click.mockImplementation(() => {
+    throw new Error('boom');
+  });
+
+  await expect(exportAndShareHealthRecord('a1', 'Rex')).rejects.toThrow('boom');
+  expect(link.remove).toHaveBeenCalledTimes(1);
+  expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+  jest.advanceTimersByTime(1000);
   expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:pdf');
 });
 

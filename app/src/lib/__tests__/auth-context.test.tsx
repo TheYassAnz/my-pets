@@ -18,9 +18,10 @@ jest.mock('@/lib/api', () => ({
 const mockSub = { toJSON: () => ({ endpoint: 'e' }), unsubscribe: jest.fn().mockResolvedValue(true) };
 jest.mock('@/lib/notifications', () => ({ detachPushSubscription: async () => mockSub }));
 
-let session: ReturnType<typeof useSession>;
+const sessionRef: { current: ReturnType<typeof useSession> } = { current: undefined! };
 function Probe() {
-  session = useSession();
+  const session = useSession();
+  sessionRef.current = session; // eslint-disable-line react-hooks/immutability -- capture de test, objet mutable externe
   return <Text>{session.isLoading ? 'chargement' : (session.user?.email ?? 'anonyme')}</Text>;
 }
 
@@ -34,7 +35,7 @@ it('signOut rejette et garde la session si api.logout échoue', async () => {
   expect(await screen.findByText('a@b.c')).toBeTruthy();
 
   await act(async () => {
-    await expect(session.signOut()).rejects.toThrow('500');
+    await expect(sessionRef.current.signOut()).rejects.toThrow('500');
   });
   expect(screen.getByText('a@b.c')).toBeTruthy();
   expect(mockSave).toHaveBeenCalledWith({ endpoint: 'e' });

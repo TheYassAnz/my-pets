@@ -56,6 +56,14 @@ it('permission accordée : abonne puis enregistre', async () => {
   });
 });
 
+it('permission déjà accordée : ne redemande pas', async () => {
+  const notif = g.Notification as { permission?: string; requestPermission: jest.Mock };
+  notif.permission = 'granted';
+  expect(await enablePushReminders()).toBe('granted');
+  expect(notif.requestPermission).not.toHaveBeenCalled();
+  expect(api.savePushSubscription).toHaveBeenCalled();
+});
+
 it('permission refusée : denied, aucun appel API', async () => {
   (g.Notification as { requestPermission: jest.Mock }).requestPermission.mockResolvedValue('denied');
   expect(await enablePushReminders()).toBe('denied');

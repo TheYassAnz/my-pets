@@ -158,4 +158,16 @@ describe('Nouvelle entrée', () => {
     await openDatePicker();
     expect(toIsoDate(lastPickerProps().maximumDate)).toBe(TODAY);
   });
+
+  it('vaccin → poids : une date future reportée est refusée, aucun appel', async () => {
+    await setup();
+    await openDatePicker();
+    await act(async () => lastPickerProps().onValueChange(null, new Date(2026, 11, 1)));
+    await fireEvent.press(screen.getByText('Valider'));
+    await fireEvent.press(screen.getByLabelText('Poids'));
+    await fireEvent.changeText(screen.getByLabelText('Poids (kg)'), '4,2');
+    await save();
+    expect(await screen.findByText('La date ne peut pas être dans le futur')).toBeTruthy();
+    expect(mockAddWeight).not.toHaveBeenCalled();
+  });
 });

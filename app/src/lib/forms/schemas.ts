@@ -78,7 +78,9 @@ export const weightEntrySchema = z.object({
   date: z
     .string()
     .min(1, 'Date requise')
-    .refine((d) => parseIsoDate(d) !== null, 'Date invalide'),
+    .refine((d) => parseIsoDate(d) !== null, 'Date invalide')
+    // Le poids se pèse aujourd'hui ou avant : une date future reportée d'un vaccin est refusée.
+    .refine((d) => !isFutureDate(d), 'La date ne peut pas être dans le futur'),
 });
 
 export type WeightEntryValues = z.infer<typeof weightEntrySchema>;

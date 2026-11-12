@@ -132,4 +132,10 @@ describe('weightEntrySchema', () => {
     const result = parse('4,2', '');
     expect(messageFor(result, 'date')).toBe('Date requise');
   });
+
+  it('refuse une date future', () => {
+    const nextYear = new Date().getFullYear() + 1;
+    const result = parse('4,2', `${nextYear}-01-01`);
+    expect(messageFor(result, 'date')).toBe('La date ne peut pas être dans le futur');
+  });
 });

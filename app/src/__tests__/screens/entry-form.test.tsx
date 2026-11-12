@@ -213,14 +213,14 @@ describe('Modifier l’entrée', () => {
     expect(mockUpdateEvent).toHaveBeenCalledWith('a1', 'e1', expect.objectContaining({ nextDueDate: null }));
   });
 
-  it('passer en Visite conserve le titre, envoie vet null et pas de nextDueDate', async () => {
+  it('passer en Visite conserve le titre, envoie vet null et nextDueDate null', async () => {
     await setupEdit();
     await fireEvent.press(screen.getByLabelText('Visite'));
     expect(screen.getByLabelText('Motif').props.value).toBe('Rage');
     await fireEvent.changeText(screen.getByLabelText('Note'), 'RAS');
     await save();
     const payload = mockUpdateEvent.mock.calls[0][2];
-    expect(payload).toEqual({ type: 'VISIT', title: 'Rage', date: '2026-11-21', notes: 'RAS', vet: null });
+    expect(payload).toEqual({ type: 'VISIT', title: 'Rage', date: '2026-11-21', notes: 'RAS', vet: null, nextDueDate: null });
   });
 
   it('Supprimer appelle onDelete', async () => {
@@ -228,5 +228,25 @@ describe('Modifier l’entrée', () => {
     await setupEdit(onDelete);
     await fireEvent.press(screen.getByLabelText('Supprimer'));
     expect(onDelete).toHaveBeenCalled();
+  });
+
+  it('visite existante : nextDueDate hérité non envoyé', async () => {
+    const visit = { ...(event as object), type: 'VISIT', nextDueDate: '2026-12-15T00:00:00.000Z' } as never;
+    await render(
+      <ToastProvider>
+        <EntryForm animalId="a1" event={visit} />
+      </ToastProvider>,
+    );
+    await save();
+    expect(mockUpdateEvent.mock.calls[0][2]).not.toHaveProperty('nextDueDate');
+  });
+
+  it('changer de type efface l’erreur précédente', async () => {
+    mockUpdateEvent.mockRejectedValueOnce(new Error('Serveur indisponible'));
+    await setupEdit();
+    await save();
+    expect(await screen.findByText('Serveur indisponible')).toBeTruthy();
+    await fireEvent.press(screen.getByLabelText('Soin'));
+    expect(screen.queryByText('Serveur indisponible')).toBeNull();
   });
 });

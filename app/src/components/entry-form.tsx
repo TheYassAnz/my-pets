@@ -81,7 +81,11 @@ export function EntryForm({ animalId, animal, event, onDelete }: Props) {
   const isWeight = type === 'WEIGHT';
 
   const changeType = (next: string) => {
-    if (editing) return setValue('type', next as EntryType);
+    if (editing) {
+      setValue('type', next as EntryType);
+      setError(null);
+      return;
+    }
     // La date saisie est conservée ; les champs propres au type précédent repartent à vide.
     reset({ ...SPECIFIC_DEFAULTS, date: getValues('date'), type: next as EntryType });
     setError(null);
@@ -100,7 +104,9 @@ export function EntryForm({ animalId, animal, event, onDelete }: Props) {
           title: values.title.trim(),
           date: values.date,
           notes: values.notes.trim() || null,
-          ...(entryType === 'VISIT' ? { vet } : { nextDueDate: values.nextDueDate }),
+          ...(entryType !== 'VISIT'
+            ? { nextDueDate: values.nextDueDate }
+            : { vet, ...(event.type !== 'VISIT' && { nextDueDate: null }) }),
         });
       } else if (entryType === 'WEIGHT') {
         // Le résolveur renvoie la sortie du schéma : weightKg est déjà un nombre.

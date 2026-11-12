@@ -25,6 +25,8 @@ const IONICONS = {
   search: 'search-outline',
   sun: 'sunny-outline',
   moon: 'moon-outline',
+  calendar: 'calendar-outline',
+  person: 'person-outline',
 } as const;
 
 const MATERIAL = {

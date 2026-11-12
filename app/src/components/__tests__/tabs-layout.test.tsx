@@ -10,6 +10,7 @@ jest.mock('expo-router', () => {
   return { Tabs, Redirect: jest.fn(() => null) };
 });
 jest.mock('@/hooks/use-color-scheme', () => ({ useColorScheme: () => 'light' }));
+jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 34, left: 0, right: 0 }) }));
 
 describe('(tabs)/_layout', () => {
   it('déclare trois onglets dans l’ordre, sans header', () => {
@@ -19,6 +20,8 @@ describe('(tabs)/_layout', () => {
       headerShown: false,
       tabBarActiveTintColor: Colors.light.text,
       tabBarInactiveTintColor: Colors.light.textTertiary,
+      tabBarStyle: { height: 64 + 34 },
+      tabBarLabelStyle: { lineHeight: 16 },
     });
     const screens = React.Children.toArray(el.props.children) as React.ReactElement<any>[];
     expect(screens.map((s) => s.props.name)).toEqual(['index', 'upcoming', 'account']);

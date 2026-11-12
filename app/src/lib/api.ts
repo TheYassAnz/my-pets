@@ -218,10 +218,10 @@ export type HealthEventInput = {
   type: HealthEventType;
   title: string;
   date: string;
-  dosage?: string;
-  vet?: string;
-  notes?: string;
-  nextDueDate?: string;
+  dosage?: string | null;
+  vet?: string | null;
+  notes?: string | null;
+  nextDueDate?: string | null;
 };
 
 async function uploadFile<T>(

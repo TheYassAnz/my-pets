@@ -57,7 +57,13 @@ export class HealthEventsService {
         dosage: dto.dosage,
         vet: dto.vet,
         notes: dto.notes,
-        nextDueDate: dto.nextDueDate ? new Date(dto.nextDueDate) : undefined,
+        // null vide le champ, undefined le laisse inchangé
+        nextDueDate:
+          dto.nextDueDate === null
+            ? null
+            : dto.nextDueDate
+              ? new Date(dto.nextDueDate)
+              : undefined,
       },
     });
   }

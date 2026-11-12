@@ -71,3 +71,48 @@ describe('HealthEventsService.findUpcoming', () => {
     expect(daysBetween).toBe(30);
   });
 });
+
+describe('HealthEventsService.update', () => {
+  const buildService = () => {
+    const updateMock = jest.fn().mockResolvedValue({});
+    const prisma = {
+      animal: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: 'animal-1', ownerId: 'owner-1' }),
+      },
+      healthEvent: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: 'evt-1', animalId: 'animal-1' }),
+        update: updateMock,
+      },
+    } as unknown as PrismaService;
+    return { service: new HealthEventsService(prisma), updateMock };
+  };
+
+  it('envoie null pour vider un champ optionnel', async () => {
+    const { service, updateMock } = buildService();
+
+    await service.update('owner-1', 'animal-1', 'evt-1', {
+      nextDueDate: null,
+      notes: null,
+    });
+
+    const { data } = updateMock.mock.calls[0][0];
+    expect(data.nextDueDate).toBeNull();
+    expect(data.notes).toBeNull();
+  });
+
+  it('laisse inchangés les champs absents (undefined)', async () => {
+    const { service, updateMock } = buildService();
+
+    await service.update('owner-1', 'animal-1', 'evt-1', { title: 'x' });
+
+    const { data } = updateMock.mock.calls[0][0];
+    expect(data.nextDueDate).toBeUndefined();
+    expect(data.notes).toBeUndefined();
+    expect(data.dosage).toBeUndefined();
+    expect(data.vet).toBeUndefined();
+  });
+});

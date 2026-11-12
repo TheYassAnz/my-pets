@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
-import MyAnimalsScreen from '@/app/(app)/index';
+import MyAnimalsScreen from '@/app/(app)/(tabs)/index';
 
 const mockListAnimals = jest.fn();
 const mockSignOut = jest.fn();

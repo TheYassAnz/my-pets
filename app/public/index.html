@@ -74,8 +74,24 @@
         transition: opacity 200ms;
         pointer-events: none;
       }
+      #splash-fun {
+        margin: 20px 0 0;
+        min-height: 20px;
+        font-size: 15px;
+        line-height: 20px;
+        text-align: center;
+        transition: opacity 200ms;
+      }
+      #splash-fun.splash-fun-out {
+        opacity: 0;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash-fun {
+          transition: none;
+        }
+      }
       #splash-msg {
-        margin: 24px 0 0;
+        margin: 12px 0 0;
         max-width: 280px;
         text-align: center;
         font-size: 14px;
@@ -91,10 +107,66 @@
     </noscript>
     <div id="splash" role="status" aria-label="Chargement">
       <img src="/icons/icon-192.png" width="96" height="96" alt="" />
+      <p id="splash-fun" aria-hidden="true"></p>
       <p id="splash-msg" hidden></p>
     </div>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
+    <script id="splash-fun-script">
+      // Phrases rotatives du splash : une toutes les 2 s (fondu 200 ms), tant que #splash est là.
+      (function () {
+        var el = document.getElementById('splash-fun');
+        if (!el) return;
+        var PHRASES = [
+          'Nettoyage des litières…',
+          'Ravitaillement des croquettes…',
+          "Remplissage des gamelles d'eau…",
+          'Brossage des poils…',
+          'Recherche de la balle sous le canapé…',
+          'Négociation avec le chat…',
+          'Promenade du chien…',
+          'Comptage des moustaches…',
+          'Réveil du hamster…',
+          'Vérification du carnet de vaccins…',
+          'Coupe des griffes…',
+          'Distribution des friandises…',
+          "Nettoyage de l'aquarium…",
+          'Installation du panier…'
+        ];
+        var queue = [];
+        var last = '';
+        function next() {
+          if (!queue.length) {
+            queue = PHRASES.slice();
+            for (var i = queue.length - 1; i > 0; i--) {
+              var j = Math.floor(Math.random() * (i + 1));
+              var t = queue[i];
+              queue[i] = queue[j];
+              queue[j] = t;
+            }
+            if (queue[0] === last) {
+              var s = queue[0];
+              queue[0] = queue[1];
+              queue[1] = s;
+            }
+          }
+          last = queue.shift();
+          return last;
+        }
+        el.textContent = next();
+        var timer = setInterval(function () {
+          if (!document.getElementById('splash')) {
+            clearInterval(timer);
+            return;
+          }
+          el.classList.add('splash-fun-out');
+          setTimeout(function () {
+            el.textContent = next();
+            el.classList.remove('splash-fun-out');
+          }, 200);
+        }, 2000);
+      })();
+    </script>
     <script>
       // Réveil du serveur (Render free) : on rassure si le splash est encore là après 6 s.
       setTimeout(function () {

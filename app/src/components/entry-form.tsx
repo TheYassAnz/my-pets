@@ -15,7 +15,7 @@ import {
   Text,
   useToast,
 } from '@/components/ui';
-import { api, type HealthEventType } from '@/lib/api';
+import { api, type HealthEvent, type HealthEventType } from '@/lib/api';
 import { toIsoDate } from '@/lib/dates';
 import {
   healthEventSchema,
@@ -46,9 +46,13 @@ const resolver: Resolver<EntryValues> = (values, context, options) =>
 type Props = {
   animalId: string;
   animal?: { name: string; photoUrl?: string | null };
+  /** Présent ⇒ mode édition. */
+  event?: HealthEvent;
+  onDelete?: () => void;
 };
 
-export function EntryForm({ animalId, animal }: Props) {
+export function EntryForm({ animalId, animal, event, onDelete }: Props) {
+  const editing = !!event;
   const { show } = useToast();
   const insets = useSafeAreaInsets();
   const [error, setError] = useState<string | null>(null);
@@ -56,16 +60,28 @@ export function EntryForm({ animalId, animal }: Props) {
   const vetRef = useRef<RNTextInput>(null);
   const notesRef = useRef<RNTextInput>(null);
 
-  const { control, handleSubmit, reset, getValues, formState } =
+  const { control, handleSubmit, reset, getValues, setValue, formState } =
     useForm<EntryValues>({
       resolver,
       mode: 'onTouched',
-      defaultValues: { type: 'VACCINE', date: toIsoDate(new Date()), ...SPECIFIC_DEFAULTS },
+      defaultValues: event
+        ? {
+            type: event.type,
+            title: event.title,
+            date: event.date.slice(0, 10),
+            dosage: event.dosage ?? '',
+            vet: event.vet ?? '',
+            notes: event.notes ?? '',
+            nextDueDate: event.nextDueDate?.slice(0, 10) ?? null,
+            weightKg: '',
+          }
+        : { type: 'VACCINE', date: toIsoDate(new Date()), ...SPECIFIC_DEFAULTS },
     });
   const type = useWatch({ control, name: 'type' });
   const isWeight = type === 'WEIGHT';
 
   const changeType = (next: string) => {
+    if (editing) return setValue('type', next as EntryType);
     // La date saisie est conservée ; les champs propres au type précédent repartent à vide.
     reset({ ...SPECIFIC_DEFAULTS, date: getValues('date'), type: next as EntryType });
     setError(null);
@@ -76,9 +92,21 @@ export function EntryForm({ animalId, animal }: Props) {
     try {
       // `values` est la sortie du schéma choisi : le schéma poids ne renvoie pas `type`.
       const entryType = getValues('type');
-      if (entryType === 'WEIGHT') {
+      if (event) {
+        // Champ visible vidé ⇒ null (le serveur le remet à vide) ; dosage n'est pas éditable ici.
+        const vet = values.vet.trim() || null;
+        await api.updateEvent(animalId, event.id, {
+          type: entryType as HealthEventType,
+          title: values.title.trim(),
+          date: values.date,
+          notes: values.notes.trim() || null,
+          ...(entryType === 'VISIT' ? { vet } : { nextDueDate: values.nextDueDate }),
+        });
+        show('Entrée mise à jour');
+      } else if (entryType === 'WEIGHT') {
         // Le résolveur renvoie la sortie du schéma : weightKg est déjà un nombre.
         await api.addWeight(animalId, Number(values.weightKg), values.date);
+        show('Entrée ajoutée');
       } else {
         await api.createEvent(animalId, {
           type: entryType,
@@ -89,8 +117,8 @@ export function EntryForm({ animalId, animal }: Props) {
           notes: values.notes.trim() || undefined,
           nextDueDate: values.nextDueDate ?? undefined,
         });
+        show('Entrée ajoutée');
       }
-      show('Entrée ajoutée');
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Enregistrement impossible');
@@ -125,7 +153,7 @@ export function EntryForm({ animalId, animal }: Props) {
           <Icon name="chevron-back" size={22} decorative />
         </Pressable>
 
-        <Text className="text-[30px] font-extrabold text-text">Nouvelle entrée</Text>
+        <Text className="text-[30px] font-extrabold text-text">{editing ? 'Modifier l\'entrée' : 'Nouvelle entrée'}</Text>
 
         {animal ? (
           <View className="flex-row items-center gap-2">
@@ -134,7 +162,7 @@ export function EntryForm({ animalId, animal }: Props) {
           </View>
         ) : null}
 
-        <SegmentedControl options={OPTIONS} value={type} onChange={changeType} />
+        <SegmentedControl options={editing ? OPTIONS.filter((o) => o.value !== 'WEIGHT') : OPTIONS} value={type} onChange={changeType} />
 
         <Controller
           control={control}
@@ -215,6 +243,8 @@ export function EntryForm({ animalId, animal }: Props) {
             {error}
           </Text>
         ) : null}
+
+        {onDelete ? <Button label="Supprimer" variant="destructive" icon="trash" onPress={onDelete} /> : null}
       </ScrollView>
 
       <View className="bg-surface px-5 pt-3" style={{ paddingBottom: insets.bottom + 12 }}>

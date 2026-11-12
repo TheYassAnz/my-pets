@@ -14,7 +14,7 @@ export default function AnimalsLayout() {
         name="[id]/events/scan"
         options={{ title: 'Scanner un document', presentation: 'modal' }}
       />
-      <Stack.Screen name="[id]/events/[eventId]" options={{ title: 'Événement' }} />
+      <Stack.Screen name="[id]/events/[eventId]" options={{ headerShown: false }} />
     </Stack>
   );
 }

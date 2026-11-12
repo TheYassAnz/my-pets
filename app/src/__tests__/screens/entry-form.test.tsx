@@ -7,6 +7,7 @@ import { toIsoDate } from '@/lib/dates';
 
 const mockCreateEvent = jest.fn();
 const mockAddWeight = jest.fn();
+const mockUpdateEvent = jest.fn();
 const mockPicker = jest.fn();
 
 jest.mock('@expo/ui/community/datetime-picker', () => ({
@@ -20,6 +21,7 @@ jest.mock('@/lib/api', () => ({
   api: {
     createEvent: (...a: unknown[]) => mockCreateEvent(...a),
     addWeight: (...a: unknown[]) => mockAddWeight(...a),
+    updateEvent: (...a: unknown[]) => mockUpdateEvent(...a),
   },
 }));
 jest.mock('react-native-safe-area-context', () => ({
@@ -45,6 +47,7 @@ beforeEach(() => {
   jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate', 'setTimeout', 'queueMicrotask'], now: new Date(`${TODAY}T12:00:00`) });
   mockCreateEvent.mockResolvedValue({});
   mockAddWeight.mockResolvedValue({});
+  mockUpdateEvent.mockResolvedValue({});
 });
 afterEach(() => jest.useRealTimers());
 
@@ -169,5 +172,60 @@ describe('Nouvelle entrée', () => {
     await save();
     expect(await screen.findByText('La date ne peut pas être dans le futur')).toBeTruthy();
     expect(mockAddWeight).not.toHaveBeenCalled();
+  });
+});
+
+describe('Modifier l’entrée', () => {
+  const event = {
+    id: 'e1', type: 'VACCINE', title: 'Rage', date: '2026-11-21T00:00:00.000Z',
+    dosage: '1 ml', vet: null, notes: null, nextDueDate: '2026-11-29T00:00:00.000Z',
+  } as never;
+  const setupEdit = (onDelete?: () => void) =>
+    render(
+      <ToastProvider>
+        <EntryForm animalId="a1" animal={{ name: 'Nala', photoUrl: null }} event={event} onDelete={onDelete} />
+      </ToastProvider>,
+    );
+
+  it('affiche le titre, les valeurs initiales, sans Poids ni Dosage', async () => {
+    await setupEdit();
+    expect(screen.getByText('Modifier l\'entrée')).toBeTruthy();
+    expect(screen.getByLabelText('Produit').props.value).toBe('Rage');
+    expect(screen.queryByLabelText('Poids')).toBeNull();
+    expect(screen.queryByLabelText('Dosage')).toBeNull();
+  });
+
+  it('enregistrer sans modifier : updateEvent sans dosage, toast, retour', async () => {
+    await setupEdit();
+    await save();
+    expect(mockUpdateEvent).toHaveBeenCalledWith('a1', 'e1', {
+      type: 'VACCINE', title: 'Rage', date: '2026-11-21', notes: null, nextDueDate: '2026-11-29',
+    });
+    expect(await screen.findByText('Entrée mise à jour')).toBeTruthy();
+    expect(router.back).toHaveBeenCalled();
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+  });
+
+  it('vider la prochaine échéance envoie null', async () => {
+    await setupEdit();
+    await fireEvent.press(screen.getByLabelText(/^Effacer/));
+    await save();
+    expect(mockUpdateEvent).toHaveBeenCalledWith('a1', 'e1', expect.objectContaining({ nextDueDate: null }));
+  });
+
+  it('passer en Visite conserve le titre, envoie vet null et pas de nextDueDate', async () => {
+    await setupEdit();
+    await fireEvent.press(screen.getByLabelText('Visite'));
+    expect(screen.getByLabelText('Motif').props.value).toBe('Rage');
+    await save();
+    const payload = mockUpdateEvent.mock.calls[0][2];
+    expect(payload).toEqual({ type: 'VISIT', title: 'Rage', date: '2026-11-21', notes: null, vet: null });
+  });
+
+  it('Supprimer appelle onDelete', async () => {
+    const onDelete = jest.fn();
+    await setupEdit(onDelete);
+    await fireEvent.press(screen.getByLabelText('Supprimer'));
+    expect(onDelete).toHaveBeenCalled();
   });
 });

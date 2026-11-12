@@ -145,7 +145,7 @@ export function EntryForm({ animalId, animal }: Props) {
               value={field.value || null}
               onChange={(v) => field.onChange(v ?? '')}
               error={fieldState.error?.message}
-              maximumDate={new Date()}
+              maximumDate={isWeight ? new Date() : undefined}
             />
           )}
         />

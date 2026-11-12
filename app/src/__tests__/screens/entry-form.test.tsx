@@ -3,9 +3,18 @@ import { router } from 'expo-router';
 
 import { EntryForm } from '@/components/entry-form';
 import { ToastProvider } from '@/components/ui';
+import { toIsoDate } from '@/lib/dates';
 
 const mockCreateEvent = jest.fn();
 const mockAddWeight = jest.fn();
+const mockPicker = jest.fn();
+
+jest.mock('@expo/ui/community/datetime-picker', () => ({
+  DateTimePicker: (props: unknown) => {
+    mockPicker(props);
+    return null;
+  },
+}));
 
 jest.mock('@/lib/api', () => ({
   api: {
@@ -28,6 +37,8 @@ const setup = () =>
   );
 
 const save = () => fireEvent.press(screen.getByLabelText('Enregistrer'));
+const openDatePicker = () => fireEvent.press(screen.getByLabelText(/^Date,/));
+const lastPickerProps = () => mockPicker.mock.calls.at(-1)[0];
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -127,5 +138,24 @@ describe('Nouvelle entrée', () => {
     });
     expect(mockAddWeight).toHaveBeenCalledTimes(1);
     await act(async () => resolve());
+  });
+
+  it('visite : date future acceptée', async () => {
+    await setup();
+    await fireEvent.press(screen.getByLabelText('Visite'));
+    await openDatePicker();
+    expect(lastPickerProps().maximumDate).toBeUndefined();
+    await act(async () => lastPickerProps().onValueChange(null, new Date(2026, 11, 1)));
+    await fireEvent.press(screen.getByText('Valider'));
+    await fireEvent.changeText(screen.getByLabelText('Motif'), 'Contrôle');
+    await save();
+    expect(mockCreateEvent).toHaveBeenCalledWith('a1', expect.objectContaining({ type: 'VISIT', date: '2026-12-01' }));
+  });
+
+  it('poids : date bornée à aujourd’hui', async () => {
+    await setup();
+    await fireEvent.press(screen.getByLabelText('Poids'));
+    await openDatePicker();
+    expect(toIsoDate(lastPickerProps().maximumDate)).toBe(TODAY);
   });
 });

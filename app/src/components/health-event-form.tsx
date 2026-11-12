@@ -88,7 +88,6 @@ export function HealthEventForm({ initial, submitLabel, onSubmit }: Props) {
             value={field.value || null}
             onChange={(value) => field.onChange(value ?? '')}
             error={fieldState.error?.message}
-            maximumDate={new Date()}
           />
         )}
       />

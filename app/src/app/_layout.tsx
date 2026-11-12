@@ -8,7 +8,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import { ErrorState, ToastProvider } from '@/components/ui';
+import { DialogHost, ErrorState, ToastProvider } from '@/components/ui';
 import { AppFontSources } from '@/constants/fonts';
 import { Colors } from '@/constants/theme';
 import { SessionProvider, useSession } from '@/lib/auth-context';
@@ -79,6 +79,7 @@ export default function RootLayout() {
               <ToastProvider>
                 <AnimatedSplashOverlay />
                 <RootNavigator />
+                <DialogHost />
               </ToastProvider>
             </View>
           </View>

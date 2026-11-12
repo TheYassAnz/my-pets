@@ -13,7 +13,7 @@ export default function AccountScreen() {
   const scheme = useColorScheme();
 
   const confirmSignOut = async () => {
-    if (!(await confirmAction('Se déconnecter', 'Voulez-vous vraiment vous déconnecter ?'))) return;
+    if (!(await confirmAction('Se déconnecter', 'Voulez-vous vraiment vous déconnecter ?', { confirmLabel: 'Se déconnecter' }))) return;
     try {
       await signOut();
     } catch {

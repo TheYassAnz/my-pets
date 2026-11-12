@@ -4,6 +4,10 @@ const token = (name) => `rgb(var(--color-${name}) / <alpha-value>)`;
 module.exports = {
   content: ['./src/**/*.{ts,tsx}'],
   presets: [require('nativewind/preset')],
+  // Le thème passe par data-theme (lib/color-scheme.ts), pas par les variantes dark: de NativeWind.
+  // 'media' (défaut) fait planter css-interop 0.2.6 en dev : son MutationObserver appelle
+  // colorScheme.set() quand Metro injecte le CSS après le JS, et set() refuse le mode 'media'.
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {

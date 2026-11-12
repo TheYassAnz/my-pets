@@ -23,7 +23,7 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
-const event = { id: 'e1', type: 'VACCINE', title: 'Rage', date: '2025-11-20', nextDueDate: '2026-11-20', animalId: 'a1', animalName: 'Nala' };
+const event = { id: 'e1', type: 'VACCINE', title: 'Rage', date: '2025-11-20', nextDueDate: '2026-11-20', dueDate: '2026-11-20', animalId: 'a1', animalName: 'Nala' };
 
 describe('À venir', () => {
   it('liste les échéances avec animal, date et badge', async () => {
@@ -37,9 +37,19 @@ describe('À venir', () => {
   });
 
   it('affiche « Aujourd’hui » pour une échéance du jour', async () => {
-    mockList.mockResolvedValue([{ ...event, nextDueDate: '2026-11-12' }]);
+    mockList.mockResolvedValue([{ ...event, nextDueDate: '2026-11-12', dueDate: '2026-11-12' }]);
     await render(<UpcomingScreen />);
     expect(await screen.findByText('Aujourd’hui')).toBeTruthy();
+  });
+
+  it('visite planifiée sans prochaine échéance : affichée à sa date', async () => {
+    mockList.mockResolvedValue([
+      { ...event, type: 'VISIT', title: 'Contrôle', date: '2026-11-29', nextDueDate: null, dueDate: '2026-11-29' },
+    ]);
+    await render(<UpcomingScreen />);
+    expect(await screen.findByText('Contrôle')).toBeTruthy();
+    expect(screen.getByText(/Nala · 29 nov\.? 2026/)).toBeTruthy();
+    expect(screen.getByText('Dans 17 j')).toBeTruthy();
   });
 
   it('liste vide : EmptyState', async () => {

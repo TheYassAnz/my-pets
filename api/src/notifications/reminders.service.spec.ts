@@ -43,6 +43,7 @@ const event = (
   id: 'e',
   title,
   animalId,
+  date: inDays(-30),
   nextDueDate: inDays(days),
   animal: { name: animal, owner: o },
 });
@@ -95,6 +96,25 @@ describe('RemindersService', () => {
     expect(mail.sendReminderDigest).toHaveBeenCalledTimes(1);
     expect(mail.sendReminderDigest).toHaveBeenCalledWith('a@b.fr', [
       'Rex — Vaccin rage dans 15 jours',
+    ]);
+  });
+
+  it('rappelle une visite planifiée à J-15 (date future, sans échéance)', async () => {
+    const visit = {
+      ...event(0, owner('a@b.fr'), 'Contrôle', 'Proxima'),
+      date: inDays(15),
+      nextDueDate: null,
+    };
+    await run([visit]);
+    expect(mail.sendReminderDigest).toHaveBeenCalledWith('a@b.fr', [
+      'Proxima — Contrôle dans 15 jours',
+    ]);
+    const [{ where }] = prisma.healthEvent.findMany.mock.calls[0] as [
+      { where: { OR: object[] } },
+    ];
+    expect(where.OR.map((c) => Object.keys(c))).toEqual([
+      ['nextDueDate'],
+      ['date'],
     ]);
   });
 
@@ -202,9 +222,7 @@ describe('RemindersService', () => {
     it('envoie les rappels quand REMINDERS_ENABLED=true', async () => {
       process.env.REMINDERS_ENABLED = 'true';
       const service = make();
-      const spy = jest
-        .spyOn(service, 'sendDueReminders')
-        .mockResolvedValue();
+      const spy = jest.spyOn(service, 'sendDueReminders').mockResolvedValue();
       await service.runDaily();
       expect(spy).toHaveBeenCalledTimes(1);
     });

@@ -6,17 +6,27 @@ type FindManyEvent = {
   type: string;
   title: string;
   date: Date;
-  nextDueDate: Date;
+  nextDueDate: Date | null;
   animal: { id: string; name: string };
 };
 
+type UpdateArgs = { data: Record<string, unknown> };
+type Window = { gte: Date; lte: Date };
 type FindManyArgs = {
-  where: { nextDueDate: { gte: Date; lte: Date }; animal: { ownerId: string } };
-  orderBy: { nextDueDate: 'asc' };
+  where: {
+    OR: [{ nextDueDate: Window }, { date: Window }];
+    animal: { ownerId: string };
+  };
 };
 
 describe('HealthEventsService.findUpcoming', () => {
-  it("filtre par propriétaire, trie par échéance et aplatit le nom de l'animal", async () => {
+  const inDays = (n: number) => {
+    const d = new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    return new Date(d.getTime() + n * 86_400_000);
+  };
+
+  it("filtre par propriétaire, trie par date à venir et aplatit le nom de l'animal", async () => {
     const findMany = jest
       .fn<Promise<FindManyEvent[]>, [FindManyArgs]>()
       .mockResolvedValue([
@@ -24,9 +34,17 @@ describe('HealthEventsService.findUpcoming', () => {
           id: 'evt-1',
           type: 'VACCINE',
           title: 'Rappel CHPL',
-          date: new Date('2026-01-01'),
-          nextDueDate: new Date('2026-02-01'),
+          date: inDays(-300),
+          nextDueDate: inDays(30),
           animal: { id: 'animal-1', name: 'Nala' },
+        },
+        {
+          id: 'evt-2',
+          type: 'VISIT',
+          title: 'Contrôle',
+          date: inDays(17),
+          nextDueDate: null,
+          animal: { id: 'animal-2', name: 'Proxima' },
         },
       ]);
     const prisma = {
@@ -36,16 +54,26 @@ describe('HealthEventsService.findUpcoming', () => {
 
     const result = await service.findUpcoming('owner-1', 90);
 
-    const { where, orderBy } = findMany.mock.calls[0][0];
+    const { where } = findMany.mock.calls[0][0];
     expect(where.animal).toEqual({ ownerId: 'owner-1' });
-    expect(orderBy).toEqual({ nextDueDate: 'asc' });
     expect(result).toEqual([
+      {
+        id: 'evt-2',
+        type: 'VISIT',
+        title: 'Contrôle',
+        date: inDays(17),
+        nextDueDate: null,
+        dueDate: inDays(17),
+        animalId: 'animal-2',
+        animalName: 'Proxima',
+      },
       {
         id: 'evt-1',
         type: 'VACCINE',
         title: 'Rappel CHPL',
-        date: new Date('2026-01-01'),
-        nextDueDate: new Date('2026-02-01'),
+        date: inDays(-300),
+        nextDueDate: inDays(30),
+        dueDate: inDays(30),
         animalId: 'animal-1',
         animalName: 'Nala',
       },
@@ -62,7 +90,9 @@ describe('HealthEventsService.findUpcoming', () => {
     await service.findUpcoming('owner-1', 30);
 
     const { where } = findMany.mock.calls[0][0];
-    const { gte, lte } = where.nextDueDate;
+    // Une date planifiée OU une prochaine échéance dans la même fenêtre
+    expect(where.OR[1].date).toBe(where.OR[0].nextDueDate);
+    const { gte, lte } = where.OR[0].nextDueDate;
 
     expect(gte.getUTCHours()).toBe(0);
     const daysBetween = Math.round(
@@ -99,7 +129,7 @@ describe('HealthEventsService.update', () => {
       notes: null,
     });
 
-    const { data } = updateMock.mock.calls[0][0];
+    const [{ data }] = updateMock.mock.calls[0] as [UpdateArgs];
     expect(data.nextDueDate).toBeNull();
     expect(data.notes).toBeNull();
   });
@@ -109,7 +139,7 @@ describe('HealthEventsService.update', () => {
 
     await service.update('owner-1', 'animal-1', 'evt-1', { title: 'x' });
 
-    const { data } = updateMock.mock.calls[0][0];
+    const [{ data }] = updateMock.mock.calls[0] as [UpdateArgs];
     expect(data.nextDueDate).toBeUndefined();
     expect(data.notes).toBeUndefined();
     expect(data.dosage).toBeUndefined();

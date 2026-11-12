@@ -197,7 +197,9 @@ export type UpcomingHealthEvent = {
   type: HealthEventType;
   title: string;
   date: string;
-  nextDueDate: string;
+  nextDueDate: string | null;
+  // Date affichée : la date d'un événement planifié, sinon sa prochaine échéance.
+  dueDate: string;
   animalId: string;
   animalName: string;
 };

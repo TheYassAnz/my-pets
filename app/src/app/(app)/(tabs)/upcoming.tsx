@@ -59,12 +59,12 @@ export default function UpcomingScreen() {
     body = (
       <View>
         {events.map((e) => {
-          const days = daysUntil(e.nextDueDate);
+          const days = daysUntil(e.dueDate);
           return (
             <ListRow
               key={e.id}
               title={e.title}
-              subtitle={`${e.animalName} · ${formatDate(e.nextDueDate)}`}
+              subtitle={`${e.animalName} · ${formatDate(e.dueDate)}`}
               leading={<TypeIcon type={e.type} />}
               trailing={
                 <Badge

@@ -1,15 +1,11 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
 import MyAnimalsScreen from '@/app/(app)/(tabs)/index';
 
 const mockListAnimals = jest.fn();
-const mockSignOut = jest.fn();
 
 jest.mock('@/lib/api', () => ({ api: { listAnimals: (...a: unknown[]) => mockListAnimals(...a) } }));
-jest.mock('@/lib/auth-context', () => ({
-  useSession: () => ({ user: { email: 'yassine@mail.com' }, signOut: mockSignOut }),
-}));
 jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }) }));
 jest.mock('expo-router', () => {
   const { useEffect } = jest.requireActual('react');
@@ -32,14 +28,7 @@ const animal = (o: object) => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockSignOut.mockResolvedValue(undefined);
 });
-
-// jest-expo n'expose pas window.confirm/alert : on les définit avant de les espionner.
-function spyDialog(name: 'confirm' | 'alert') {
-  (window as unknown as Record<string, unknown>)[name] = () => undefined;
-  return jest.spyOn(window, name);
-}
 
 describe('Mes animaux', () => {
   it('affiche les animaux, poids en virgule et « — » sans poids', async () => {
@@ -98,31 +87,11 @@ describe('Mes animaux', () => {
     expect(router.push).toHaveBeenCalledWith('/animals/new');
   });
 
-  it('la déconnexion ne se fait qu’après confirmation', async () => {
+  it('n’affiche plus le bouton compte / déconnexion', async () => {
     mockListAnimals.mockResolvedValue([]);
-    const confirm = spyDialog('confirm').mockReturnValue(false);
     await render(<MyAnimalsScreen />);
-    await fireEvent.press(await screen.findByLabelText('Compte et déconnexion'));
-    expect(confirm).toHaveBeenCalled();
-    expect(mockSignOut).not.toHaveBeenCalled();
-
-    confirm.mockReturnValue(true);
-    await fireEvent.press(screen.getByLabelText('Compte et déconnexion'));
-    await waitFor(() => expect(mockSignOut).toHaveBeenCalled());
-  });
-
-  it('affiche un message si la déconnexion échoue', async () => {
-    mockListAnimals.mockResolvedValue([]);
-    mockSignOut.mockRejectedValue(new Error('500'));
-    spyDialog('confirm').mockReturnValue(true);
-    const alert = spyDialog('alert').mockImplementation(() => {});
-    await render(<MyAnimalsScreen />);
-    await fireEvent.press(await screen.findByLabelText('Compte et déconnexion'));
-    await waitFor(() =>
-      expect(alert).toHaveBeenCalledWith(
-        'Déconnexion impossible. Vérifiez votre connexion et réessayez.',
-      ),
-    );
+    await screen.findByText('Mes animaux');
+    expect(screen.queryByLabelText('Compte et déconnexion')).toBeNull();
   });
 
   it('n’affiche pas l’invite « Activer les rappels » tant que les rappels sont coupés', async () => {

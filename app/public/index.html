@@ -18,7 +18,8 @@
       })();
     </script>
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- viewport-fit=cover : sans lui env(safe-area-inset-*) vaut 0 sur iOS et la barre d'onglets passe sous la barre Safari / l'indicateur d'accueil. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#FFFFFF" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />

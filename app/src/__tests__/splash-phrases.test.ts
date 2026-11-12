@@ -9,6 +9,10 @@ describe('phrases rotatives du splash', () => {
   let el: { textContent: string; classList: { add: jest.Mock; remove: jest.Mock } };
   let splashPresent: boolean;
 
+  it('script splash-fun-script présent', () => {
+    expect(code).toBeDefined();
+  });
+
   const run = ({ withFun = true } = {}) => {
     globalThis.document = {
       getElementById: (id: string) =>

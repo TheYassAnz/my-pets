@@ -1,7 +1,9 @@
-import { Stack, useFocusEffect, useLocalSearchParams, router } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackButton } from '@/components/back-button';
 import { EntryForm } from '@/components/entry-form';
 import { ErrorState, Skeleton } from '@/components/ui';
 import { confirmAction, notifyError } from '@/lib/dialog';
@@ -11,6 +13,7 @@ export default function EditHealthEventScreen() {
   const { id, eventId } = useLocalSearchParams<{ id: string; eventId: string }>();
   const [event, setEvent] = useState<HealthEvent | null>(null);
   const [animal, setAnimal] = useState<Animal | undefined>();
+  const insets = useSafeAreaInsets();
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -50,13 +53,17 @@ export default function EditHealthEventScreen() {
   let body;
   if (error) {
     body = (
-      <View className="flex-1 justify-center bg-surface">
-        <ErrorState message={error} onRetry={load} />
+      <View className="flex-1 bg-surface px-5" style={{ paddingTop: insets.top + 12 }}>
+        <BackButton />
+        <View className="flex-1 justify-center">
+          <ErrorState message={error} onRetry={load} />
+        </View>
       </View>
     );
   } else if (!event) {
     body = (
-      <View className="flex-1 bg-surface p-4">
+      <View className="flex-1 gap-5 bg-surface px-5" style={{ paddingTop: insets.top + 12 }}>
+        <BackButton />
         <Skeleton variant="card" count={1} />
       </View>
     );
@@ -64,10 +71,5 @@ export default function EditHealthEventScreen() {
     body = <EntryForm animalId={id} animal={animal} event={event} onDelete={onDelete} />;
   }
 
-  return (
-    <>
-      <Stack.Screen options={{ headerShown: false }} />
-      {body}
-    </>
-  );
+  return body;
 }

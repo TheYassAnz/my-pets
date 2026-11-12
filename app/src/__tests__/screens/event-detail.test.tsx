@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { router } from 'expo-router';
 
 import { ToastProvider } from '@/components/ui';
-import { confirmAction } from '@/lib/dialog';
+import { confirmAction, notifyError } from '@/lib/dialog';
 import EditHealthEventScreen from '@/app/(app)/animals/[id]/events/[eventId]';
 
 const mockGetEvent = jest.fn();
@@ -72,5 +72,25 @@ describe('Fiche événement', () => {
     await waitFor(() => expect(confirmAction).toHaveBeenCalled());
     expect(mockDeleteEvent).not.toHaveBeenCalled();
     expect(router.back).not.toHaveBeenCalled();
+  });
+
+  it('échec de suppression : notifyError', async () => {
+    (confirmAction as jest.Mock).mockResolvedValue(true);
+    mockDeleteEvent.mockRejectedValue(new Error('boom'));
+    await setup();
+    await fireEvent.press(screen.getByLabelText('Supprimer'));
+    await waitFor(() => expect(notifyError).toHaveBeenCalledWith('Suppression impossible'));
+    expect(router.back).not.toHaveBeenCalled();
+  });
+
+  it('erreur de chargement : bouton Retour disponible', async () => {
+    mockGetEvent.mockRejectedValue(new Error('x'));
+    await render(
+      <ToastProvider>
+        <EditHealthEventScreen />
+      </ToastProvider>,
+    );
+    await fireEvent.press(await screen.findByLabelText('Retour'));
+    expect(router.back).toHaveBeenCalled();
   });
 });

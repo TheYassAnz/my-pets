@@ -2,15 +2,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Controller, useForm, useWatch, type Resolver } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput as RNTextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, TextInput as RNTextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackButton } from '@/components/back-button';
 import {
   Avatar,
   Button,
   DateField,
   FormField,
-  Icon,
   SegmentedControl,
   Text,
   useToast,
@@ -102,11 +102,9 @@ export function EntryForm({ animalId, animal, event, onDelete }: Props) {
           notes: values.notes.trim() || null,
           ...(entryType === 'VISIT' ? { vet } : { nextDueDate: values.nextDueDate }),
         });
-        show('Entrée mise à jour');
       } else if (entryType === 'WEIGHT') {
         // Le résolveur renvoie la sortie du schéma : weightKg est déjà un nombre.
         await api.addWeight(animalId, Number(values.weightKg), values.date);
-        show('Entrée ajoutée');
       } else {
         await api.createEvent(animalId, {
           type: entryType,
@@ -117,8 +115,8 @@ export function EntryForm({ animalId, animal, event, onDelete }: Props) {
           notes: values.notes.trim() || undefined,
           nextDueDate: values.nextDueDate ?? undefined,
         });
-        show('Entrée ajoutée');
       }
+      show(event ? 'Entrée mise à jour' : 'Entrée ajoutée');
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Enregistrement impossible');
@@ -144,14 +142,7 @@ export function EntryForm({ animalId, animal, event, onDelete }: Props) {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingTop: insets.top + 12 }}
         contentContainerClassName="gap-5 px-5 pb-6">
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Retour"
-          hitSlop={8}
-          onPress={() => router.back()}
-          className="h-11 w-11 items-center justify-center rounded-full bg-surface-sunken">
-          <Icon name="chevron-back" size={22} decorative />
-        </Pressable>
+        <BackButton />
 
         <Text className="text-[30px] font-extrabold text-text">{editing ? 'Modifier l\'entrée' : 'Nouvelle entrée'}</Text>
 

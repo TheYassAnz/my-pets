@@ -217,9 +217,10 @@ describe('Modifier l’entrée', () => {
     await setupEdit();
     await fireEvent.press(screen.getByLabelText('Visite'));
     expect(screen.getByLabelText('Motif').props.value).toBe('Rage');
+    await fireEvent.changeText(screen.getByLabelText('Note'), 'RAS');
     await save();
     const payload = mockUpdateEvent.mock.calls[0][2];
-    expect(payload).toEqual({ type: 'VISIT', title: 'Rage', date: '2026-11-21', notes: null, vet: null });
+    expect(payload).toEqual({ type: 'VISIT', title: 'Rage', date: '2026-11-21', notes: 'RAS', vet: null });
   });
 
   it('Supprimer appelle onDelete', async () => {

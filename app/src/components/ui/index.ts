@@ -4,6 +4,7 @@ export { Button, type ButtonProps, type ButtonVariant } from './button';
 export { Card, type CardProps } from './card';
 export { Checkbox, type CheckboxProps } from './checkbox';
 export { Chip, type ChipProps } from './chip';
+export { DialogHost } from './dialog-host';
 export { DateField, type DateFieldProps } from './date-field';
 export { Divider } from './divider';
 export { EmptyState, type EmptyStateProps } from './empty-state';

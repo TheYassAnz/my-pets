@@ -197,7 +197,9 @@ export type UpcomingHealthEvent = {
   type: HealthEventType;
   title: string;
   date: string;
-  nextDueDate: string;
+  nextDueDate: string | null;
+  // Date affichée : la date d'un événement planifié, sinon sa prochaine échéance.
+  dueDate: string;
   animalId: string;
   animalName: string;
 };
@@ -218,10 +220,10 @@ export type HealthEventInput = {
   type: HealthEventType;
   title: string;
   date: string;
-  dosage?: string;
-  vet?: string;
-  notes?: string;
-  nextDueDate?: string;
+  dosage?: string | null;
+  vet?: string | null;
+  notes?: string | null;
+  nextDueDate?: string | null;
 };
 
 async function uploadFile<T>(

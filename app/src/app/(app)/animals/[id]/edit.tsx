@@ -65,7 +65,7 @@ export default function EditAnimalScreen() {
   });
 
   const onDelete = async () => {
-    if (!(await confirmAction('Supprimer cet animal ?', 'Cette action est irréversible.'))) return;
+    if (!(await confirmAction('Supprimer cet animal ?', 'Cette action est irréversible.', { confirmLabel: 'Supprimer', destructive: true }))) return;
     try {
       await api.deleteAnimal(id);
       // Replace allows us to completely back out of the animal details flow

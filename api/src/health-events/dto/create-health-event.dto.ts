@@ -20,17 +20,17 @@ export class CreateHealthEventDto {
 
   @IsOptional()
   @IsString()
-  dosage?: string;
+  dosage?: string | null;
 
   @IsOptional()
   @IsString()
-  vet?: string;
+  vet?: string | null;
 
   @IsOptional()
   @IsString()
-  notes?: string;
+  notes?: string | null;
 
   @IsOptional()
   @IsDateString()
-  nextDueDate?: string;
+  nextDueDate?: string | null;
 }

@@ -3,6 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import * as webpush from 'web-push';
 import { MailService } from '../mail/mail.service';
 import { PrismaService } from '../prisma.service';
+import { upcomingDate } from '../health-events/upcoming-date';
 
 type Subscription = {
   id: string;
@@ -62,8 +63,10 @@ export class RemindersService {
     const horizon = new Date(today);
     horizon.setUTCDate(horizon.getUTCDate() + maxLeadDays + 1);
 
+    // Un événement planifié (date future) se rappelle comme une prochaine échéance.
+    const window = { gte: today, lt: horizon };
     const events = await this.prisma.healthEvent.findMany({
-      where: { nextDueDate: { gte: today, lt: horizon } },
+      where: { OR: [{ nextDueDate: window }, { date: window }] },
       include: {
         animal: {
           include: {
@@ -81,7 +84,9 @@ export class RemindersService {
 
     const byOwner = new Map<string, OwnerReminders>();
     for (const event of events) {
-      const dueDate = new Date(event.nextDueDate as Date);
+      const due = upcomingDate(event, today, horizon);
+      if (!due) continue;
+      const dueDate = new Date(due);
       dueDate.setUTCHours(0, 0, 0, 0);
       const daysUntil = Math.round(
         (dueDate.getTime() - today.getTime()) / 86_400_000,

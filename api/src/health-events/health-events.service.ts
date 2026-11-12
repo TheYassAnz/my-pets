@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma.service';
 import { CreateHealthEventDto } from './dto/create-health-event.dto';
 import { UpdateHealthEventDto } from './dto/update-health-event.dto';
+import { upcomingDate } from './upcoming-date';
 
 @Injectable()
 export class HealthEventsService {
@@ -57,7 +58,13 @@ export class HealthEventsService {
         dosage: dto.dosage,
         vet: dto.vet,
         notes: dto.notes,
-        nextDueDate: dto.nextDueDate ? new Date(dto.nextDueDate) : undefined,
+        // null vide le champ, undefined le laisse inchangé
+        nextDueDate:
+          dto.nextDueDate === null
+            ? null
+            : dto.nextDueDate
+              ? new Date(dto.nextDueDate)
+              : undefined,
       },
     });
   }
@@ -76,24 +83,34 @@ export class HealthEventsService {
     const horizon = new Date(now);
     horizon.setUTCDate(horizon.getUTCDate() + days);
 
+    // Un événement planifié (date future) compte autant qu'une prochaine échéance.
+    const window = { gte: now, lte: horizon };
     const events = await this.prisma.healthEvent.findMany({
       where: {
-        nextDueDate: { gte: now, lte: horizon },
+        OR: [{ nextDueDate: window }, { date: window }],
         animal: { ownerId },
       },
       include: { animal: { select: { id: true, name: true } } },
-      orderBy: { nextDueDate: 'asc' },
     });
 
-    return events.map((event) => ({
-      id: event.id,
-      type: event.type,
-      title: event.title,
-      date: event.date,
-      nextDueDate: event.nextDueDate,
-      animalId: event.animal.id,
-      animalName: event.animal.name,
-    }));
+    return events
+      .flatMap((event) => {
+        const dueDate = upcomingDate(event, now, horizon);
+        if (!dueDate) return [];
+        return [
+          {
+            id: event.id,
+            type: event.type,
+            title: event.title,
+            date: event.date,
+            nextDueDate: event.nextDueDate,
+            dueDate,
+            animalId: event.animal.id,
+            animalName: event.animal.name,
+          },
+        ];
+      })
+      .sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime());
   }
 
   // L'animal doit exister ET appartenir à l'utilisateur — sinon on ne révèle rien

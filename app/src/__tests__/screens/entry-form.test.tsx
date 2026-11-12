@@ -3,14 +3,25 @@ import { router } from 'expo-router';
 
 import { EntryForm } from '@/components/entry-form';
 import { ToastProvider } from '@/components/ui';
+import { toIsoDate } from '@/lib/dates';
 
 const mockCreateEvent = jest.fn();
 const mockAddWeight = jest.fn();
+const mockUpdateEvent = jest.fn();
+const mockPicker = jest.fn();
+
+jest.mock('@expo/ui/community/datetime-picker', () => ({
+  DateTimePicker: (props: unknown) => {
+    mockPicker(props);
+    return null;
+  },
+}));
 
 jest.mock('@/lib/api', () => ({
   api: {
     createEvent: (...a: unknown[]) => mockCreateEvent(...a),
     addWeight: (...a: unknown[]) => mockAddWeight(...a),
+    updateEvent: (...a: unknown[]) => mockUpdateEvent(...a),
   },
 }));
 jest.mock('react-native-safe-area-context', () => ({
@@ -28,12 +39,15 @@ const setup = () =>
   );
 
 const save = () => fireEvent.press(screen.getByLabelText('Enregistrer'));
+const openDatePicker = () => fireEvent.press(screen.getByLabelText(/^Date,/));
+const lastPickerProps = () => mockPicker.mock.calls.at(-1)[0];
 
 beforeEach(() => {
   jest.clearAllMocks();
   jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate', 'setTimeout', 'queueMicrotask'], now: new Date(`${TODAY}T12:00:00`) });
   mockCreateEvent.mockResolvedValue({});
   mockAddWeight.mockResolvedValue({});
+  mockUpdateEvent.mockResolvedValue({});
 });
 afterEach(() => jest.useRealTimers());
 
@@ -127,5 +141,112 @@ describe('Nouvelle entrée', () => {
     });
     expect(mockAddWeight).toHaveBeenCalledTimes(1);
     await act(async () => resolve());
+  });
+
+  it('visite : date future acceptée', async () => {
+    await setup();
+    await fireEvent.press(screen.getByLabelText('Visite'));
+    await openDatePicker();
+    expect(lastPickerProps().maximumDate).toBeUndefined();
+    await act(async () => lastPickerProps().onValueChange(null, new Date(2026, 11, 1)));
+    await fireEvent.press(screen.getByText('Valider'));
+    await fireEvent.changeText(screen.getByLabelText('Motif'), 'Contrôle');
+    await save();
+    expect(mockCreateEvent).toHaveBeenCalledWith('a1', expect.objectContaining({ type: 'VISIT', date: '2026-12-01' }));
+  });
+
+  it('poids : date bornée à aujourd’hui', async () => {
+    await setup();
+    await fireEvent.press(screen.getByLabelText('Poids'));
+    await openDatePicker();
+    expect(toIsoDate(lastPickerProps().maximumDate)).toBe(TODAY);
+  });
+
+  it('vaccin → poids : une date future reportée est refusée, aucun appel', async () => {
+    await setup();
+    await openDatePicker();
+    await act(async () => lastPickerProps().onValueChange(null, new Date(2026, 11, 1)));
+    await fireEvent.press(screen.getByText('Valider'));
+    await fireEvent.press(screen.getByLabelText('Poids'));
+    await fireEvent.changeText(screen.getByLabelText('Poids (kg)'), '4,2');
+    await save();
+    expect(await screen.findByText('La date ne peut pas être dans le futur')).toBeTruthy();
+    expect(mockAddWeight).not.toHaveBeenCalled();
+  });
+});
+
+describe('Modifier l’entrée', () => {
+  const event = {
+    id: 'e1', type: 'VACCINE', title: 'Rage', date: '2026-11-21T00:00:00.000Z',
+    dosage: '1 ml', vet: null, notes: null, nextDueDate: '2026-11-29T00:00:00.000Z',
+  } as never;
+  const setupEdit = (onDelete?: () => void) =>
+    render(
+      <ToastProvider>
+        <EntryForm animalId="a1" animal={{ name: 'Nala', photoUrl: null }} event={event} onDelete={onDelete} />
+      </ToastProvider>,
+    );
+
+  it('affiche le titre, les valeurs initiales, sans Poids ni Dosage', async () => {
+    await setupEdit();
+    expect(screen.getByText('Modifier l\'entrée')).toBeTruthy();
+    expect(screen.getByLabelText('Produit').props.value).toBe('Rage');
+    expect(screen.queryByLabelText('Poids')).toBeNull();
+    expect(screen.queryByLabelText('Dosage')).toBeNull();
+  });
+
+  it('enregistrer sans modifier : updateEvent sans dosage, toast, retour', async () => {
+    await setupEdit();
+    await save();
+    expect(mockUpdateEvent).toHaveBeenCalledWith('a1', 'e1', {
+      type: 'VACCINE', title: 'Rage', date: '2026-11-21', notes: null, nextDueDate: '2026-11-29',
+    });
+    expect(await screen.findByText('Entrée mise à jour')).toBeTruthy();
+    expect(router.back).toHaveBeenCalled();
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+  });
+
+  it('vider la prochaine échéance envoie null', async () => {
+    await setupEdit();
+    await fireEvent.press(screen.getByLabelText(/^Effacer/));
+    await save();
+    expect(mockUpdateEvent).toHaveBeenCalledWith('a1', 'e1', expect.objectContaining({ nextDueDate: null }));
+  });
+
+  it('passer en Visite conserve le titre, envoie vet null et nextDueDate null', async () => {
+    await setupEdit();
+    await fireEvent.press(screen.getByLabelText('Visite'));
+    expect(screen.getByLabelText('Motif').props.value).toBe('Rage');
+    await fireEvent.changeText(screen.getByLabelText('Note'), 'RAS');
+    await save();
+    const payload = mockUpdateEvent.mock.calls[0][2];
+    expect(payload).toEqual({ type: 'VISIT', title: 'Rage', date: '2026-11-21', notes: 'RAS', vet: null, nextDueDate: null });
+  });
+
+  it('Supprimer appelle onDelete', async () => {
+    const onDelete = jest.fn();
+    await setupEdit(onDelete);
+    await fireEvent.press(screen.getByLabelText('Supprimer'));
+    expect(onDelete).toHaveBeenCalled();
+  });
+
+  it('visite existante : nextDueDate hérité non envoyé', async () => {
+    const visit = { ...(event as object), type: 'VISIT', nextDueDate: '2026-12-15T00:00:00.000Z' } as never;
+    await render(
+      <ToastProvider>
+        <EntryForm animalId="a1" event={visit} />
+      </ToastProvider>,
+    );
+    await save();
+    expect(mockUpdateEvent.mock.calls[0][2]).not.toHaveProperty('nextDueDate');
+  });
+
+  it('changer de type efface l’erreur précédente', async () => {
+    mockUpdateEvent.mockRejectedValueOnce(new Error('Serveur indisponible'));
+    await setupEdit();
+    await save();
+    expect(await screen.findByText('Serveur indisponible')).toBeTruthy();
+    await fireEvent.press(screen.getByLabelText('Soin'));
+    expect(screen.queryByText('Serveur indisponible')).toBeNull();
   });
 });

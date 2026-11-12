@@ -66,7 +66,7 @@ api/          NestJS + Prisma backend
   src/export/            GET /animals/:animalId/export — full health record PDF (pdfkit)
   src/storage/           SupabaseStorageService (service-role key, server-side only)
 app/          Expo front, web target only (Expo Router, NativeWind)
-  src/app/               file-based routes: sign-in, sign-up, (app)/animals/…/events/…
+  src/app/               file-based routes: sign-in, sign-up, (app)/(tabs)/ (tab bar: index = Mes animaux, upcoming = À venir, account = Compte), (app)/animals/…/events/…
   src/lib/               api.ts (HTTP client, in-memory token, single-flight refresh), auth-context.tsx, health-events.ts,
                          notifications.ts (Web Push subscription), pwa.ts (service worker registration),
                          dialog.ts (confirm/alert), export.ts (PDF browser download)
